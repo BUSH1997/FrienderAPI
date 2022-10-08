@@ -19,7 +19,7 @@ func (u eventUsecase) GetEventById(ctx context.Context, id string) (models.Event
 	return u.Events.GetEventById(ctx, id)
 }
 
-func (u eventUsecase) GetUserEvents(ctx context.Context, id string) ([]models.Event, error) {
+func (u eventUsecase) GetUserEvents(ctx context.Context, id int64) ([]models.Event, error) {
 	return u.Events.GetUserEvents(ctx, id)
 }
 

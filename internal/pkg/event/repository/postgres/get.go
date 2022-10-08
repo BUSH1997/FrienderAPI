@@ -163,6 +163,34 @@ func (r eventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 	return ret, nil
 }
 
-func (r eventRepository) GetUserEvents(ctx context.Context, id string) ([]models.Event, error) {
-	return nil, nil
+func (r eventRepository) GetUserEvents(ctx context.Context, id int64) ([]models.Event, error) {
+	var ret []models.Event
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvents []db_models.Event
+		res := r.db.Model(&db_models.Event{}).
+			Joins("JOIN event_sharings on event_sharings.event_id = events.id").
+			Joins("JOIN users on event_sharings.user_id = users.id").
+			Find(&dbEvents, "users.uid = ?", id)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user events")
+		}
+
+		ret = make([]models.Event, 0, len(dbEvents))
+		for _, dbEvent := range dbEvents {
+			event, err := r.GetEventById(ctx, dbEvent.Uid)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
+			}
+
+			ret = append(ret, event)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction")
+	}
+
+	return ret, nil
 }

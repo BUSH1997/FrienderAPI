@@ -11,6 +11,6 @@ type Repository interface {
 	GetAllPublic(ctx context.Context) ([]models.Event, error)
 	GetAll(ctx context.Context) ([]models.Event, error)
 	GetEventById(ctx context.Context, id string) (models.Event, error)
-	GetUserEvents(ctx context.Context, id string) ([]models.Event, error)
+	GetUserEvents(ctx context.Context, id int64) ([]models.Event, error)
 	UploadImage(ctx context.Context, uid string, link string) error
 }

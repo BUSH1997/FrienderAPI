@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
 )
 
 type EventHandler struct {
@@ -64,12 +65,20 @@ func (eh *EventHandler) GetEvents(ctx echo.Context) error {
 }
 
 func (eh *EventHandler) GetEventsUser(ctx echo.Context) error {
-	idString := ctx.QueryParams().Get("id")
+	idString := ctx.Param("id")
 	if idString == "" {
 		return ctx.NoContent(http.StatusBadRequest)
 	}
 
-	events, err := eh.useCase.GetUserEvents(ctx.Request().Context(), idString)
+	id, err := strconv.ParseInt(idString, 10, 32)
+	if err != nil {
+		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
+			Errorf("failed to get user events")
+
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	events, err := eh.useCase.GetUserEvents(ctx.Request().Context(), id)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to get user events")
 		return ctx.NoContent(http.StatusInternalServerError)
