@@ -7,11 +7,13 @@ import (
 )
 
 func (us *ImageUseCase) UploadImage(ctx context.Context, file *multipart.FileHeader, uid string) error {
-	err := us.repositoryFS.UploadImage(ctx, file)
+	err := us.imageRepository.UploadImage(ctx, file)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	return us.repositoryPostgres.UploadImage(ctx, uid, file.Filename)
+	link := "https://friender.hb.bizmrg.com/" + file.Filename
+
+	return us.eventRepository.UploadImage(ctx, uid, link)
 }
