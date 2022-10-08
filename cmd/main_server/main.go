@@ -40,5 +40,5 @@ func main() {
 	}
 	serverRouting.ConfigRouting(router)
 
-	router.Logger.Fatal(router.Start(":8080"))
+	router.Logger.Fatal(router.Start("localhost:8090"))
 }
