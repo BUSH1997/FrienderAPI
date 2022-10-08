@@ -14,3 +14,7 @@ func (u eventUsecase) GetAllPublic(ctx context.Context) ([]models.Event, error) 
 
 	return events, nil
 }
+
+func (u eventUsecase) GetEventById(ctx context.Context, id string) (models.Event, error) {
+	return u.Events.GetEventById(ctx, id)
+}
