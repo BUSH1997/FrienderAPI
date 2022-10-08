@@ -6,7 +6,7 @@ import (
 )
 
 type Usecase interface {
-	Create(ctx context.Context, event models.Event) error
+	Create(ctx context.Context, event models.Event) (models.Event, error)
 	Update(ctx context.Context, event models.Event) error
 	GetAllPublic(ctx context.Context) ([]models.Event, error)
 	GetAll(ctx context.Context) ([]models.Event, error)

@@ -24,11 +24,12 @@ func (eh *EventHandler) CreateEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	if err := eh.useCase.Create(ctx.Request().Context(), newEvent); err != nil {
+	event, err := eh.useCase.Create(ctx.Request().Context(), newEvent)
+	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	return ctx.JSON(http.StatusOK, 5)
+	return ctx.JSON(http.StatusOK, event)
 }
 
 func (eh *EventHandler) GetOneEvent(ctx echo.Context) error {
