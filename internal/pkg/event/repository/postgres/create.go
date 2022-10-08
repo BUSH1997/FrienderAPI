@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"strconv"
@@ -12,7 +13,7 @@ import (
 )
 
 func (r eventRepository) Create(ctx context.Context, event models.Event) error {
-	dbEvent := Event{
+	dbEvent := db_models.Event{
 		Uid:         event.Uid,
 		Title:       event.Title,
 		Description: event.Description,
@@ -23,7 +24,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 		IsPublic:    event.IsPublic,
 	}
 
-	dbCategory := Category{}
+	dbCategory := db_models.Category{}
 
 	res := r.db.Take(&dbCategory, "name = ?", event.Category)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
@@ -41,7 +42,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 	dbEvent.Images = strings.Join(event.Images, ",")
 	dbEvent.Geo = strconv.Itoa(int(event.GeoData.Longitude)) + "," + strconv.Itoa(int(event.GeoData.Latitude))
 
-	dbUser := User{}
+	dbUser := db_models.User{}
 
 	res = r.db.Take(&dbUser, "uid = ?", event.Author)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
@@ -63,7 +64,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 		return errors.Wrapf(err, "failed to create event, uid %s", event.Uid)
 	}
 
-	dbEventSharings := EventSharing{}
+	dbEventSharings := db_models.EventSharing{}
 	dbEventSharings.EventID = int(dbEvent.ID)
 	dbEventSharings.UserID = int(dbUser.ID)
 
@@ -75,7 +76,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 	return nil
 }
 
-func (r eventRepository) createUser(ctx context.Context, user *User) error {
+func (r eventRepository) createUser(ctx context.Context, user *db_models.User) error {
 	res := r.db.Create(user)
 	if err := res.Error; err != nil {
 		return errors.Wrapf(err, "failed to create user")
@@ -84,7 +85,7 @@ func (r eventRepository) createUser(ctx context.Context, user *User) error {
 	return nil
 }
 
-func (r eventRepository) createCategory(ctx context.Context, category *Category) error {
+func (r eventRepository) createCategory(ctx context.Context, category *db_models.Category) error {
 	res := r.db.Create(category)
 	if err := res.Error; err != nil {
 		return errors.Wrapf(err, "failed to create category")

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 )
 
 func (r eventRepository) GetAllPublic(ctx context.Context) ([]models.Event, error) {
-	var dbEvents []Event
+	var dbEvents []db_models.Event
 
 	res := r.db.Find(&dbEvents, "is_public = ?", true)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
@@ -37,25 +38,25 @@ func (r eventRepository) GetAllPublic(ctx context.Context) ([]models.Event, erro
 }
 
 func (r eventRepository) GetEventById(ctx context.Context, id string) (models.Event, error) {
-	var dbEvent Event
+	var dbEvent db_models.Event
 	res := r.db.Take(&dbEvent, "uid = ?", id)
 	if err := res.Error; err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to get event by id")
 	}
 
-	var dbUser User
+	var dbUser db_models.User
 	res = r.db.Take(&dbUser, "id = ?", dbEvent.Owner)
 	if err := res.Error; err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to get owner id")
 	}
 
-	var dbCategory Category
+	var dbCategory db_models.Category
 	res = r.db.Take(&dbCategory, "id = ?", dbEvent.Category)
 	if err := res.Error; err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to get category id")
 	}
 
-	var dbEventSharings []EventSharing
+	var dbEventSharings []db_models.EventSharing
 
 	res = r.db.
 		Joins("JOIN events on event_sharings.event_id = events.id").
@@ -70,7 +71,7 @@ func (r eventRepository) GetEventById(ctx context.Context, id string) (models.Ev
 		memberDBIDs = append(memberDBIDs, eventSharing.UserID)
 	}
 
-	var dbMembers []User
+	var dbMembers []db_models.User
 	res = r.db.Find(&dbMembers, memberDBIDs)
 	if err := res.Error; err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to get members")
@@ -119,7 +120,7 @@ func (r eventRepository) GetEventById(ctx context.Context, id string) (models.Ev
 }
 
 func (r eventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
-	var dbEvents []Event
+	var dbEvents []db_models.Event
 	res := r.db.Find(&dbEvents)
 	if err := res.Error; err != nil {
 		return nil, errors.Wrap(err, "failed to get all events")

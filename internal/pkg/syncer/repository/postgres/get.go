@@ -2,12 +2,13 @@ package postgres
 
 import (
 	"context"
+	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"time"
 )
 
 func (r syncerRepository) GetUpdatedTime(ctx context.Context) (time.Time, error) {
-	var syncer Syncer
+	var syncer db_models.Syncer
 
 	res := r.db.Take(&syncer)
 	if err := res.Error; err != nil {
