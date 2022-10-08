@@ -3,7 +3,6 @@ package models
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"strconv"
 	"time"
 	_ "time"
 )
@@ -36,7 +35,7 @@ type Geo struct {
 }
 
 func (e Event) GetEtag() string {
-	s := []byte(e.Uid + e.Title + strconv.Itoa(int(e.StartsAt)))
+	s := []byte(e.Title)
 
 	hasher := sha256.New()
 	hasher.Write(s)

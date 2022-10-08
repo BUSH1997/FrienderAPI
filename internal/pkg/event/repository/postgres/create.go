@@ -25,8 +25,15 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 
 	dbCategory := Category{}
 
-	res := r.db.First(&dbCategory, "name = ?", event.Category)
-	if err := res.Error; err != nil {
+	res := r.db.Take(&dbCategory, "name = ?", event.Category)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		dbCategory.Name = string(event.Category)
+		err := r.createCategory(ctx, &dbCategory)
+		if err != nil {
+			return errors.Wrap(err, "failed to create category")
+		}
+	}
+	if err := res.Error; err != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		return errors.Wrap(err, "failed to get event category")
 	}
 
@@ -72,6 +79,15 @@ func (r eventRepository) createUser(ctx context.Context, user *User) error {
 	res := r.db.Create(user)
 	if err := res.Error; err != nil {
 		return errors.Wrapf(err, "failed to create user")
+	}
+
+	return nil
+}
+
+func (r eventRepository) createCategory(ctx context.Context, category *Category) error {
+	res := r.db.Create(category)
+	if err := res.Error; err != nil {
+		return errors.Wrapf(err, "failed to create category")
 	}
 
 	return nil
