@@ -56,6 +56,10 @@ func convertEventsToModes(data PublicEventsData) []models.Event {
 			Images:      []string{value.PosterImage.DefaultURL, value.PosterImage.UploadCareURL},
 		}
 
+		if value.PosterImage.DefaultURL == "" {
+			event.Images = []string{"https://friender.hb.bizmrg.com/62f5e7ed-fb13-49e9-8af8-9ef627e697d1.jpeg"}
+		}
+
 		events = append(events, event)
 	}
 
