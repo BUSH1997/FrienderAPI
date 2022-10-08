@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/BUSH1997/FrienderAPI/config"
+	"github.com/BUSH1997/FrienderAPI/config/configMiddleware"
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
@@ -48,6 +49,7 @@ func main() {
 		EventHandler: eventHandler,
 		ImageHandler: imageHandler,
 	}
+	configMiddleware.ConfigMiddleware(router)
 	serverRouting.ConfigRouting(router)
 
 	router.Logger.Fatal(router.Start("localhost:8090"))
