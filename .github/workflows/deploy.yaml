@@ -54,5 +54,5 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script: |
              chmod -R 755 ~/testfriender/FrienderAPI/build/main_server
-             sudo service azot_api restart
+             sudo service vkevents restart
 
