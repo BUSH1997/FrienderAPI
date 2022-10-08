@@ -121,7 +121,7 @@ func separateNewAndOldEvents(
 	existingEvents []models.Event,
 	externalEvents []models.Event,
 ) ([]models.Event, []models.Event) {
-	existingEventsMap := make(map[int]bool)
+	existingEventsMap := make(map[string]bool)
 	for _, existingEvent := range existingEvents {
 		existingEventsMap[existingEvent.Uid] = true
 	}
@@ -142,7 +142,7 @@ func separateNewAndOldEvents(
 }
 
 func getChangedEvents(existingEvents []models.Event, externalEvents []models.Event) []models.Event {
-	existingEventsMap := make(map[int]string)
+	existingEventsMap := make(map[string]string)
 	for _, existingEvent := range existingEvents {
 		existingEventsMap[existingEvent.Uid] = existingEvent.GetEtag()
 	}

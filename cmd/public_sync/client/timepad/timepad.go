@@ -47,9 +47,9 @@ func convertEventsToModes(data PublicEventsData) []models.Event {
 	events := make([]models.Event, 0, len(data.Values))
 	for _, value := range data.Values {
 		event := models.Event{
-			Uid:      value.ID,
+			Uid:      strconv.Itoa(value.ID),
 			Title:    value.Name,
-			StartsAt: value.StartsAt.Time,
+			StartsAt: value.StartsAt.Time.Unix(),
 			IsPublic: true,
 		}
 
