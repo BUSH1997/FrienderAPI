@@ -1,8 +1,8 @@
 syncer:
-  sync_offset: 10s
+  sync_offset: 1d
   wait_time: 1s
   resync_delay_after_fail: 1h
-  url: https://api.timepad.ru/v1/events.json?limit=100&skip=0&cities=Москва&fields=location&sort=+starts_at&starts_at_min=2022-09-29T21:00:00
+  url: https://api.timepad.ru/v1/events.json?limit=100&skip=0&cities=Москва&fields=location,description_short&sort=+starts_at&starts_at_min=2022-10-08T21:00:00
 postgres:
   host: localhost
   port: 5432

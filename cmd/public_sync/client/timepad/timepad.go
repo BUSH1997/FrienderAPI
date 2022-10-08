@@ -47,10 +47,13 @@ func convertEventsToModes(data PublicEventsData) []models.Event {
 	events := make([]models.Event, 0, len(data.Values))
 	for _, value := range data.Values {
 		event := models.Event{
-			Uid:      strconv.Itoa(value.ID),
-			Title:    value.Name,
-			StartsAt: value.StartsAt.Time.Unix(),
-			IsPublic: true,
+			Uid:         strconv.Itoa(value.ID),
+			Title:       value.Name,
+			StartsAt:    value.StartsAt.Time.Unix(),
+			IsPublic:    true,
+			Category:    models.Category(value.Categories[0].Name),
+			Description: value.Description,
+			Images:      []string{value.PosterImage.DefaultURL, value.PosterImage.UploadCareURL},
 		}
 
 		events = append(events, event)
@@ -121,6 +124,7 @@ type Value struct {
 	ID          int         `json:"id"`
 	StartsAt    CustomTime  `json:"starts_at"`
 	Name        string      `json:"name"`
+	Description string      `json:"description_short"`
 	URL         string      `json:"url"`
 	PosterImage PosterImage `json:"poster_image"`
 	Location    Location    `json:"location"`

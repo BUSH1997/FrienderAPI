@@ -13,7 +13,16 @@ func (u eventUsecase) Create(ctx context.Context, event models.Event) (models.Ev
 		return models.Event{}, errors.Wrap(err, "failed to  generate uuid")
 	}
 
-	event.Uid = uid.String()
+	if !event.IsPublic {
+		event.Uid = uid.String()
+	}
+
+	if event.IsPublic {
+		event.GeoData = models.Geo{
+			Longitude: 127,
+			Latitude:  127,
+		}
+	}
 
 	err = u.Events.Create(ctx, event)
 	if err != nil {
