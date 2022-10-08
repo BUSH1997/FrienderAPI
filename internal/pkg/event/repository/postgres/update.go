@@ -3,18 +3,19 @@ package postgres
 import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 )
 
 func (r eventRepository) Update(ctx context.Context, event models.Event) error {
-	dbEvent := Event{
+	dbEvent := db_models.Event{
 		Uid:      event.Uid,
 		Title:    event.Title,
 		StartsAt: event.StartsAt,
 		IsPublic: event.IsPublic,
 	}
 
-	res := r.db.Model(&Event{}).Where("uid = ?", dbEvent.Uid).Updates(map[string]interface{}{
+	res := r.db.Model(&db_models.Event{}).Where("uid = ?", dbEvent.Uid).Updates(map[string]interface{}{
 		"uid":       dbEvent.Uid,
 		"title":     dbEvent.Title,
 		"starts_at": dbEvent.StartsAt,
