@@ -34,11 +34,6 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 	dbEvent.Images = strings.Join(event.Images, ",")
 	dbEvent.Geo = strconv.Itoa(int(event.GeoData.Longitude)) + "," + strconv.Itoa(int(event.GeoData.Latitude))
 
-	res = r.db.Create(&dbEvent)
-	if err := res.Error; err != nil {
-		return errors.Wrapf(err, "failed to create event, uid %s", event.Uid)
-	}
-
 	dbUser := User{}
 
 	res = r.db.Take(&dbUser, "uid = ?", event.Author)
@@ -52,6 +47,13 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 	}
 	if err := res.Error; err != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		return errors.Wrap(err, "failed to get event category")
+	}
+
+	dbEvent.Owner = int(dbUser.ID)
+
+	res = r.db.Create(&dbEvent)
+	if err := res.Error; err != nil {
+		return errors.Wrapf(err, "failed to create event, uid %s", event.Uid)
 	}
 
 	dbEventSharings := EventSharing{}

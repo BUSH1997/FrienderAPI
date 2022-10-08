@@ -22,3 +22,12 @@ func (u eventUsecase) GetEventById(ctx context.Context, id string) (models.Event
 func (u eventUsecase) GetUserEvents(ctx context.Context, id string) ([]models.Event, error) {
 	return u.Events.GetUserEvents(ctx, id)
 }
+
+func (u eventUsecase) GetAll(ctx context.Context) ([]models.Event, error) {
+	events, err := u.Events.GetAll(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get all events in usecase")
+	}
+
+	return events, nil
+}

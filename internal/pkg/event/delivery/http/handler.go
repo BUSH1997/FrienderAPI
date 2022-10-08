@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/labstack/echo/v4"
@@ -31,8 +32,9 @@ func (eh *EventHandler) CreateEvent(ctx echo.Context) error {
 }
 
 func (eh *EventHandler) GetOneEvent(ctx echo.Context) error {
-	idString := ctx.QueryParams().Get("id")
+	idString := ctx.Param("id")
 	if idString == "" {
+		fmt.Println("LOL3")
 		return ctx.NoContent(http.StatusBadRequest)
 	}
 
@@ -45,7 +47,7 @@ func (eh *EventHandler) GetOneEvent(ctx echo.Context) error {
 }
 
 func (eh *EventHandler) GetEvents(ctx echo.Context) error {
-	events, err := eh.useCase.GetAllPublic(ctx.Request().Context())
+	events, err := eh.useCase.GetAll(ctx.Request().Context())
 	if err != nil {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}

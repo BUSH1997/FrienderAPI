@@ -13,6 +13,7 @@ type Event struct {
 	TimeCreated time.Time `gorm:"column:time_created"`
 	TimeUpdated time.Time `gorm:"column:time_updated"`
 	Geo         string    `gorm:"column:geo"`
+	Owner       int       `gorm:"column:owner_id"`
 	IsGroup     bool      `gorm:"column:is_group"`
 	IsPublic    bool      `gorm:"column:is_public"`
 }

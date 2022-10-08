@@ -12,6 +12,7 @@ require (
 require github.com/spf13/viper v1.13.0
 
 require (
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/sirupsen/logrus v1.6.0
 )
