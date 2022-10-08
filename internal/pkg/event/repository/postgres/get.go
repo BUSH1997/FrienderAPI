@@ -36,3 +36,7 @@ func (r eventRepository) GetAllPublic(ctx context.Context) ([]models.Event, erro
 func (r eventRepository) GetEventById(ctx context.Context, id string) (models.Event, error) {
 	return models.Event{}, nil
 }
+
+func (r eventRepository) GetUserEvents(ctx context.Context, id string) ([]models.Event, error) {
+	return nil, nil
+}

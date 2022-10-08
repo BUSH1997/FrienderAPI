@@ -45,9 +45,24 @@ func (eh *EventHandler) GetOneEvent(ctx echo.Context) error {
 }
 
 func (eh *EventHandler) GetEvents(ctx echo.Context) error {
-	return ctx.JSON(http.StatusOK, 5)
+	events, err := eh.useCase.GetAllPublic(ctx.Request().Context())
+	if err != nil {
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	return ctx.JSON(http.StatusOK, events)
 }
 
 func (eh *EventHandler) GetEventsUser(ctx echo.Context) error {
-	return ctx.JSON(http.StatusOK, 5)
+	idString := ctx.QueryParams().Get("id")
+	if idString == "" {
+		return ctx.NoContent(http.StatusBadRequest)
+	}
+
+	events, err := eh.useCase.GetUserEvents(ctx.Request().Context(), idString)
+	if err != nil {
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	return ctx.JSON(http.StatusOK, events)
 }
