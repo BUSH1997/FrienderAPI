@@ -15,9 +15,14 @@ func (r *ImageRepositoryBD) UploadImage(ctx context.Context, uid string, fileNam
 		return errors.Wrap(err, "failed to get event by uid")
 	}
 
+	var dbImages string
 	images := strings.Split(dbEvent.Images, ",")
-	images = append(images, fileName)
-	dbImages := strings.Join(images, ",")
+	if len(images) != 0 {
+		images = append(images, fileName)
+		dbImages = strings.Join(images, ",")
+	} else {
+		dbImages = fileName
+	}
 
 	res = r.db.Model(&event_repo.Event{}).Where("uid = ?", dbEvent.Uid).Update("images", dbImages)
 	if err := res.Error; err != nil {
