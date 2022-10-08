@@ -5,22 +5,23 @@ import (
 	"encoding/hex"
 	"strconv"
 	"time"
+	_ "time"
 )
 
 type Event struct {
-	Uid         string
-	Title       string
-	Description string
-	Members     []int
-	Images      []string
-	TimeCreated time.Time
-	TimeUpdated time.Time
-	GeoData     Geo
-	Author      int
-	StartsAt    time.Time
-	IsGroup     bool
-	IsPublic    bool
-	Category    Category
+	Uid         string    `json:id, omitempty`
+	Title       string    `json:title, omitempty`
+	Description string    `json:description, omitempty`
+	Members     []int     `json:members, omitempty`
+	Images      []string  `json:images, omitempty`
+	TimeCreated time.Time `json:time_created, omitempty`
+	TimeUpdated time.Time `json:time_update, omitempty`
+	GeoData     Geo       `json:geo, omitempty`
+	Author      int       `json:author, omitempty`
+	StartsAt    time.Time `json:time_start, omitempty`
+	IsGroup     bool      `json:is_group, omitempty`
+	IsPublic    bool      `json:is_public, omitempty`
+	Category    Category  `json:category, omitempty`
 }
 
 type Category string
