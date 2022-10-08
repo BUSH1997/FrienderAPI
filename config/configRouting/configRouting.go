@@ -11,4 +11,7 @@ type ServerConfigRouting struct {
 
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("event/create", sc.EventHandler.CreateEvent)
+	router.GET("event/:id", sc.EventHandler.GetOneEvent)
+	router.GET("events", sc.EventHandler.GetEvents)
+	router.GET("events/:id", sc.EventHandler.GetEventsUser)
 }
