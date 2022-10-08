@@ -21,7 +21,7 @@ type Config struct {
 
 func LoadConfig(config *Config, path string) error {
 	viper.AddConfigPath(path)
-	viper.SetConfigName("/home/ubuntu/testfriender/FrienderAPI/config/public_sync")
+	viper.SetConfigName("public_sync")
 	viper.SetConfigType("yaml")
 
 	viper.AutomaticEnv()

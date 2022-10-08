@@ -24,7 +24,7 @@ var (
 
 func main() {
 	configApp := config.Config{}
-	err := config.LoadConfig(&configApp, "config")
+	err := config.LoadConfig(&configApp, "/home/ubuntu/testfriender/FrienderAPI/config/")
 	if err != nil {
 		panic(err)
 	}
