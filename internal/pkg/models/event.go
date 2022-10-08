@@ -8,16 +8,36 @@ import (
 )
 
 type Event struct {
-	Uid      int
-	Title    string
-	StartsAt time.Time
-	IsPublic bool
+	Uid         string
+	Title       string
+	Description string
+	Members     []int
+	Images      []string
+	TimeCreated time.Time
+	TimeUpdated time.Time
+	GeoData     Geo
+	Author      int
+	StartsAt    time.Time
+	IsGroup     bool
+	IsPublic    bool
+	Category    Category
+}
+
+type Category string
+
+const (
+	Sport Category = "SPORT"
+)
+
+type Geo struct {
+	Longitude float64
+	Latitude  float64
 }
 
 func (e Event) GetEtag() string {
 	timeStamp := e.StartsAt.Unix()
 
-	s := []byte(strconv.Itoa(e.Uid) + e.Title + strconv.Itoa(int(timeStamp)))
+	s := []byte(e.Uid + e.Title + strconv.Itoa(int(timeStamp)))
 
 	hasher := sha256.New()
 	hasher.Write(s)
