@@ -1,3 +1,7 @@
+.PHONY: build
+build:
+	go build -o ./build/main_server/main ./cmd/main_server
+
 ROOT_PATH = $(PWD)
 BIN_OUTPUT_PATH = $(ROOT_PATH)/bin
 
@@ -13,6 +17,6 @@ build_public_sync:
 tidy:
 	go mod tidy
 
-#.PHONY: generate
-#generate:
-#	protoc --go_out=. --go-grpc_out=. --proto_path=$(ROOT_PATH)/grpc $(ROOT_PATH)/grpc/api.proto
+.PHONY: generate
+generate:
+	protoc --go_out=. --go-grpc_out=. --proto_path=$(ROOT_PATH)/grpc $(ROOT_PATH)/grpc/api.proto
