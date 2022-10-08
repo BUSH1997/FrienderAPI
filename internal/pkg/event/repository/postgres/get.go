@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
@@ -12,133 +11,186 @@ import (
 )
 
 func (r eventRepository) GetAllPublic(ctx context.Context) ([]models.Event, error) {
-	var dbEvents []db_models.Event
+	var events []models.Event
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvents []db_models.Event
 
-	res := r.db.Find(&dbEvents, "is_public = ?", true)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		return nil, nil
-	}
-	if err := res.Error; err != nil {
-		return nil, errors.Wrap(err, "failed to check user")
-	}
-
-	events := make([]models.Event, 0, len(dbEvents))
-	for _, dbEvent := range dbEvents {
-		event := models.Event{
-			Uid:      dbEvent.Uid,
-			Title:    dbEvent.Title,
-			StartsAt: dbEvent.StartsAt,
-			IsPublic: dbEvent.IsPublic,
+		res := r.db.Find(&dbEvents, "is_public = ?", true)
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to check user")
 		}
 
-		events = append(events, event)
+		events = make([]models.Event, 0, len(dbEvents))
+		for _, dbEvent := range dbEvents {
+			event := models.Event{
+				Uid:      dbEvent.Uid,
+				Title:    dbEvent.Title,
+				StartsAt: dbEvent.StartsAt,
+				IsPublic: dbEvent.IsPublic,
+			}
+
+			events = append(events, event)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction")
 	}
 
 	return events, nil
 }
 
 func (r eventRepository) GetEventById(ctx context.Context, id string) (models.Event, error) {
-	var dbEvent db_models.Event
-	res := r.db.Take(&dbEvent, "uid = ?", id)
-	if err := res.Error; err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to get event by id")
-	}
+	var event models.Event
 
-	var dbUser db_models.User
-	res = r.db.Take(&dbUser, "id = ?", dbEvent.Owner)
-	if err := res.Error; err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to get owner id")
-	}
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvent db_models.Event
+		res := r.db.Take(&dbEvent, "uid = ?", id)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get event by id")
+		}
 
-	var dbCategory db_models.Category
-	res = r.db.Take(&dbCategory, "id = ?", dbEvent.Category)
-	if err := res.Error; err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to get category id")
-	}
+		var dbUser db_models.User
+		res = r.db.Take(&dbUser, "id = ?", dbEvent.Owner)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get owner id")
+		}
 
-	var dbEventSharings []db_models.EventSharing
+		var dbCategory db_models.Category
+		res = r.db.Take(&dbCategory, "id = ?", dbEvent.Category)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get category id")
+		}
 
-	res = r.db.
-		Joins("JOIN events on event_sharings.event_id = events.id").
-		Where("events.uid = ?", id).
-		Find(&dbEventSharings)
-	if err := res.Error; err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to get event sharings")
-	}
+		var dbEventSharings []db_models.EventSharing
 
-	memberDBIDs := make([]int, 0, len(dbEventSharings))
-	for _, eventSharing := range dbEventSharings {
-		memberDBIDs = append(memberDBIDs, eventSharing.UserID)
-	}
+		res = r.db.
+			Joins("JOIN events on event_sharings.event_id = events.id").
+			Where("events.uid = ?", id).
+			Find(&dbEventSharings)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get event sharings")
+		}
 
-	var dbMembers []db_models.User
-	res = r.db.Find(&dbMembers, memberDBIDs)
-	if err := res.Error; err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to get members")
-	}
+		memberDBIDs := make([]int, 0, len(dbEventSharings))
+		for _, eventSharing := range dbEventSharings {
+			memberDBIDs = append(memberDBIDs, eventSharing.UserID)
+		}
 
-	members := make([]int, 0, len(dbEventSharings))
-	for _, dbMember := range dbMembers {
-		members = append(members, dbMember.Uid)
-	}
+		var dbMembers []db_models.User
+		res = r.db.Find(&dbMembers, memberDBIDs)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get members")
+		}
 
-	event := models.Event{
-		Uid:         dbEvent.Uid,
-		Title:       dbEvent.Title,
-		Description: dbEvent.Description,
-		TimeCreated: dbEvent.TimeCreated,
-		TimeUpdated: dbEvent.TimeUpdated,
-		Author:      dbUser.Uid,
-		StartsAt:    dbEvent.StartsAt,
-		IsGroup:     dbEvent.IsGroup,
-		IsPublic:    dbEvent.IsPublic,
-		Category:    models.Category(dbCategory.Name),
-	}
+		members := make([]int, 0, len(dbEventSharings))
+		for _, dbMember := range dbMembers {
+			members = append(members, dbMember.Uid)
+		}
 
-	event.Members = members
+		event = models.Event{
+			Uid:         dbEvent.Uid,
+			Title:       dbEvent.Title,
+			Description: dbEvent.Description,
+			TimeCreated: dbEvent.TimeCreated,
+			TimeUpdated: dbEvent.TimeUpdated,
+			Author:      dbUser.Uid,
+			StartsAt:    dbEvent.StartsAt,
+			IsGroup:     dbEvent.IsGroup,
+			IsPublic:    dbEvent.IsPublic,
+			Category:    models.Category(dbCategory.Name),
+		}
 
-	longitude, err := strconv.ParseFloat(strings.Split(dbEvent.Geo, ",")[0], 32)
+		event.Members = members
+
+		longitude, err := strconv.ParseFloat(strings.Split(dbEvent.Geo, ",")[0], 32)
+		if err != nil {
+			return errors.Wrap(err, "failed to parse longitude")
+		}
+
+		latitude, err := strconv.ParseFloat(strings.Split(dbEvent.Geo, ",")[1], 32)
+		if err != nil {
+			return errors.Wrap(err, "failed to parse latitude")
+		}
+
+		event.GeoData = models.Geo{
+			Longitude: longitude,
+			Latitude:  latitude,
+		}
+
+		images := strings.Split(dbEvent.Images, ",")
+		event.Images = images
+
+		return nil
+	})
 	if err != nil {
-		fmt.Println(err, "POP")
-		return models.Event{}, errors.Wrap(err, "failed to parse longitude")
+		return models.Event{}, errors.Wrap(err, "failed to make transaction")
 	}
-
-	latitude, err := strconv.ParseFloat(strings.Split(dbEvent.Geo, ",")[1], 32)
-	if err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to parse latitude")
-	}
-
-	event.GeoData = models.Geo{
-		Longitude: longitude,
-		Latitude:  latitude,
-	}
-
-	images := strings.Split(dbEvent.Images, ",")
-	event.Images = images
 
 	return event, nil
 }
 
 func (r eventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
-	var dbEvents []db_models.Event
-	res := r.db.Find(&dbEvents)
-	if err := res.Error; err != nil {
-		return nil, errors.Wrap(err, "failed to get all events")
-	}
+	var ret []models.Event
 
-	ret := make([]models.Event, 0, len(dbEvents))
-	for _, dbEvent := range dbEvents {
-		event, err := r.GetEventById(ctx, dbEvent.Uid)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvents []db_models.Event
+		res := r.db.Find(&dbEvents)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get all events")
 		}
 
-		ret = append(ret, event)
+		ret = make([]models.Event, 0, len(dbEvents))
+		for _, dbEvent := range dbEvents {
+			event, err := r.GetEventById(ctx, dbEvent.Uid)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
+			}
+
+			ret = append(ret, event)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction")
 	}
 
 	return ret, nil
 }
 
-func (r eventRepository) GetUserEvents(ctx context.Context, id string) ([]models.Event, error) {
-	return nil, nil
+func (r eventRepository) GetUserEvents(ctx context.Context, id int64) ([]models.Event, error) {
+	var ret []models.Event
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvents []db_models.Event
+		res := r.db.Model(&db_models.Event{}).
+			Joins("JOIN event_sharings on event_sharings.event_id = events.id").
+			Joins("JOIN users on event_sharings.user_id = users.id").
+			Find(&dbEvents, "users.uid = ?", id)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user events")
+		}
+
+		ret = make([]models.Event, 0, len(dbEvents))
+		for _, dbEvent := range dbEvents {
+			event, err := r.GetEventById(ctx, dbEvent.Uid)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
+			}
+
+			ret = append(ret, event)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction")
+	}
+
+	return ret, nil
 }
