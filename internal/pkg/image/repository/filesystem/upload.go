@@ -14,7 +14,7 @@ func (r *ImageRepository) UploadImage(ctx context.Context, file *multipart.FileH
 	}
 	defer src.Close()
 
-	dst, err := os.Create(file.Filename)
+	dst, err := os.Create("/home/ubuntu/testfriender/static" + file.Filename)
 	if err != nil {
 		return err
 	}
