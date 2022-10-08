@@ -12,7 +12,7 @@ type eventRepository struct {
 }
 
 func New(db *gorm.DB, logger *logrus.Logger) event.Repository {
-	return eventRepository{
+	return &eventRepository{
 		db:     db,
 		logger: logger,
 	}
