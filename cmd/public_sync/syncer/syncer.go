@@ -91,7 +91,7 @@ func (s PublicSyncer) syncPublicEvents(ctx context.Context) error {
 	newEvents, changedEvents := getEventsToImport(existingEvents, externalEvents)
 
 	for _, newEvent := range newEvents {
-		err = s.Events.Create(ctx, newEvent)
+		_, err = s.Events.Create(ctx, newEvent)
 		if err != nil {
 			return errors.Wrapf(err, "failed to create public event, uid: %d", newEvent.Uid)
 		}
