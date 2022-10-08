@@ -1,5 +1,5 @@
 syncer:
-  sync_offset: 1d
+  sync_offset: 24h
   wait_time: 1s
   resync_delay_after_fail: 1h
   url: https://api.timepad.ru/v1/events.json?limit=100&skip=0&cities=Москва&fields=location,description_short&sort=+starts_at&starts_at_min=2022-10-08T21:00:00
