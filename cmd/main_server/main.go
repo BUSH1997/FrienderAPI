@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/BUSH1997/FrienderAPI/config"
 	"github.com/BUSH1997/FrienderAPI/config/configMiddleware"
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
@@ -23,6 +24,7 @@ var (
 )
 
 func main() {
+	fmt.Println("test actions")
 	configApp := config.Config{}
 	err := config.LoadConfig(&configApp, "/home/ubuntu/testfriender/FrienderAPI/config/")
 	if err != nil {
