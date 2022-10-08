@@ -26,7 +26,7 @@ var (
 func main() {
 	fmt.Println("test actions")
 	configApp := config.Config{}
-	err := config.LoadConfig(&configApp, "/home/ubuntu/testfriender/FrienderAPI/config/")
+	err := config.LoadConfig(&configApp, "config")
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +39,7 @@ func main() {
 
 	eventRepo := postgres.New(db, logger)
 	eventUsecase := usecase.New(eventRepo, logger)
-	eventHandler := http.NewEventHandler(eventUsecase)
+	eventHandler := http.NewEventHandler(eventUsecase, logger)
 
 	imageRepo := s3.New(logger)
 	imageUseCase := imageUseCase.New(imageRepo, eventRepo, logger)

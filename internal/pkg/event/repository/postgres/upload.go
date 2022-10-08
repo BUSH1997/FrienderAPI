@@ -4,21 +4,29 @@ import (
 	"context"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 	"strings"
 )
 
 func (r *eventRepository) UploadImage(ctx context.Context, uid string, link string) error {
-	var dbEvent db_models.Event
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvent db_models.Event
 
-	res := r.db.Take(&dbEvent, "uid = ?", uid)
-	if err := res.Error; err != nil {
-		return errors.Wrap(err, "failed to get event by uid")
-	}
+		res := r.db.Take(&dbEvent, "uid = ?", uid)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get event by uid")
+		}
 
-	res = r.db.Model(&db_models.Event{}).
-		Where("uid = ?", dbEvent.Uid).Update("images", buildImageLink(dbEvent.Images, link))
-	if err := res.Error; err != nil {
-		return errors.Wrapf(err, "failed to update images in event, uid %s", uid)
+		res = r.db.Model(&db_models.Event{}).
+			Where("uid = ?", dbEvent.Uid).Update("images", buildImageLink(dbEvent.Images, link))
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update images in event, uid %s", uid)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to make transaction")
 	}
 
 	return nil
