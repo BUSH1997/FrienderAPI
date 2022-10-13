@@ -7,8 +7,8 @@ postgres:
   host: localhost
   port: 5432
   dbname: friender
-  user: manuel
-  password: 0000
+  user: postgres
+  password: 1234
 transport:
   timepad:
     download_limit_bytes: 2000000000

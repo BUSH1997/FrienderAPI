@@ -2,13 +2,12 @@ package usecase
 
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
-	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
 )
 
-func (uc *UseCase) ChangeProfile(profile profile.UseCase) error {
+func (uc *UseCase) ChangeProfile(profile models.ChangeProfile) error {
 	return nil
 }
 
-func (uc *UseCase) ChangePriorityEvent(eventPriority models.PriorityEvent) error {
+func (uc *UseCase) ChangePriorityEvent(eventPriority models.UidEventPriority) error {
 	return nil
 }

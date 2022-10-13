@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/BUSH1997/FrienderAPI/config"
 	"github.com/BUSH1997/FrienderAPI/config/configMiddleware"
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
@@ -12,6 +11,9 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/image/repository/s3"
 	imageUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/image/usecase"
 	postgreslib "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
+	profileHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/delivery/http"
+	profilePostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/repository/postgre"
+	profileUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/usecase"
 	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -24,7 +26,6 @@ var (
 )
 
 func main() {
-	fmt.Println("test actions")
 	configApp := config.Config{}
 	err := config.LoadConfig(&configApp, "config")
 	if err != nil {
@@ -45,9 +46,14 @@ func main() {
 	imageUseCase := imageUseCase.New(imageRepo, eventRepo, logger)
 	imageHandler := image.NewImageHandler(imageUseCase)
 
+	profileRepo := profilePostgres.New(db, logger)
+	profileUseCase := profileUseCase.New(profileRepo, logger)
+	profileHandler := profileHandler.NewProfileHandler(profileUseCase, logger)
+
 	serverRouting := configRouting.ServerConfigRouting{
-		EventHandler: eventHandler,
-		ImageHandler: imageHandler,
+		EventHandler:   eventHandler,
+		ImageHandler:   imageHandler,
+		ProfileHandler: profileHandler,
 	}
 	configMiddleware.ConfigMiddleware(router)
 	serverRouting.ConfigRouting(router)
