@@ -14,3 +14,19 @@ func (u eventUsecase) Update(ctx context.Context, event models.Event) error {
 
 	return nil
 }
+
+func (u eventUsecase) SubscribeEvent(ctx context.Context, id models.UserIdEventId) error {
+	return nil
+}
+
+func (u eventUsecase) UnsubscribeEvent(ctx context.Context, id models.UserIdEventId) error {
+	return nil
+}
+
+func (u eventUsecase) DeleteEvent(ctx context.Context, id models.UserIdEventId) error {
+	return nil
+}
+
+func (u eventUsecase) ChangeEvent(ctx context.Context, event models.Event) error {
+	return nil
+}

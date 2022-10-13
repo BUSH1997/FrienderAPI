@@ -11,3 +11,7 @@ type ChangeProfile struct {
 	ProfileId string `json:"-"`
 	Status    Status `json:"new_status_id"`
 }
+
+type UserId struct {
+	Id int `json:"user_id"`
+}

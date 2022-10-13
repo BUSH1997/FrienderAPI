@@ -23,4 +23,8 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("profile/:id/statuses", sc.ProfileHandler.GetAllStatusesUser)
 	router.PUT("profile/:id", sc.ProfileHandler.ChangeProfile)
 	router.PUT("profile/:id/events/priority", sc.ProfileHandler.ChangePriorityEvent)
+	router.PUT("event/:id/subscribe", sc.EventHandler.SubscribeEvent)
+	router.PUT("event/:id/unsubscribe", sc.EventHandler.UnsubscribeEvent)
+	router.PUT("event/:id/delete", sc.EventHandler.DeleteEvent)
+	router.PUT("event/:id/change", sc.EventHandler.ChangeEvent)
 }

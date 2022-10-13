@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/pkg/errors"
 )
@@ -23,7 +24,7 @@ func (u eventUsecase) GetUserEvents(ctx context.Context, id int64) ([]models.Eve
 	return u.Events.GetUserEvents(ctx, id)
 }
 
-func (u eventUsecase) GetAll(ctx context.Context) ([]models.Event, error) {
+func (u eventUsecase) GetAll(ctx context.Context, filter event.FilterGetAll) ([]models.Event, error) {
 	events, err := u.Events.GetAll(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get all events in usecase")

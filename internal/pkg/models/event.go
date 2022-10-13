@@ -7,6 +7,11 @@ import (
 	_ "time"
 )
 
+type UserIdEventId struct {
+	UserId  int
+	EventId int
+}
+
 type UidEventPriority struct {
 	UidUser  string `json:"-"`
 	UidEvent string `json:"event_uid,omitempty"`
