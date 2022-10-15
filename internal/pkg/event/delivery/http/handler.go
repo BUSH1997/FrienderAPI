@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/queryParamParser"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -55,7 +56,13 @@ func (eh *EventHandler) GetOneEvent(ctx echo.Context) error {
 }
 
 func (eh *EventHandler) GetEvents(ctx echo.Context) error {
-	events, err := eh.useCase.GetAll(ctx.Request().Context())
+	queryParam := ctx.QueryParams()
+	filter, err := queryParamParser.ParseGetAllEvents(queryParam)
+	if err != nil {
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	events, err := eh.useCase.GetAll(ctx.Request().Context(), filter)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to get events")
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -85,4 +92,119 @@ func (eh *EventHandler) GetEventsUser(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, events)
+}
+
+func (eh *EventHandler) SubscribeEvent(ctx echo.Context) error {
+	idString := ctx.Param("id")
+	if idString == "" {
+		return ctx.NoContent(http.StatusBadRequest)
+	}
+
+	eventId, err := strconv.Atoi(idString)
+	if err != nil {
+		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
+			Errorf("failed to subscribe event")
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	var userId models.UserId
+	if err := ctx.Bind(&userId); err != nil {
+		eh.logger.WithError(err).Errorf("failed to subscribe event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	err = eh.useCase.SubscribeEvent(ctx.Request().Context(),
+		models.UserIdEventId{EventId: eventId, UserId: userId.Id})
+	if err != nil {
+		eh.logger.WithError(err).Errorf("failed to subscribe event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	return ctx.NoContent(http.StatusInternalServerError)
+}
+
+func (eh *EventHandler) UnsubscribeEvent(ctx echo.Context) error {
+	idString := ctx.Param("id")
+	if idString == "" {
+		return ctx.NoContent(http.StatusBadRequest)
+	}
+
+	eventId, err := strconv.Atoi(idString)
+	if err != nil {
+		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
+			Errorf("failed to unsubscribe event")
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	var userId models.UserId
+	if err := ctx.Bind(&userId); err != nil {
+		eh.logger.WithError(err).Errorf("failed to unsubscribe event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	err = eh.useCase.UnsubscribeEvent(ctx.Request().Context(),
+		models.UserIdEventId{EventId: eventId, UserId: userId.Id})
+	if err != nil {
+		eh.logger.WithError(err).Errorf("failed to unsubscribe event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	return ctx.NoContent(http.StatusInternalServerError)
+}
+
+func (eh *EventHandler) DeleteEvent(ctx echo.Context) error {
+	idString := ctx.Param("id")
+	if idString == "" {
+		return ctx.NoContent(http.StatusBadRequest)
+	}
+
+	eventId, err := strconv.Atoi(idString)
+	if err != nil {
+		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
+			Errorf("failed to delete event")
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	var userId models.UserId
+	if err := ctx.Bind(&userId); err != nil {
+		eh.logger.WithError(err).Errorf("failed to delete event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	err = eh.useCase.DeleteEvent(ctx.Request().Context(),
+		models.UserIdEventId{EventId: eventId, UserId: userId.Id})
+	if err != nil {
+		eh.logger.WithError(err).Errorf("failed to delete event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	return ctx.NoContent(http.StatusInternalServerError)
+}
+
+func (eh *EventHandler) ChangeEvent(ctx echo.Context) error {
+	idString := ctx.Param("id")
+	if idString == "" {
+		return ctx.NoContent(http.StatusBadRequest)
+	}
+
+	_, err := strconv.Atoi(idString)
+	if err != nil {
+		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
+			Errorf("failed to delete event")
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	var event models.Event
+	if err := ctx.Bind(&event); err != nil {
+		eh.logger.WithError(err).Errorf("failed to delete event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	err = eh.useCase.ChangeEvent(ctx.Request().Context(), event)
+	if err != nil {
+		eh.logger.WithError(err).Errorf("failed to delete event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	return ctx.NoContent(http.StatusInternalServerError)
 }
