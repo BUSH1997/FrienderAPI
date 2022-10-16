@@ -8,7 +8,7 @@ type Profile struct {
 }
 
 type ChangeProfile struct {
-	ProfileId string `json:"-"`
+	ProfileId int64  `json:"-"`
 	Status    Status `json:"new_status_id"`
 }
 

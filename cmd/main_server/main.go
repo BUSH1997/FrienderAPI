@@ -12,7 +12,7 @@ import (
 	imageUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/image/usecase"
 	postgreslib "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
 	profileHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/delivery/http"
-	profilePostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/repository/postgre"
+	profilePostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/repository/postgres"
 	profileUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/usecase"
 	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
 	"github.com/labstack/echo/v4"
