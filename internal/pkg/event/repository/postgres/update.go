@@ -3,10 +3,12 @@ package postgres
 import (
 	"context"
 	"fmt"
+	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"math"
 	"strconv"
 	"time"
 )
@@ -39,16 +41,27 @@ func (r eventRepository) Update(ctx context.Context, event models.Event) error {
 
 func (r eventRepository) UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-		oldPriority, err := r.getPriority(ctx, eventPriority.UidUser, eventPriority.UidEvent)
-		if err != nil {
-			return errors.Wrap(err, "failed to get old event priority")
+		var dbEventSharing db_models.EventSharing
+
+		res := r.db.Model(&db_models.EventSharing{}).
+			Joins("JOIN users on event_sharings.user_id = users.id").
+			Joins("JOIN events on event_sharings.event_id = events.id").
+			Take(&dbEventSharing, "users.uid = ? AND events.uid = ?",
+				eventPriority.UidUser, eventPriority.UidEvent)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get event sharing")
 		}
 
+		oldPriority := dbEventSharing.Priority
+
 		var dbUser db_models.User
-		res := r.db.Take(&dbUser, "uid = ?", eventPriority.UidUser)
-		if err = res.Error; err != nil {
+		res = r.db.Take(&dbUser, "uid = ?", eventPriority.UidUser)
+		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user")
 		}
+
+		smallerPriority := int(math.Min(float64(oldPriority), float64(eventPriority.Priority)))
+		greaterPriority := int(math.Max(float64(oldPriority), float64(eventPriority.Priority)))
 
 		posDiff := 0
 		if oldPriority-eventPriority.Priority > 0 {
@@ -58,16 +71,17 @@ func (r eventRepository) UpdateEventPriority(ctx context.Context, eventPriority 
 		}
 
 		res = r.db.Model(&db_models.EventSharing{}).
-			Where("user_id = ? AND priority BETWEEN ? AND ?", dbUser.ID, oldPriority-posDiff, eventPriority.Priority).
+			Where("user_id = ?", dbUser.ID).
+			Where("priority BETWEEN ? AND ?", smallerPriority, greaterPriority).
 			Update("priority", gorm.Expr("event_sharings.priority + ?", posDiff))
-		if err = res.Error; err != nil {
+		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to update event sharings priority")
 		}
 
 		res = r.db.Model(&db_models.EventSharing{}).
-			Where("user_id = ? AND priority = ?", dbUser.ID, oldPriority).
+			Where("id = ?", dbEventSharing.ID).
 			Update("priority", eventPriority.Priority)
-		if err = res.Error; err != nil {
+		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to update event sharing priority")
 		}
 
@@ -80,7 +94,7 @@ func (r eventRepository) UpdateEventPriority(ctx context.Context, eventPriority 
 	return nil
 }
 
-func (r eventRepository) Subscribe(ctx context.Context, user int64, event string) error {
+func (r eventRepository) Subscribe(ctx context.Context, event string) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := r.db.Take(&dbEvent, "uid = ?", event)
@@ -88,11 +102,22 @@ func (r eventRepository) Subscribe(ctx context.Context, user int64, event string
 			return errors.Wrapf(err, "failed to get event by uid %s", event)
 		}
 
+		userID := contextlib.GetUser(ctx)
+
 		var dbUser db_models.User
-		res = r.db.Take(&dbUser, "uid = ?", user)
+		res = r.db.Take(&dbUser, "uid = ?", userID)
 		if err := res.Error; err != nil {
-			return errors.Wrapf(err, "failed to get user by uid %d", user)
+			return errors.Wrapf(err, "failed to get user by uid %d", userID)
 		}
+
+		var sharingsExist []db_models.EventSharing
+		res = r.db.Model(&db_models.EventSharing{}).
+			Find(&sharingsExist, "user_id = ? AND is_deleted = ?", dbUser.ID, false)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user event sharings")
+		}
+
+		currentMaxPriority := len(sharingsExist)
 
 		dbEventSharing := db_models.EventSharing{}
 		res = r.db.Take(&dbEventSharing, "event_id = ? AND user_id = ?", dbEvent.ID, dbUser.ID)
@@ -108,22 +133,11 @@ func (r eventRepository) Subscribe(ctx context.Context, user int64, event string
 			return errors.Wrap(err, "failed to get event sharing")
 		}
 
-		var dbEventSharings []db_models.EventSharing
-		res = r.db.Order("priority desc").Find(&dbEventSharings, "user_id = ?", dbUser.ID)
-		if err := res.Error; err != nil {
-			return errors.Wrap(err, "failed to get event sharings")
-		}
-
-		priority := 1
-		if len(dbEventSharings) > 0 {
-			priority = dbEventSharings[0].Priority
-		}
-
 		res = r.db.Model(&db_models.EventSharing{}).
 			Where("event_id = ? AND user_id = ?", dbEvent.ID, dbUser.ID).
 			Updates(map[string]interface{}{
 				"is_deleted": false,
-				"priority":   priority,
+				"priority":   currentMaxPriority + 1,
 			})
 		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to update event sharing")
@@ -145,7 +159,7 @@ func (r eventRepository) Subscribe(ctx context.Context, user int64, event string
 	return nil
 }
 
-func (r eventRepository) UnSubscribe(ctx context.Context, user int64, event string) error {
+func (r eventRepository) UnSubscribe(ctx context.Context, event string) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := r.db.Take(&dbEvent, "uid = ?", event)
@@ -153,10 +167,12 @@ func (r eventRepository) UnSubscribe(ctx context.Context, user int64, event stri
 			return errors.Wrapf(err, "failed to get event by uid %s", event)
 		}
 
+		userID := contextlib.GetUser(ctx)
+
 		var dbUser db_models.User
-		res = r.db.Take(&dbUser, "uid = ?", user)
+		res = r.db.Take(&dbUser, "uid = ?", userID)
 		if err := res.Error; err != nil {
-			return errors.Wrapf(err, "failed to get user by uid %d", user)
+			return errors.Wrapf(err, "failed to get user by uid %d", userID)
 		}
 
 		dbEventSharing := db_models.EventSharing{}
@@ -165,7 +181,7 @@ func (r eventRepository) UnSubscribe(ctx context.Context, user int64, event stri
 		currentPriority := dbEventSharing.Priority
 
 		res = r.db.Model(&db_models.EventSharing{}).
-			Where("user_id = ? AND priority > ?", currentPriority).
+			Where("user_id = ? AND priority > ?", dbUser.ID, currentPriority).
 			Update("priority", gorm.Expr("event_sharings.priority + ?", -1))
 		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to update event sharings priority")
@@ -193,12 +209,3 @@ func (r eventRepository) UnSubscribe(ctx context.Context, user int64, event stri
 
 	return nil
 }
-
-//res := r.db.Model(&db_models.EventSharing{}).
-//	Joins("JOIN events on event_sharings.event_id = events.id").
-//	Joins("JOIN users on event_sharings.user_id = users.id").
-//	Where("users.uid = ? AND event.uid = ?", user, event).
-//	Update("is", eventPriority.Priority)
-//if err = res.Error; err != nil {
-//	return errors.Wrapf(err, "failed to update event sharing priority")
-//}

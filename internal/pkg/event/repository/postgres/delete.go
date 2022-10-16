@@ -2,12 +2,13 @@ package postgres
 
 import (
 	"context"
+	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
-func (r eventRepository) Delete(ctx context.Context, user int64, event string) error {
+func (r eventRepository) Delete(ctx context.Context, event string) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := r.db.Take(&dbEvent, "uid = ?", event)
@@ -15,10 +16,22 @@ func (r eventRepository) Delete(ctx context.Context, user int64, event string) e
 			return errors.Wrapf(err, "failed to get event by uid %s", event)
 		}
 
+		userID := contextlib.GetUser(ctx)
+
 		var dbUser db_models.User
-		res = r.db.Take(&dbUser, "uid = ?", user)
+		res = r.db.Take(&dbUser, "uid = ?", userID)
 		if err := res.Error; err != nil {
-			return errors.Wrapf(err, "failed to get user by uid %d", user)
+			return errors.Wrapf(err, "failed to get user by uid %d", userID)
+		}
+
+		res = r.db.Model(&db_models.User{}).Where("id = ?", dbUser.ID).
+			Update("created_events", dbUser.CreatedEventsCount-1)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to update user created events")
+		}
+
+		if dbEvent.Owner != int(dbUser.ID) {
+			return errors.New("user is not events owner, cannot delete")
 		}
 
 		dbEventSharing := db_models.EventSharing{}

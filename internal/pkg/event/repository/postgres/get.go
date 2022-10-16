@@ -148,7 +148,7 @@ func (r eventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvents []db_models.Event
-		res := r.db.Find(&dbEvents)
+		res := r.db.Where("is_deleted = ?", false).Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get all events")
 		}
@@ -180,7 +180,7 @@ func (r eventRepository) GetUserEvents(ctx context.Context, user int64) ([]model
 		res := r.db.Model(&db_models.Event{}).
 			Joins("JOIN event_sharings on event_sharings.event_id = events.id").
 			Joins("JOIN users on event_sharings.user_id = users.id").
-			Find(&dbEvents, "users.uid = ?", user)
+			Find(&dbEvents, "users.uid = ? AND is_deleted = ?", user, false)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user events")
 		}
@@ -212,7 +212,10 @@ func (r eventRepository) GetUserActiveEvents(ctx context.Context, user int64) ([
 		res := r.db.Model(&db_models.EventSharing{}).
 			Joins("JOIN users on event_sharings.user_id = users.id").
 			Joins("JOIN events on event_sharings.event_id = events.id").
-			Find(&dbEventSharings, "users.uid = ? AND events.starts_at >= ?", user, time.Now().Unix())
+			Where("users.uid = ?", user).
+			Where("events.starts_at >= ?", time.Now().Unix()).
+			Where("is_deleted = ?", false).
+			Find(&dbEventSharings)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user event sharings")
 		}
@@ -255,7 +258,10 @@ func (r eventRepository) GetUserVisitedEvents(ctx context.Context, user int64) (
 		res := r.db.Model(&db_models.EventSharing{}).
 			Joins("JOIN users on event_sharings.user_id = users.id").
 			Joins("JOIN events on event_sharings.event_id = events.id").
-			Find(&dbEventSharings, "users.uid = ? AND events.starts_at < ?", user, time.Now().Unix())
+			Where("users.uid = ?", user).
+			Where("events.starts_at < ?", time.Now().Unix()).
+			Where("is_deleted = ?", false).
+			Find(&dbEventSharings)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user event sharings")
 		}
@@ -290,20 +296,6 @@ func (r eventRepository) GetUserVisitedEvents(ctx context.Context, user int64) (
 	return ret, nil
 }
 
-func (r eventRepository) getPriority(ctx context.Context, user int, event string) (int, error) {
-	var dbEventSharing db_models.EventSharing
-
-	res := r.db.Model(&db_models.EventSharing{}).
-		Joins("JOIN users on event_sharings.user_id = users.id").
-		Joins("JOIN events on event_sharings.event_id = events.id").
-		Take(&dbEventSharing, "users.uid = ? AND events.uid = ?", user, event)
-	if err := res.Error; err != nil {
-		return 0, errors.Wrap(err, "failed to get event sharing")
-	}
-
-	return dbEventSharing.Priority, nil
-}
-
 func (r eventRepository) GetAllCategories(ctx context.Context) ([]string, error) {
 	var ret []string
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -336,7 +328,9 @@ func (r eventRepository) GetOwnerEvents(ctx context.Context, user int64) ([]mode
 		var dbEvents []db_models.Event
 		res := r.db.Model(&db_models.Event{}).
 			Joins("JOIN users on events.owner_id = users.id").
-			Find(&dbEvents, "users.uid = ?", user)
+			Where("users.uid = ?", user).
+			Where("is_deleted = ?", false).
+			Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get owner events")
 		}
@@ -378,14 +372,14 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 			subscribeSharingIDs = append(subscribeSharingIDs, dbSubscribeSharing.SubscriberID)
 		}
 
-		var dbSubscriptions []db_models.User
+		var dbSubscriptions []db_models.SubscribeSharing
 		res = r.db.Find(&dbSubscriptions, subscribeSharingIDs)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user subscriptions")
 		}
 
 		for _, dbSubscription := range dbSubscriptions {
-			subscriptionEvents, err := r.GetUserActiveEvents(ctx, int64(dbSubscription.Uid))
+			subscriptionEvents, err := r.GetUserActiveEvents(ctx, int64(dbSubscription.UserID))
 			if err != nil {
 				return errors.Wrap(err, "failed to get subscription events")
 			}

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
@@ -21,6 +22,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			TimeCreated: time.Now().Unix(),
 			TimeUpdated: time.Now().Unix(),
 			IsPublic:    event.IsPublic,
+			IsPrivate:   event.IsPrivate,
 		}
 
 		dbCategory := db_models.Category{}
@@ -43,17 +45,17 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 
 		dbUser := db_models.User{}
 
-		res = r.db.Take(&dbUser, "uid = ?", event.Author)
-		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			dbUser.Uid = event.Author
-			dbUser.CurrentStatus = 1
-			err := r.createUser(ctx, &dbUser)
-			if err != nil {
-				return errors.Wrap(err, "failed to create user")
-			}
-		}
-		if err := res.Error; err != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		userID := contextlib.GetUser(ctx)
+
+		res = r.db.Take(&dbUser, "uid = ?", userID)
+		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get event user")
+		}
+
+		res = r.db.Model(&db_models.User{}).Where("id = ?", dbUser.ID).
+			Update("created_events", dbUser.CreatedEventsCount+1)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to update user created events")
 		}
 
 		dbEvent.Owner = int(dbUser.ID)
@@ -64,11 +66,18 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			return errors.Wrapf(err, "failed to create event, uid %s", event.Uid)
 		}
 
-		dbEventSharings := db_models.EventSharing{}
-		dbEventSharings.EventID = int(dbEvent.ID)
-		dbEventSharings.UserID = int(dbUser.ID)
+		var sharingsExist []db_models.EventSharing
+		res = r.db.Model(&db_models.EventSharing{}).Find(&sharingsExist, "user_id = ?", dbUser.ID)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user event sharings")
+		}
 
-		res = r.db.Create(&dbEventSharings)
+		dbEventSharing := db_models.EventSharing{}
+		dbEventSharing.EventID = int(dbEvent.ID)
+		dbEventSharing.UserID = int(dbUser.ID)
+		dbEventSharing.Priority = len(sharingsExist) + 1
+
+		res = r.db.Create(&dbEventSharing)
 		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to create event sharing")
 		}
@@ -77,15 +86,6 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to make transaction")
-	}
-
-	return nil
-}
-
-func (r eventRepository) createUser(ctx context.Context, user *db_models.User) error {
-	res := r.db.Create(user)
-	if err := res.Error; err != nil {
-		return errors.Wrapf(err, "failed to create user")
 	}
 
 	return nil

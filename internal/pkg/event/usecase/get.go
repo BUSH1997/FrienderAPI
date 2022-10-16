@@ -5,6 +5,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/pkg/errors"
+	"sort"
 )
 
 func (uc eventUsecase) GetAllPublic(ctx context.Context) ([]models.Event, error) {
@@ -38,6 +39,19 @@ func (uc eventUsecase) GetAllCategories(ctx context.Context) ([]string, error) {
 }
 
 func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	events, err := uc.routerGet(ctx, params)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get events in usecase")
+	}
+
+	sort.SliceStable(events, func(i, j int) bool {
+		return events[i].StartsAt > events[j].StartsAt
+	})
+
+	return events, nil
+}
+
+func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	if params.IsOwner.IsDefinedTrue() {
 		return uc.Events.GetOwnerEvents(ctx, params.UserID)
 	}

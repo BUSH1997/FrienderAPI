@@ -22,9 +22,9 @@ type Usecase interface {
 	GetAll(ctx context.Context, filter FilterGetAll) ([]models.Event, error)
 	GetEventById(ctx context.Context, id string) (models.Event, error)
 	GetUserEvents(ctx context.Context, id int64) ([]models.Event, error)
-	SubscribeEvent(ctx context.Context, user int64, event string) error
-	UnsubscribeEvent(ctx context.Context, user int64, event string) error
-	Delete(ctx context.Context, user int64, event string) error
+	SubscribeEvent(ctx context.Context, event string) error
+	UnsubscribeEvent(ctx context.Context, event string) error
+	Delete(ctx context.Context, event string) error
 	Change(ctx context.Context, event models.Event) error
 	GetAllCategories(ctx context.Context) ([]string, error)
 }

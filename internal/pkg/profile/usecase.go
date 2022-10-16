@@ -7,7 +7,7 @@ import (
 
 type UseCase interface {
 	GetOneProfile(ctx context.Context, id int64) (models.Profile, error)
-	GetAllProfileStatuses(ctx context.Context, id int64) ([]models.Status, error)
+	GetAllProfileStatuses(ctx context.Context) ([]models.Status, error)
 	UpdateProfile(ctx context.Context, profile models.ChangeProfile) error
 	ChangeEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
 }
