@@ -290,7 +290,7 @@ func (r eventRepository) GetUserVisitedEvents(ctx context.Context, id int) ([]mo
 	return ret, nil
 }
 
-func (r eventRepository) getPriority(ctx context.Context, user int, event string) (int, error) {
+func (r eventRepository) GetPriority(ctx context.Context, user int, event string) (int, error) {
 	var dbEventSharing db_models.EventSharing
 
 	res := r.db.Model(&db_models.EventSharing{}).

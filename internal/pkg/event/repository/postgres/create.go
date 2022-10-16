@@ -21,7 +21,6 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			StartsAt:    event.StartsAt,
 			TimeCreated: time.Now(),
 			TimeUpdated: time.Now(),
-			IsGroup:     event.IsGroup,
 			IsPublic:    event.IsPublic,
 		}
 
