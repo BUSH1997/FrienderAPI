@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (uc *UseCase) GetOneProfile(ctx context.Context, id int) (models.Profile, error) {
+func (uc *UseCase) GetOneProfile(ctx context.Context, id int64) (models.Profile, error) {
 	currentStatus, err := uc.statusRepository.GetUserCurrentStatus(ctx, id)
 	if err != nil {
 		return models.Profile{}, errors.Wrap(err, "failed to get profile status")
@@ -37,7 +37,7 @@ func (uc *UseCase) GetOneProfile(ctx context.Context, id int) (models.Profile, e
 	return profile, nil
 }
 
-func (uc *UseCase) GetAllProfileStatuses(ctx context.Context, id int) ([]models.Status, error) {
+func (uc *UseCase) GetAllProfileStatuses(ctx context.Context, id int64) ([]models.Status, error) {
 	statuses, err := uc.statusRepository.GetAllUserStatuses(ctx, id)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get all profile statuses")

@@ -97,8 +97,3 @@ func (r eventRepository) createCategory(ctx context.Context, category *db_models
 
 	return nil
 }
-
-func (r eventRepository) SubscribeEvent(ctx context.Context, sub models.UserIdEventId) error {
-
-	return nil
-}

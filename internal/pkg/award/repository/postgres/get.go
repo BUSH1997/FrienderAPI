@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r awardRepository) GetUserAwards(ctx context.Context, id int) ([]models.Award, error) {
+func (r awardRepository) GetUserAwards(ctx context.Context, id int64) ([]models.Award, error) {
 	var awards []models.Award
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbAwards []db_models.Award
