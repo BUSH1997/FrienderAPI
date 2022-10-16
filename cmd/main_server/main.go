@@ -4,6 +4,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/config"
 	"github.com/BUSH1997/FrienderAPI/config/configMiddleware"
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
+	awardPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/award/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
@@ -14,6 +15,7 @@ import (
 	profileHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/delivery/http"
 	profilePostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/repository/postgres"
 	profileUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/usecase"
+	statusPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/status/repository/postgres"
 	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -46,8 +48,11 @@ func main() {
 	imageUseCase := imageUseCase.New(imageRepo, eventRepo, logger)
 	imageHandler := image.NewImageHandler(imageUseCase)
 
+	awardRepo := awardPostgres.New(db, logger)
+	statusRepo := statusPostgres.New(db, logger)
+
 	profileRepo := profilePostgres.New(db, logger)
-	profileUseCase := profileUseCase.New(profileRepo, logger)
+	profileUseCase := profileUseCase.New(profileRepo, eventRepo, awardRepo, statusRepo, logger)
 	profileHandler := profileHandler.NewProfileHandler(profileUseCase, logger)
 
 	serverRouting := configRouting.ServerConfigRouting{
