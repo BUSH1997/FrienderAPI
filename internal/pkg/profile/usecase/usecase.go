@@ -1,18 +1,33 @@
 package usecase
 
 import (
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/award"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/status"
 	"github.com/sirupsen/logrus"
 )
 
 type UseCase struct {
-	Repository profile.Repository
-	Logger *logrus.Logger
+	profileRepository profile.Repository
+	eventRepository   event.Repository
+	awardRepository   award.Repository
+	statusRepository  status.Repository
+	Logger            *logrus.Logger
 }
 
-func New(repository profile.Repository, logger *logrus.Logger) profile.UseCase {
+func New(
+	profileRepository profile.Repository,
+	eventRepository event.Repository,
+	awardRepository award.Repository,
+	statusRepository status.Repository,
+	logger *logrus.Logger,
+) profile.UseCase {
 	return &UseCase{
-		Repository: repository,
-		Logger: logger,
+		profileRepository: profileRepository,
+		eventRepository:   eventRepository,
+		awardRepository:   awardRepository,
+		statusRepository:  statusRepository,
+		Logger:            logger,
 	}
 }

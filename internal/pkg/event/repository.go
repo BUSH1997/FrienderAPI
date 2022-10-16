@@ -13,4 +13,8 @@ type Repository interface {
 	GetEventById(ctx context.Context, id string) (models.Event, error)
 	GetUserEvents(ctx context.Context, id int64) ([]models.Event, error)
 	UploadImage(ctx context.Context, uid string, link string) error
+	GetUserActiveEvents(ctx context.Context, id int) ([]models.Event, error)
+	GetUserVisitedEvents(ctx context.Context, id int) ([]models.Event, error)
+	GetPriority(ctx context.Context, user int, event string) (int, error)
+	UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
 }

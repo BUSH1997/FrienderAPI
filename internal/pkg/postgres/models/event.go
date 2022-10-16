@@ -1,21 +1,22 @@
 package models
 
-import "time"
-
 type Event struct {
-	ID          uint      `gorm:"column:id"`
-	Uid         string    `gorm:"column:uid"`
-	Title       string    `gorm:"column:title"`
-	Description string    `gorm:"column:description"`
-	Category    int       `gorm:"column:category_id"`
-	Images      string    `gorm:"column:images"`
-	StartsAt    int64     `gorm:"column:starts_at"`
-	TimeCreated time.Time `gorm:"column:time_created"`
-	TimeUpdated time.Time `gorm:"column:time_updated"`
-	Geo         string    `gorm:"column:geo"`
-	Owner       int       `gorm:"column:owner_id"`
-	IsGroup     bool      `gorm:"column:is_group"`
-	IsPublic    bool      `gorm:"column:is_public"`
+	ID           uint   `gorm:"column:id"`
+	Uid          string `gorm:"column:uid"`
+	Title        string `gorm:"column:title"`
+	Description  string `gorm:"column:description"`
+	Images       string `gorm:"column:images"`
+	StartsAt     int64  `gorm:"column:starts_at"`
+	TimeCreated  int64  `gorm:"column:time_created"`
+	TimeUpdated  int64  `gorm:"column:time_updated"`
+	Geo          string `gorm:"column:geo"`
+	Category     int    `gorm:"column:category_id"`
+	CountMembers int    `gorm:"column:count_members"`
+	IsPublic     bool   `gorm:"column:is_public"`
+	IsPrivate    bool   `gorm:"column:is_private"`
+	Owner        int    `gorm:"column:owner_id"`
+	IsDeleted    bool   `gorm:"is_deleted"`
+	Photos       string `gorm:"photos"`
 }
 
 func (Event) TableName() string {

@@ -1,4 +1,4 @@
-package postgre
+package postgres
 
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
@@ -6,13 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository struct {
+type profileRepository struct {
 	db     *gorm.DB
 	logger *logrus.Logger
 }
 
 func New(db *gorm.DB, logger *logrus.Logger) profile.Repository {
-	return &Repository{
+	return &profileRepository{
 		db:     db,
 		logger: logger,
 	}
