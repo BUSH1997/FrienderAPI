@@ -19,7 +19,7 @@ type Repository interface {
 	GetUserVisitedEvents(ctx context.Context, user int64) ([]models.Event, error)
 	GetSubscriptionEvents(ctx context.Context, user int64) ([]models.Event, error)
 	UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
-	Subscribe(ctx context.Context, user int64, event string) error
-	UnSubscribe(ctx context.Context, user int64, event string) error
-	Delete(ctx context.Context, user int64, event string) error
+	Subscribe(ctx context.Context, event string) error
+	UnSubscribe(ctx context.Context, event string) error
+	Delete(ctx context.Context, event string) error
 }

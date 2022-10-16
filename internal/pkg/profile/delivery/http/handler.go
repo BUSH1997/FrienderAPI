@@ -1,6 +1,7 @@
 package http
 
 import (
+	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
 	"github.com/labstack/echo/v4"
@@ -47,21 +48,7 @@ func (eh *ProfileHandler) GetOneProfile(ctx echo.Context) error {
 }
 
 func (eh *ProfileHandler) GetAllStatusesUser(ctx echo.Context) error {
-	idString := ctx.Param("id")
-	if idString == "" {
-		eh.logger.Errorf("[GetAllStatusesUser] failed get id")
-		return ctx.NoContent(http.StatusInternalServerError)
-	}
-
-	id, err := strconv.ParseInt(idString, 10, 32)
-	if err != nil {
-		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
-			Errorf("failed to get user events")
-
-		return ctx.NoContent(http.StatusInternalServerError)
-	}
-
-	statuses, err := eh.useCase.GetAllProfileStatuses(ctx.Request().Context(), id)
+	statuses, err := eh.useCase.GetAllProfileStatuses(ctx.Request().Context())
 	if err != nil {
 		eh.logger.WithError(err).Errorf("[GetAllStatusesUser] failed get all statuses user")
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -71,26 +58,13 @@ func (eh *ProfileHandler) GetAllStatusesUser(ctx echo.Context) error {
 }
 
 func (eh *ProfileHandler) ChangeProfile(ctx echo.Context) error {
-	idString := ctx.Param("id")
-	if idString == "" {
-		eh.logger.Errorf("[ChangeProfile] failed get id")
-		return ctx.NoContent(http.StatusInternalServerError)
-	}
-
-	id, err := strconv.ParseInt(idString, 10, 32)
-	if err != nil {
-		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
-			Errorf("failed to get user events")
-
-		return ctx.NoContent(http.StatusInternalServerError)
-	}
-
 	var newProfileData models.ChangeProfile
 	if err := ctx.Bind(&newProfileData); err != nil {
 		eh.logger.WithError(err).Errorf("[ChangeProfile] failed bind change profile")
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
-	newProfileData.ProfileId = id
+
+	newProfileData.ProfileId = contextlib.GetUser(ctx.Request().Context())
 
 	if err := eh.useCase.UpdateProfile(ctx.Request().Context(), newProfileData); err != nil {
 		eh.logger.WithError(err).Errorf("[ChangeProfile] failed change profile")
@@ -101,26 +75,12 @@ func (eh *ProfileHandler) ChangeProfile(ctx echo.Context) error {
 }
 
 func (eh *ProfileHandler) ChangePriorityEvent(ctx echo.Context) error {
-	idString := ctx.Param("id")
-	if idString != "" {
-		eh.logger.Errorf("[ChangePriorityEvent] failed get id")
-		return ctx.NoContent(http.StatusInternalServerError)
-	}
-
-	id, err := strconv.ParseInt(idString, 10, 32)
-	if err != nil {
-		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
-			Errorf("failed to get user events")
-
-		return ctx.NoContent(http.StatusInternalServerError)
-	}
-
 	var newPriorityEvent models.UidEventPriority
 	if err := ctx.Bind(&newPriorityEvent); err != nil {
 		eh.logger.WithError(err).Errorf("[ChangePriorityEvent] failed bind priority event")
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
-	newPriorityEvent.UidUser = int(id)
+	newPriorityEvent.UidUser = int(contextlib.GetUser(ctx.Request().Context()))
 
 	if err := eh.useCase.ChangeEventPriority(ctx.Request().Context(), newPriorityEvent); err != nil {
 		eh.logger.WithError(err).Errorf("[ChangePriorityEvent] failed change priority event")

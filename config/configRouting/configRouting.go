@@ -14,15 +14,14 @@ type ServerConfigRouting struct {
 }
 
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
-	router.POST("event/create", sc.EventHandler.CreateEvent)
+	router.POST("event/create", sc.EventHandler.Create)
 	router.GET("event/get/:id", sc.EventHandler.GetOneEvent)
-	router.GET("events", sc.EventHandler.GetEvents)
-	router.GET("events/get/:id", sc.EventHandler.GetEventsUser)
+	router.GET("events", sc.EventHandler.Get)
 	router.POST("image/upload", sc.ImageHandler.UploadImage)
 	router.GET("profile/:id", sc.ProfileHandler.GetOneProfile)
-	router.GET("profile/:id/statuses", sc.ProfileHandler.GetAllStatusesUser)
-	router.PUT("profile/:id", sc.ProfileHandler.ChangeProfile)
-	router.PUT("profile/:id/events/priority", sc.ProfileHandler.ChangePriorityEvent)
+	router.GET("profile/statuses", sc.ProfileHandler.GetAllStatusesUser)
+	router.PUT("profile/change", sc.ProfileHandler.ChangeProfile)
+	router.PUT("profile/events/priority", sc.ProfileHandler.ChangePriorityEvent)
 	router.PUT("event/:id/subscribe", sc.EventHandler.SubscribeEvent)
 	router.PUT("event/:id/unsubscribe", sc.EventHandler.UnsubscribeEvent)
 	router.PUT("event/:id/delete", sc.EventHandler.DeleteEvent)

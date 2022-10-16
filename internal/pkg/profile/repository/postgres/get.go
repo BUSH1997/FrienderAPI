@@ -1,1 +1,30 @@
 package postgres
+
+import (
+	"context"
+	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
+	"github.com/pkg/errors"
+	"gorm.io/gorm"
+)
+
+func (r profileRepository) CheckUserExists(ctx context.Context, user int64) (bool, error) {
+	userExists := true
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbUser db_models.User
+		res := r.db.Take(&dbUser, "uid = ?", user)
+		if err := res.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			userExists = false
+			return nil
+		}
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user by id")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return false, errors.Wrap(err, "failed to make transaction")
+	}
+
+	return userExists, nil
+}

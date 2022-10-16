@@ -14,8 +14,8 @@ func (uc eventUsecase) Update(ctx context.Context, event models.Event) error {
 	return nil
 }
 
-func (uc eventUsecase) SubscribeEvent(ctx context.Context, user int64, event string) error {
-	err := uc.Events.Subscribe(ctx, user, event)
+func (uc eventUsecase) SubscribeEvent(ctx context.Context, event string) error {
+	err := uc.Events.Subscribe(ctx, event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to subscribe event %s", event)
 	}
@@ -23,8 +23,8 @@ func (uc eventUsecase) SubscribeEvent(ctx context.Context, user int64, event str
 	return nil
 }
 
-func (uc eventUsecase) UnsubscribeEvent(ctx context.Context, user int64, event string) error {
-	err := uc.Events.UnSubscribe(ctx, user, event)
+func (uc eventUsecase) UnsubscribeEvent(ctx context.Context, event string) error {
+	err := uc.Events.UnSubscribe(ctx, event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to unsubscribe event %s", event)
 	}
@@ -32,8 +32,8 @@ func (uc eventUsecase) UnsubscribeEvent(ctx context.Context, user int64, event s
 	return nil
 }
 
-func (uc eventUsecase) Delete(ctx context.Context, user int64, event string) error {
-	err := uc.Events.Delete(ctx, user, event)
+func (uc eventUsecase) Delete(ctx context.Context, event string) error {
+	err := uc.Events.Delete(ctx, event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to delete event %s", event)
 	}

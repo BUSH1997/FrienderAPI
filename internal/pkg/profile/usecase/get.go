@@ -2,27 +2,28 @@ package usecase
 
 import (
 	"context"
+	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/pkg/errors"
 )
 
-func (uc *UseCase) GetOneProfile(ctx context.Context, id int64) (models.Profile, error) {
-	currentStatus, err := uc.statusRepository.GetUserCurrentStatus(ctx, id)
+func (uc *UseCase) GetOneProfile(ctx context.Context, userID int64) (models.Profile, error) {
+	currentStatus, err := uc.statusRepository.GetUserCurrentStatus(ctx, userID)
 	if err != nil {
 		return models.Profile{}, errors.Wrap(err, "failed to get profile status")
 	}
 
-	activeEvents, err := uc.eventRepository.GetUserActiveEvents(ctx, id)
+	activeEvents, err := uc.eventRepository.GetUserActiveEvents(ctx, userID)
 	if err != nil {
 		return models.Profile{}, errors.Wrap(err, "failed to get user active events")
 	}
 
-	visitedEvents, err := uc.eventRepository.GetUserActiveEvents(ctx, id)
+	visitedEvents, err := uc.eventRepository.GetUserActiveEvents(ctx, userID)
 	if err != nil {
 		return models.Profile{}, errors.Wrap(err, "failed to get user visited events")
 	}
 
-	awards, err := uc.awardRepository.GetUserAwards(ctx, id)
+	awards, err := uc.awardRepository.GetUserAwards(ctx, userID)
 	if err != nil {
 		return models.Profile{}, errors.Wrap(err, "failed to get user awards")
 	}
@@ -37,8 +38,10 @@ func (uc *UseCase) GetOneProfile(ctx context.Context, id int64) (models.Profile,
 	return profile, nil
 }
 
-func (uc *UseCase) GetAllProfileStatuses(ctx context.Context, id int64) ([]models.Status, error) {
-	statuses, err := uc.statusRepository.GetAllUserStatuses(ctx, id)
+func (uc *UseCase) GetAllProfileStatuses(ctx context.Context) ([]models.Status, error) {
+	userID := contextlib.GetUser(ctx)
+
+	statuses, err := uc.statusRepository.GetAllUserStatuses(ctx, userID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get all profile statuses")
 	}

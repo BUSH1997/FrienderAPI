@@ -60,7 +60,7 @@ func main() {
 		ImageHandler:   imageHandler,
 		ProfileHandler: profileHandler,
 	}
-	configMiddleware.ConfigMiddleware(router)
+	configMiddleware.ConfigMiddleware(router, profileRepo, logger)
 	serverRouting.ConfigRouting(router)
 
 	router.Logger.Fatal(router.Start("localhost:8090"))
