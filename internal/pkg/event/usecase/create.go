@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u eventUsecase) Create(ctx context.Context, event models.Event) (models.Event, error) {
+func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.Event, error) {
 	uid, err := uuid.NewV4()
 	if err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to  generate uuid")
@@ -24,7 +24,7 @@ func (u eventUsecase) Create(ctx context.Context, event models.Event) (models.Ev
 		}
 	}
 
-	err = u.Events.Create(ctx, event)
+	err = uc.Events.Create(ctx, event)
 	if err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to create public event in usecase")
 	}

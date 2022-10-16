@@ -172,7 +172,7 @@ func (r eventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 	return ret, nil
 }
 
-func (r eventRepository) GetUserEvents(ctx context.Context, id int64) ([]models.Event, error) {
+func (r eventRepository) GetUserEvents(ctx context.Context, user int64) ([]models.Event, error) {
 	var ret []models.Event
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -180,7 +180,7 @@ func (r eventRepository) GetUserEvents(ctx context.Context, id int64) ([]models.
 		res := r.db.Model(&db_models.Event{}).
 			Joins("JOIN event_sharings on event_sharings.event_id = events.id").
 			Joins("JOIN users on event_sharings.user_id = users.id").
-			Find(&dbEvents, "users.uid = ?", id)
+			Find(&dbEvents, "users.uid = ?", user)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user events")
 		}
@@ -204,7 +204,7 @@ func (r eventRepository) GetUserEvents(ctx context.Context, id int64) ([]models.
 	return ret, nil
 }
 
-func (r eventRepository) GetUserActiveEvents(ctx context.Context, id int) ([]models.Event, error) {
+func (r eventRepository) GetUserActiveEvents(ctx context.Context, user int64) ([]models.Event, error) {
 	var ret []models.Event
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -212,7 +212,7 @@ func (r eventRepository) GetUserActiveEvents(ctx context.Context, id int) ([]mod
 		res := r.db.Model(&db_models.EventSharing{}).
 			Joins("JOIN users on event_sharings.user_id = users.id").
 			Joins("JOIN events on event_sharings.event_id = events.id").
-			Find(&dbEventSharings, "users.uid = ? AND events.starts_at >= ?", id, time.Now().Unix())
+			Find(&dbEventSharings, "users.uid = ? AND events.starts_at >= ?", user, time.Now().Unix())
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user event sharings")
 		}
@@ -247,7 +247,7 @@ func (r eventRepository) GetUserActiveEvents(ctx context.Context, id int) ([]mod
 	return ret, nil
 }
 
-func (r eventRepository) GetUserVisitedEvents(ctx context.Context, id int) ([]models.Event, error) {
+func (r eventRepository) GetUserVisitedEvents(ctx context.Context, user int64) ([]models.Event, error) {
 	var ret []models.Event
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -255,7 +255,7 @@ func (r eventRepository) GetUserVisitedEvents(ctx context.Context, id int) ([]mo
 		res := r.db.Model(&db_models.EventSharing{}).
 			Joins("JOIN users on event_sharings.user_id = users.id").
 			Joins("JOIN events on event_sharings.event_id = events.id").
-			Find(&dbEventSharings, "users.uid = ? AND events.starts_at < ?", id, time.Now().Unix())
+			Find(&dbEventSharings, "users.uid = ? AND events.starts_at < ?", user, time.Now().Unix())
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user event sharings")
 		}
@@ -324,6 +324,79 @@ func (r eventRepository) GetAllCategories(ctx context.Context) ([]string, error)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to make transaction GetAllCategories")
+	}
+
+	return ret, nil
+}
+
+func (r eventRepository) GetOwnerEvents(ctx context.Context, user int64) ([]models.Event, error) {
+	var ret []models.Event
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvents []db_models.Event
+		res := r.db.Model(&db_models.Event{}).
+			Joins("JOIN users on events.owner_id = users.id").
+			Find(&dbEvents, "users.uid = ?", user)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get owner events")
+		}
+
+		ret = make([]models.Event, 0, len(dbEvents))
+		for _, dbEvent := range dbEvents {
+			event, err := r.GetEventById(ctx, dbEvent.Uid)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
+			}
+
+			ret = append(ret, event)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction GetOwnerEvents")
+	}
+
+	return ret, nil
+}
+
+func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) ([]models.Event, error) {
+	var ret []models.Event
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbSubscribeSharings []db_models.SubscribeSharing
+		res := r.db.Model(&db_models.SubscribeSharing{}).
+			Joins("JOIN users on subscribe_sharings.subscriber_id = users.id").
+			Find(&dbSubscribeSharings, "users.uid = ?", user)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user subscribe sharings")
+		}
+
+		subscribeSharingIDs := make([]int, 0, len(dbSubscribeSharings))
+		for _, dbSubscribeSharing := range dbSubscribeSharings {
+			subscribeSharingIDs = append(subscribeSharingIDs, dbSubscribeSharing.SubscriberID)
+		}
+
+		var dbSubscriptions []db_models.User
+		res = r.db.Find(&dbSubscriptions, subscribeSharingIDs)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user subscriptions")
+		}
+
+		for _, dbSubscription := range dbSubscriptions {
+			subscriptionEvents, err := r.GetUserActiveEvents(ctx, int64(dbSubscription.Uid))
+			if err != nil {
+				return errors.Wrap(err, "failed to get subscription events")
+			}
+
+			ret = append(ret, subscriptionEvents...)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction")
 	}
 
 	return ret, nil

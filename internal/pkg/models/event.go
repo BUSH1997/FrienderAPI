@@ -7,11 +7,6 @@ import (
 	_ "time"
 )
 
-type UserIdEventId struct {
-	UserId  int
-	EventId int
-}
-
 type UidEventPriority struct {
 	UidUser  int    `json:"-"`
 	UidEvent string `json:"event_uid,omitempty"`
@@ -37,6 +32,13 @@ type Event struct {
 	IsGroup     bool      `json:"is_group,omitempty"`
 	IsPublic    bool      `json:"is_public,omitempty"`
 	Category    Category  `json:"category,omitempty"`
+}
+
+type GetEventParams struct {
+	UserID       int64
+	IsOwner      Bool
+	IsActive     Bool
+	IsSubscriber Bool
 }
 
 type Category string

@@ -6,5 +6,5 @@ import (
 )
 
 type Repository interface {
-	GetUserAwards(ctx context.Context, id int) ([]models.Award, error)
+	GetUserAwards(ctx context.Context, id int64) ([]models.Award, error)
 }
