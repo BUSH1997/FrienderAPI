@@ -27,5 +27,5 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.PUT("event/:id/unsubscribe", sc.EventHandler.UnsubscribeEvent)
 	router.PUT("event/:id/delete", sc.EventHandler.DeleteEvent)
 	router.PUT("event/:id/change", sc.EventHandler.ChangeEvent)
-	router.GET("ev/categories", sc.EventHandler.GetAllCategory)
+	router.GET("categories", sc.EventHandler.GetAllCategory)
 }
