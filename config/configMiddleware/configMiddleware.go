@@ -9,7 +9,7 @@ import (
 var (
 	allowOrigins  = []string{"*"}
 	allowMethods  = []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut, http.MethodOptions}
-	allowHeaders  = []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "X-Csrf-Token", "x-user-id"}
+	allowHeaders  = []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "X-Csrf-Token", "X-User-ID"}
 	exposeHeaders = []string{"Authorization", "X-Csrf-Token"}
 )
 

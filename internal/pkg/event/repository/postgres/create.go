@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
@@ -19,8 +18,8 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			Title:       event.Title,
 			Description: event.Description,
 			StartsAt:    event.StartsAt,
-			TimeCreated: time.Now(),
-			TimeUpdated: time.Now(),
+			TimeCreated: time.Now().Unix(),
+			TimeUpdated: time.Now().Unix(),
 			IsPublic:    event.IsPublic,
 		}
 
@@ -47,7 +46,6 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 		res = r.db.Take(&dbUser, "uid = ?", event.Author)
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			dbUser.Uid = event.Author
-			fmt.Println("LOL1", dbUser)
 			err := r.createUser(ctx, &dbUser)
 			if err != nil {
 				return errors.Wrap(err, "failed to create user")
