@@ -32,10 +32,20 @@ func (uc eventUsecase) UnsubscribeEvent(ctx context.Context, user int64, event s
 	return nil
 }
 
-func (uc eventUsecase) DeleteEvent(ctx context.Context, user int64, event string) error {
+func (uc eventUsecase) Delete(ctx context.Context, user int64, event string) error {
+	err := uc.Events.Delete(ctx, user, event)
+	if err != nil {
+		return errors.Wrapf(err, "failed to delete event %s", event)
+	}
+
 	return nil
 }
 
-func (uc eventUsecase) ChangeEvent(ctx context.Context, event models.Event) error {
+func (uc eventUsecase) Change(ctx context.Context, event models.Event) error {
+	err := uc.Events.Update(ctx, event)
+	if err != nil {
+		return errors.Wrapf(err, "failed to update event %s", event.Uid)
+	}
+
 	return nil
 }

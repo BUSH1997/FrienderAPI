@@ -21,4 +21,5 @@ type Repository interface {
 	UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
 	Subscribe(ctx context.Context, user int64, event string) error
 	UnSubscribe(ctx context.Context, user int64, event string) error
+	Delete(ctx context.Context, user int64, event string) error
 }

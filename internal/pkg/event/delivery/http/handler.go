@@ -213,7 +213,7 @@ func (eh *EventHandler) DeleteEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	err := eh.useCase.DeleteEvent(ctx.Request().Context(), int64(userId.Id), eventID)
+	err := eh.useCase.Delete(ctx.Request().Context(), int64(userId.Id), eventID)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to delete event")
 		return ctx.JSON(http.StatusBadRequest, err)
@@ -223,27 +223,15 @@ func (eh *EventHandler) DeleteEvent(ctx echo.Context) error {
 }
 
 func (eh *EventHandler) ChangeEvent(ctx echo.Context) error {
-	idString := ctx.Param("id")
-	if idString == "" {
-		return ctx.NoContent(http.StatusBadRequest)
-	}
-
-	_, err := strconv.Atoi(idString)
-	if err != nil {
-		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
-			Errorf("failed to delete event")
-		return ctx.NoContent(http.StatusInternalServerError)
-	}
-
 	var event models.Event
 	if err := ctx.Bind(&event); err != nil {
-		eh.logger.WithError(err).Errorf("failed to delete event")
+		eh.logger.WithError(err).Errorf("failed to bind event")
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	err = eh.useCase.ChangeEvent(ctx.Request().Context(), event)
+	err := eh.useCase.Change(ctx.Request().Context(), event)
 	if err != nil {
-		eh.logger.WithError(err).Errorf("failed to delete event")
+		eh.logger.WithError(err).Errorf("failed to change event")
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
@@ -253,7 +241,8 @@ func (eh *EventHandler) ChangeEvent(ctx echo.Context) error {
 func (eh *EventHandler) GetAllCategory(ctx echo.Context) error {
 	categories, err := eh.useCase.GetAllCategories(ctx.Request().Context())
 	if err != nil {
-		return ctx.NoContent(http.StatusInternalServerError)
+		eh.logger.WithError(err).Errorf("failed to get all categories")
+		return ctx.NoContent(http.StatusBadRequest)
 	}
 
 	return ctx.JSON(http.StatusOK, categories)
