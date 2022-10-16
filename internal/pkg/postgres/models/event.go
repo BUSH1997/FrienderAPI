@@ -15,8 +15,8 @@ type Event struct {
 	IsPublic     bool   `gorm:"column:is_public"`
 	IsPrivate    bool   `gorm:"column:is_private"`
 	Owner        int    `gorm:"column:owner_id"`
-	IsDeleted    bool   `gorm:"is_deleted"`
-	Photos       string `gorm:"photos"`
+	IsDeleted    bool   `gorm:"column:is_deleted"`
+	Photos       string `gorm:"column:photos"`
 }
 
 func (Event) TableName() string {

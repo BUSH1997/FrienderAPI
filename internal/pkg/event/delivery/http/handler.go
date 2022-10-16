@@ -177,7 +177,7 @@ func (eh *EventHandler) SubscribeEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	return ctx.NoContent(http.StatusInternalServerError)
+	return ctx.JSON(http.StatusOK, "success")
 }
 
 func (eh *EventHandler) UnsubscribeEvent(ctx echo.Context) error {
@@ -198,7 +198,7 @@ func (eh *EventHandler) UnsubscribeEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	return ctx.NoContent(http.StatusInternalServerError)
+	return ctx.JSON(http.StatusOK, "success")
 }
 
 func (eh *EventHandler) DeleteEvent(ctx echo.Context) error {
@@ -219,7 +219,7 @@ func (eh *EventHandler) DeleteEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	return ctx.NoContent(http.StatusInternalServerError)
+	return ctx.JSON(http.StatusOK, "success")
 }
 
 func (eh *EventHandler) ChangeEvent(ctx echo.Context) error {
@@ -235,7 +235,7 @@ func (eh *EventHandler) ChangeEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	return ctx.NoContent(http.StatusInternalServerError)
+	return ctx.JSON(http.StatusOK, "success")
 }
 
 func (eh *EventHandler) GetAllCategory(ctx echo.Context) error {

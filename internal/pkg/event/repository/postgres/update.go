@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
@@ -11,6 +12,7 @@ import (
 )
 
 func (r eventRepository) Update(ctx context.Context, event models.Event) error {
+	fmt.Println(event.Uid)
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		res := r.db.Model(&db_models.Event{}).Where("uid = ?", event.Uid).Updates(map[string]interface{}{
 			"uid":          event.Uid,

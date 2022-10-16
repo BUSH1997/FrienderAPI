@@ -1,10 +1,10 @@
 package models
 
 type Status struct {
-	ID          uint   `gorm:"id"`
-	UID         int    `gorm:"uid"`
-	Title       string `gorm:"title"`
-	ConditionID int    `gorm:"condition_id"`
+	ID          uint   `gorm:"column:id"`
+	UID         int    `gorm:"column:uid"`
+	Title       string `gorm:"column:title"`
+	ConditionID int    `gorm:"column:condition_id"`
 }
 
 func (Status) TableName() string {

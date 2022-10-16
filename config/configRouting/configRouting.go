@@ -15,9 +15,9 @@ type ServerConfigRouting struct {
 
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("event/create", sc.EventHandler.CreateEvent)
-	router.GET("event/:id", sc.EventHandler.GetOneEvent)
+	router.GET("event/get/:id", sc.EventHandler.GetOneEvent)
 	router.GET("events", sc.EventHandler.GetEvents)
-	router.GET("events/:id", sc.EventHandler.GetEventsUser)
+	router.GET("events/get/:id", sc.EventHandler.GetEventsUser)
 	router.POST("image/upload", sc.ImageHandler.UploadImage)
 	router.GET("profile/:id", sc.ProfileHandler.GetOneProfile)
 	router.GET("profile/:id/statuses", sc.ProfileHandler.GetAllStatusesUser)
@@ -26,6 +26,6 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.PUT("event/:id/subscribe", sc.EventHandler.SubscribeEvent)
 	router.PUT("event/:id/unsubscribe", sc.EventHandler.UnsubscribeEvent)
 	router.PUT("event/:id/delete", sc.EventHandler.DeleteEvent)
-	router.PUT("event/:id/change", sc.EventHandler.ChangeEvent)
+	router.PUT("event/change", sc.EventHandler.ChangeEvent)
 	router.GET("categories", sc.EventHandler.GetAllCategory)
 }

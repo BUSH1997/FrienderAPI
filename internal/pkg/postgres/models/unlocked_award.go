@@ -1,9 +1,9 @@
 package models
 
 type UnlockedAward struct {
-	ID      uint `gorm:"id"`
-	UserID  int  `gorm:"user_id"`
-	AwardID int  `gorm:"award_id"`
+	ID      uint `gorm:"column:id"`
+	UserID  int  `gorm:"column:user_id"`
+	AwardID int  `gorm:"column:award_id"`
 }
 
 func (UnlockedAward) TableName() string {

@@ -27,7 +27,7 @@ func (r eventRepository) Delete(ctx context.Context, user int64, event string) e
 		currentPriority := dbEventSharing.Priority
 
 		res = r.db.Model(&db_models.EventSharing{}).
-			Where("user_id = ? AND priority > ?", currentPriority).
+			Where("user_id = ? AND priority > ?", dbUser.ID, currentPriority).
 			Update("priority", gorm.Expr("event_sharings.priority + ?", -1))
 		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to update event sharings priority")

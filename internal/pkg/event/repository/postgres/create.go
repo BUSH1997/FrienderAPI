@@ -46,16 +46,18 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 		res = r.db.Take(&dbUser, "uid = ?", event.Author)
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			dbUser.Uid = event.Author
+			dbUser.CurrentStatus = 1
 			err := r.createUser(ctx, &dbUser)
 			if err != nil {
 				return errors.Wrap(err, "failed to create user")
 			}
 		}
 		if err := res.Error; err != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			return errors.Wrap(err, "failed to get event category")
+			return errors.Wrap(err, "failed to get event user")
 		}
 
 		dbEvent.Owner = int(dbUser.ID)
+		dbEvent.CountMembers = 1
 
 		res = r.db.Create(&dbEvent)
 		if err := res.Error; err != nil {

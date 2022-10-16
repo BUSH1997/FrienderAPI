@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Syncer struct {
-	UpdatedAt time.Time `gorm:"updated_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at"`
 }
 
 func (Syncer) TableName() string {
