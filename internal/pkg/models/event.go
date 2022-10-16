@@ -31,6 +31,7 @@ type Event struct {
 	StartsAt    int64     `json:"time_start,omitempty"`
 	IsGroup     bool      `json:"is_group,omitempty"`
 	IsPublic    bool      `json:"is_public,omitempty"`
+	IsPrivate   bool      `json:"is_private,omitempty"`
 	Category    Category  `json:"category,omitempty"`
 }
 

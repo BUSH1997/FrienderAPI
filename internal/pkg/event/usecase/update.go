@@ -41,6 +41,11 @@ func (uc eventUsecase) Delete(ctx context.Context, user int64, event string) err
 	return nil
 }
 
-func (uc eventUsecase) ChangeEvent(ctx context.Context, event models.Event) error {
+func (uc eventUsecase) Change(ctx context.Context, event models.Event) error {
+	err := uc.Events.Update(ctx, event)
+	if err != nil {
+		return errors.Wrapf(err, "failed to update event %s", event.Uid)
+	}
+
 	return nil
 }
