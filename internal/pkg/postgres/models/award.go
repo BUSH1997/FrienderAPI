@@ -1,11 +1,11 @@
 package models
 
 type Award struct {
-	ID          uint   `gorm:"id"`
-	Image       string `gorm:"image"`
-	Name        string `gorm:"name"`
-	Description string `gorm:"description"`
-	ConditionID int    `gorm:"condition_id"`
+	ID          uint   `gorm:"column:id"`
+	Image       string `gorm:"column:image"`
+	Name        string `gorm:"column:name"`
+	Description string `gorm:"column:description"`
+	ConditionID int    `gorm:"column:condition_id"`
 }
 
 func (Award) TableName() string {
