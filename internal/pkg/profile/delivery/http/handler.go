@@ -37,7 +37,7 @@ func (eh *ProfileHandler) GetOneProfile(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	profile, err := eh.useCase.GetOneProfile(ctx.Request().Context(), int(id))
+	profile, err := eh.useCase.GetOneProfile(ctx.Request().Context(), id)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("[GetOneProfile] failed get one profile")
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -61,7 +61,7 @@ func (eh *ProfileHandler) GetAllStatusesUser(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	statuses, err := eh.useCase.GetAllProfileStatuses(ctx.Request().Context(), int(id))
+	statuses, err := eh.useCase.GetAllProfileStatuses(ctx.Request().Context(), id)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("[GetAllStatusesUser] failed get all statuses user")
 		return ctx.NoContent(http.StatusInternalServerError)

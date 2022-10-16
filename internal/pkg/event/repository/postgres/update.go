@@ -78,3 +78,126 @@ func (r eventRepository) UpdateEventPriority(ctx context.Context, eventPriority 
 
 	return nil
 }
+
+func (r eventRepository) Subscribe(ctx context.Context, user int64, event string) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvent db_models.Event
+		res := r.db.Take(&dbEvent, "uid = ?", event)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to get event by uid %s", event)
+		}
+
+		var dbUser db_models.User
+		res = r.db.Take(&dbUser, "uid = ?", user)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to get user by uid %d", user)
+		}
+
+		dbEventSharing := db_models.EventSharing{}
+		res = r.db.Take(&dbEventSharing, "event_id = ? AND user_id = ?", dbEvent.ID, dbUser.ID)
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			dbEventSharing.EventID = int(dbEvent.ID)
+			dbEventSharing.UserID = int(dbUser.ID)
+			res = r.db.Create(&dbEventSharing)
+			if err := res.Error; err != nil {
+				return errors.Wrapf(err, "failed to create event sharing")
+			}
+		}
+		if err := res.Error; err != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return errors.Wrap(err, "failed to get event sharing")
+		}
+
+		var dbEventSharings []db_models.EventSharing
+		res = r.db.Order("priority desc").Find(&dbEventSharings, "user_id = ?", dbUser.ID)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get event sharings")
+		}
+
+		priority := 1
+		if len(dbEventSharings) > 0 {
+			priority = dbEventSharings[0].Priority
+		}
+
+		res = r.db.Model(&db_models.EventSharing{}).
+			Where("event_id = ? AND user_id = ?", dbEvent.ID, dbUser.ID).
+			Updates(map[string]interface{}{
+				"is_deleted": false,
+				"priority":   priority,
+			})
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update event sharing")
+		}
+
+		res = r.db.Model(&db_models.Event{}).
+			Where("id = ?", dbEvent.ID).
+			Update("count_members", gorm.Expr("events.count_members + ?", 1))
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update event members count")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to make transaction")
+	}
+
+	return nil
+}
+
+func (r eventRepository) UnSubscribe(ctx context.Context, user int64, event string) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvent db_models.Event
+		res := r.db.Take(&dbEvent, "uid = ?", event)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to get event by uid %s", event)
+		}
+
+		var dbUser db_models.User
+		res = r.db.Take(&dbUser, "uid = ?", user)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to get user by uid %d", user)
+		}
+
+		dbEventSharing := db_models.EventSharing{}
+		res = r.db.Take(&dbEventSharing, "event_id = ? AND user_id = ?", dbEvent.ID, dbUser.ID)
+
+		currentPriority := dbEventSharing.Priority
+
+		res = r.db.Model(&db_models.EventSharing{}).
+			Where("user_id = ? AND priority > ?", currentPriority).
+			Update("priority", gorm.Expr("event_sharings.priority + ?", -1))
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update event sharings priority")
+		}
+
+		res = r.db.Model(&db_models.EventSharing{}).
+			Where("event_id = ? AND user_id = ?", dbEvent.ID, dbUser.ID).
+			Update("is_deleted", true)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update event sharing")
+		}
+
+		res = r.db.Model(&db_models.Event{}).
+			Where("id = ?", dbEvent.ID).
+			Update("count_members", gorm.Expr("events.count_members + ?", -1))
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update event members count")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to make transaction")
+	}
+
+	return nil
+}
+
+//res := r.db.Model(&db_models.EventSharing{}).
+//	Joins("JOIN events on event_sharings.event_id = events.id").
+//	Joins("JOIN users on event_sharings.user_id = users.id").
+//	Where("users.uid = ? AND event.uid = ?", user, event).
+//	Update("is", eventPriority.Priority)
+//if err = res.Error; err != nil {
+//	return errors.Wrapf(err, "failed to update event sharing priority")
+//}

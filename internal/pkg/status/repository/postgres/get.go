@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r statusRepository) GetUserCurrentStatus(ctx context.Context, id int) (models.Status, error) {
+func (r statusRepository) GetUserCurrentStatus(ctx context.Context, id int64) (models.Status, error) {
 	var status models.Status
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -37,7 +37,7 @@ func (r statusRepository) GetUserCurrentStatus(ctx context.Context, id int) (mod
 	return status, nil
 }
 
-func (r statusRepository) GetAllUserStatuses(ctx context.Context, id int) ([]models.Status, error) {
+func (r statusRepository) GetAllUserStatuses(ctx context.Context, id int64) ([]models.Status, error) {
 	var statuses []models.Status
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {

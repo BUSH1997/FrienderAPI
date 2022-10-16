@@ -6,6 +6,6 @@ import (
 )
 
 type Repository interface {
-	GetUserCurrentStatus(ctx context.Context, id int) (models.Status, error)
-	GetAllUserStatuses(ctx context.Context, id int) ([]models.Status, error)
+	GetUserCurrentStatus(ctx context.Context, id int64) (models.Status, error)
+	GetAllUserStatuses(ctx context.Context, id int64) ([]models.Status, error)
 }

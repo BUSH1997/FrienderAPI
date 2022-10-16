@@ -10,12 +10,15 @@ type Repository interface {
 	Update(ctx context.Context, event models.Event) error
 	GetAllPublic(ctx context.Context) ([]models.Event, error)
 	GetAll(ctx context.Context) ([]models.Event, error)
+	GetOwnerEvents(ctx context.Context, user int64) ([]models.Event, error)
 	GetEventById(ctx context.Context, id string) (models.Event, error)
-	GetUserEvents(ctx context.Context, id int64) ([]models.Event, error)
+	GetUserEvents(ctx context.Context, user int64) ([]models.Event, error)
 	UploadImage(ctx context.Context, uid string, link string) error
-	SubscribeEvent(ctx context.Context, id models.UserIdEventId) error
 	GetAllCategories(ctx context.Context) ([]string, error)
-	GetUserActiveEvents(ctx context.Context, id int) ([]models.Event, error)
-	GetUserVisitedEvents(ctx context.Context, id int) ([]models.Event, error)
+	GetUserActiveEvents(ctx context.Context, user int64) ([]models.Event, error)
+	GetUserVisitedEvents(ctx context.Context, user int64) ([]models.Event, error)
+	GetSubscriptionEvents(ctx context.Context, user int64) ([]models.Event, error)
 	UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
+	Subscribe(ctx context.Context, user int64, event string) error
+	UnSubscribe(ctx context.Context, user int64, event string) error
 }
