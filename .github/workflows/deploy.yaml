@@ -44,7 +44,7 @@ jobs:
           username: ubuntu
           password: ${{ secrets.PASSWORD }}
           source: "main_server"
-          target: "~/testfriender/FrienderAPI/build/main_server"
+          target: "~/testfriender/FrienderAPI/build"
 
       - name: chmod
         uses: appleboy/ssh-action@master
