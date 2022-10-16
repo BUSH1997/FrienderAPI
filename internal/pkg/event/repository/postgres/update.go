@@ -6,22 +6,21 @@ import (
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"strconv"
+	"time"
 )
 
 func (r eventRepository) Update(ctx context.Context, event models.Event) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-		dbEvent := db_models.Event{
-			Uid:      event.Uid,
-			Title:    event.Title,
-			StartsAt: event.StartsAt,
-			IsPublic: event.IsPublic,
-		}
-
-		res := r.db.Model(&db_models.Event{}).Where("uid = ?", dbEvent.Uid).Updates(map[string]interface{}{
-			"uid":       dbEvent.Uid,
-			"title":     dbEvent.Title,
-			"starts_at": dbEvent.StartsAt,
-			"is_public": dbEvent.IsPublic,
+		res := r.db.Model(&db_models.Event{}).Where("uid = ?", event.Uid).Updates(map[string]interface{}{
+			"uid":          event.Uid,
+			"title":        event.Title,
+			"description":  event.Description,
+			"starts_at":    event.StartsAt,
+			"time_updated": time.Now().Unix(),
+			"geo":          strconv.Itoa(int(event.GeoData.Longitude)) + "," + strconv.Itoa(int(event.GeoData.Latitude)),
+			"is_public":    event.IsPublic,
+			"is_private":   event.IsPrivate,
 		})
 		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to update event, uid %d", event.Uid)
