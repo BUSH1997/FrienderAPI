@@ -28,6 +28,7 @@ var (
 )
 
 func main() {
+
 	configApp := config.Config{}
 	err := config.LoadConfig(&configApp, "config")
 	if err != nil {
