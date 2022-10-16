@@ -1,11 +1,11 @@
 package models
 
 type SubscribeSharing struct {
-	Id           int
-	UserId       int
-	SubscriberId int
+	ID           uint `gorm:"id"`
+	UserID       int  `gorm:"user_id"`
+	SubscriberID int  `gorm:"subscriber_id"`
 }
 
 func (SubscribeSharing) TableName() string {
-	return "subscribe_sharing"
+	return "subscribe_sharings"
 }

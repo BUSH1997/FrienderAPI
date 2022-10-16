@@ -1,4 +1,4 @@
-package profile
+package award
 
 import (
 	"context"
@@ -6,5 +6,5 @@ import (
 )
 
 type Repository interface {
-	UpdateProfile(ctx context.Context, profile models.ChangeProfile) error
+	GetUserAwards(ctx context.Context, id int) ([]models.Award, error)
 }

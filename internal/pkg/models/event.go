@@ -13,7 +13,7 @@ type UserIdEventId struct {
 }
 
 type UidEventPriority struct {
-	UidUser  string `json:"-"`
+	UidUser  int    `json:"-"`
 	UidEvent string `json:"event_uid,omitempty"`
 	Priority int    `json:"priority,omitempty"`
 }
