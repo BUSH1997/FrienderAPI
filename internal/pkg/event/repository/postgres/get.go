@@ -194,3 +194,28 @@ func (r eventRepository) GetUserEvents(ctx context.Context, id int64) ([]models.
 
 	return ret, nil
 }
+
+func (r eventRepository) GetAllCategories(ctx context.Context) ([]string, error) {
+	var ret []string
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbCategories []db_models.Category
+		res := r.db.Find(&dbCategories)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get all categories")
+		}
+
+		ret = make([]string, 0, len(dbCategories))
+		for _, dbEvent := range dbCategories {
+			currentCategory := dbEvent.Name
+			ret = append(ret, currentCategory)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction GetAllCategories")
+	}
+
+	return ret, nil
+}

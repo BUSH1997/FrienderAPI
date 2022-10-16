@@ -208,3 +208,12 @@ func (eh *EventHandler) ChangeEvent(ctx echo.Context) error {
 
 	return ctx.NoContent(http.StatusInternalServerError)
 }
+
+func (eh *EventHandler) GetAllCategory(ctx echo.Context) error {
+	categories, err := eh.useCase.GetAllCategories(ctx.Request().Context())
+	if err != nil {
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	return ctx.JSON(http.StatusOK, categories)
+}

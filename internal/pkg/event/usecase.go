@@ -25,4 +25,5 @@ type Usecase interface {
 	UnsubscribeEvent(ctx context.Context, id models.UserIdEventId) error
 	DeleteEvent(ctx context.Context, id models.UserIdEventId) error
 	ChangeEvent(ctx context.Context, event models.Event) error
+	GetAllCategories(ctx context.Context) ([]string, error)
 }

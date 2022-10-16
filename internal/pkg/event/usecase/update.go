@@ -11,11 +11,14 @@ func (u eventUsecase) Update(ctx context.Context, event models.Event) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to update public event in usecase")
 	}
-
 	return nil
 }
 
 func (u eventUsecase) SubscribeEvent(ctx context.Context, id models.UserIdEventId) error {
+	err := u.Events.SubscribeEvent(ctx, id)
+	if err != nil {
+		return errors.Wrap(err, "failed to subscribe event in usecase")
+	}
 	return nil
 }
 

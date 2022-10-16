@@ -32,3 +32,7 @@ func (u eventUsecase) GetAll(ctx context.Context, filter event.FilterGetAll) ([]
 
 	return events, nil
 }
+
+func (u eventUsecase) GetAllCategories(ctx context.Context) ([]string, error) {
+	return u.Events.GetAllCategories(ctx)
+}

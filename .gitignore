@@ -3,3 +3,4 @@ bin
 .idea
 .cache
 .go
+config/public_sync.yaml
