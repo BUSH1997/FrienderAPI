@@ -88,6 +88,7 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 	res = r.db.
 		Joins("JOIN events on event_sharings.event_id = events.id").
 		Where("events.uid = ?", id).
+		Where("event_sharings.is_deleted = ?", false).
 		Find(&dbEventSharings)
 	if err := res.Error; err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to get event sharings")
