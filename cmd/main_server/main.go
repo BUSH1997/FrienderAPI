@@ -17,6 +17,7 @@ import (
 	profileUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/usecase"
 	statusPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/status/repository/postgres"
 	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/vk_api"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"log"
@@ -28,11 +29,17 @@ var (
 )
 
 func main() {
-
 	configApp := config.Config{}
 	err := config.LoadConfig(&configApp, "config")
 	if err != nil {
 		panic(err)
+	}
+
+	vk := vk_api.VKApi{
+		AccessToken: configApp.Vk.AccessToken,
+		GroupId:     configApp.Vk.GroupId,
+		AlbumId:     configApp.Vk.AlbumId,
+		Version:     configApp.Vk.Version,
 	}
 
 	db, err := postgreslib.InitDB(configApp.Postgres)
@@ -46,7 +53,7 @@ func main() {
 	eventHandler := http.NewEventHandler(eventUsecase, logger)
 
 	imageRepo := s3.New(logger)
-	imageUseCase := imageUseCase.New(imageRepo, eventRepo, logger)
+	imageUseCase := imageUseCase.New(imageRepo, eventRepo, logger, vk)
 	imageHandler := image.NewImageHandler(imageUseCase)
 
 	awardRepo := awardPostgres.New(db, logger)

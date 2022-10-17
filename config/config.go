@@ -13,10 +13,18 @@ type TransportConfig struct {
 	HTTP    httplib.Config                 `mapstructure:"http"`
 }
 
+type VKConfig struct {
+	AccessToken string
+	GroupId     string
+	AlbumId     string
+	Version     string
+}
+
 type Config struct {
 	Syncer    syncer.SyncerConfig  `mapstructure:"syncer"`
 	Transport TransportConfig      `mapstructure:"transport"`
 	Postgres  postgreslib.Postgres `mapstructure:"postgres"`
+	Vk        VKConfig             `mapstructure:"vk"`
 }
 
 func LoadConfig(config *Config, path string) error {
