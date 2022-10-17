@@ -17,6 +17,7 @@ type Event struct {
 	Owner        int    `gorm:"column:owner_id"`
 	IsDeleted    bool   `gorm:"column:is_deleted"`
 	Photos       string `gorm:"column:photos"`
+	MembersLimit int    `gorm:"column:members_limit"`
 }
 
 func (Event) TableName() string {

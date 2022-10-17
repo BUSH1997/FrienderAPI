@@ -2,12 +2,12 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -41,7 +41,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 
 		dbEvent.Category = int(dbCategory.ID)
 		dbEvent.Images = strings.Join(event.Images, ",")
-		dbEvent.Geo = strconv.Itoa(int(event.GeoData.Longitude)) + "," + strconv.Itoa(int(event.GeoData.Latitude))
+		dbEvent.Geo = fmt.Sprintf("%f", event.GeoData.Longitude) + "," + fmt.Sprintf("%f", event.GeoData.Latitude)
 
 		dbUser := db_models.User{}
 

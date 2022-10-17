@@ -19,20 +19,21 @@ type PriorityEvent struct {
 }
 
 type Event struct {
-	Uid         string    `json:"id,omitempty"`
-	Title       string    `json:"title,omitempty"`
-	Description string    `json:"description,omitempty"`
-	Members     []int     `json:"members,omitempty"`
-	Images      []string  `json:"images,omitempty"`
-	TimeCreated time.Time `json:"time_created,omitempty"`
-	TimeUpdated time.Time `json:"time_update,omitempty"`
-	GeoData     Geo       `json:"geo,omitempty"`
-	Author      int       `json:"author,omitempty"`
-	StartsAt    int64     `json:"time_start,omitempty"`
-	IsGroup     bool      `json:"is_group,omitempty"`
-	IsPublic    bool      `json:"is_public,omitempty"`
-	IsPrivate   bool      `json:"is_private,omitempty"`
-	Category    Category  `json:"category,omitempty"`
+	Uid          string    `json:"id,omitempty"`
+	Title        string    `json:"title,omitempty"`
+	Description  string    `json:"description,omitempty"`
+	Members      []int     `json:"members,omitempty"`
+	Images       []string  `json:"images,omitempty"`
+	TimeCreated  time.Time `json:"time_created,omitempty"`
+	TimeUpdated  time.Time `json:"time_update,omitempty"`
+	GeoData      Geo       `json:"geo,omitempty"`
+	Author       int       `json:"author,omitempty"`
+	StartsAt     int64     `json:"time_start,omitempty"`
+	IsGroup      bool      `json:"is_group,omitempty"`
+	IsPublic     bool      `json:"is_public,omitempty"`
+	IsPrivate    bool      `json:"is_private,omitempty"`
+	Category     Category  `json:"category,omitempty"`
+	MembersLimit int       `json:"members_limit,omitempty"`
 }
 
 type GetEventParams struct {

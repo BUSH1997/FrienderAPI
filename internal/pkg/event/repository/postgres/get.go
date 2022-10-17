@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
@@ -109,19 +110,20 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 	}
 
 	event := models.Event{
-		Uid:         dbEvent.Uid,
-		Title:       dbEvent.Title,
-		Description: dbEvent.Description,
-		TimeCreated: time.Unix(dbEvent.TimeCreated, 0),
-		TimeUpdated: time.Unix(dbEvent.TimeUpdated, 0),
-		Author:      dbUser.Uid,
-		StartsAt:    dbEvent.StartsAt,
-		IsPublic:    dbEvent.IsPublic,
-		Category:    models.Category(dbCategory.Name),
+		Uid:          dbEvent.Uid,
+		Title:        dbEvent.Title,
+		Description:  dbEvent.Description,
+		TimeCreated:  time.Unix(dbEvent.TimeCreated, 0),
+		TimeUpdated:  time.Unix(dbEvent.TimeUpdated, 0),
+		Author:       dbUser.Uid,
+		StartsAt:     dbEvent.StartsAt,
+		IsPublic:     dbEvent.IsPublic,
+		Category:     models.Category(dbCategory.Name),
+		MembersLimit: dbEvent.MembersLimit,
 	}
 
 	event.Members = members
-
+	fmt.Println(strings.Split(dbEvent.Geo, ",")[0])
 	longitude, err := strconv.ParseFloat(strings.Split(dbEvent.Geo, ",")[0], 32)
 	if err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to parse longitude")
