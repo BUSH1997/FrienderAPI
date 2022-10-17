@@ -41,7 +41,7 @@ func main() {
 		AlbumId:     configApp.Vk.AlbumId,
 		Version:     configApp.Vk.Version,
 	}
-
+	log.Println(configApp.Vk.AccessToken)
 	db, err := postgreslib.InitDB(configApp.Postgres)
 	if err != nil {
 		log.Fatal(err)
