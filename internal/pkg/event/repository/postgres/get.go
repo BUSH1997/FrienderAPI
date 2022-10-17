@@ -223,6 +223,10 @@ func (r eventRepository) GetUserActiveEvents(ctx context.Context, user int64) ([
 			return errors.Wrap(err, "failed to get user event sharings")
 		}
 
+		if len(dbEventSharings) == 0 {
+			return nil
+		}
+
 		eventIDs := make([]int, 0, len(dbEventSharings))
 		for _, sharing := range dbEventSharings {
 			eventIDs = append(eventIDs, sharing.EventID)
