@@ -267,7 +267,7 @@ func (r eventRepository) GetUserVisitedEvents(ctx context.Context, user int64) (
 			Joins("JOIN events on event_sharings.event_id = events.id").
 			Where("users.uid = ?", user).
 			Where("events.starts_at < ?", time.Now().Unix()).
-			Where("is_deleted = ?", false).
+			Where("event_sharings.is_deleted = ?", false).
 			Find(&dbEventSharings)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user event sharings")
