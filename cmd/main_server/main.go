@@ -47,7 +47,7 @@ func main() {
 		log.Fatal(err)
 	}
 	logger := logger2.New(os.Stdout, &logrus.JSONFormatter{}, logrus.InfoLevel)
-
+	logger.Println(configApp.Vk.AccessToken)
 	eventRepo := postgres.New(db, logger)
 	eventUsecase := usecase.New(eventRepo, logger)
 	eventHandler := http.NewEventHandler(eventUsecase, logger)
