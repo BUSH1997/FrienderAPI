@@ -14,10 +14,10 @@ type TransportConfig struct {
 }
 
 type VKConfig struct {
-	AccessToken string
-	GroupId     string
-	AlbumId     string
-	Version     string
+	AccessToken string `mapstructure:"access_token"`
+	GroupId     string `mapstructure:"group_id"`
+	AlbumId     string `mapstructure:"album_id"`
+	Version     string `mapstructure:"version"`
 }
 
 type Config struct {
