@@ -9,7 +9,6 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"math"
-	"strconv"
 	"time"
 )
 
@@ -22,7 +21,7 @@ func (r eventRepository) Update(ctx context.Context, event models.Event) error {
 			"description":  event.Description,
 			"starts_at":    event.StartsAt,
 			"time_updated": time.Now().Unix(),
-			"geo":          strconv.Itoa(int(event.GeoData.Longitude)) + "," + strconv.Itoa(int(event.GeoData.Latitude)),
+			"geo":          fmt.Sprintf("%f", event.GeoData.Longitude) + "," + fmt.Sprintf("%f", event.GeoData.Latitude),
 			"is_public":    event.IsPublic,
 			"is_private":   event.IsPrivate,
 		})
