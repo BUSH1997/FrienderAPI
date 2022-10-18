@@ -156,7 +156,7 @@ func (vk VKApi) SaveFile(photosList string, server string, hash string) (string,
 	fieldResponse1 := fieldResponse[0].(map[string]interface{})
 	id := fieldResponse1["id"].(float64)
 	ownerId := fieldResponse1["owner_id"].(float64)
-	stringId := fmt.Sprintf("%.0f-%.0f", ownerId, id)
+	stringId := fmt.Sprintf("%.0f_%.0f", ownerId, id)
 	fmt.Println(stringId)
 	return stringId, nil
 }
