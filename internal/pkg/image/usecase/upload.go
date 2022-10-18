@@ -9,7 +9,7 @@ import (
 )
 
 func (us *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*multipart.FileHeader, uid string) error {
-	for i := 1; i < len(files); i++ {
+	for i := 0; i < len(files); i++ {
 		currentFieldName := fmt.Sprintf("photo%d", i)
 		err := us.imageRepository.UploadImage(ctx, files[currentFieldName][0])
 		if err != nil {
