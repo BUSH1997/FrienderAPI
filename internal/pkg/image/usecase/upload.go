@@ -31,7 +31,7 @@ func (us *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*mul
 	links := ""
 	for i := 1; i < len(files); i++ {
 		currentFieldName := fmt.Sprintf("photo%d", i)
-		links += "https://friender.hb.bizmrg.com/" + files[currentFieldName][0].Filename
+		links += "https://friender.hb.bizmrg.com/" + files[currentFieldName][0].Filename + ","
 	}
 
 	if links == "" {
