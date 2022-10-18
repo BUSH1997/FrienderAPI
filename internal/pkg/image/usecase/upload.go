@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/gommon/log"
 	"mime/multipart"
+	"strings"
 )
 
 func (us *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*multipart.FileHeader, uid string) error {
@@ -37,6 +38,6 @@ func (us *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*mul
 	if links == "" {
 		return nil
 	}
-
+	links = strings.TrimSuffix(links, ",")
 	return us.eventRepository.UploadImage(ctx, uid, links)
 }
