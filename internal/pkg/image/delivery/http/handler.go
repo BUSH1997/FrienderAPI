@@ -23,14 +23,13 @@ func (h *ImageHandler) UploadImage(ctx echo.Context) error {
 		log.Error("Baduid")
 		return ctx.NoContent(http.StatusBadRequest)
 	}
-
-	file, err := ctx.FormFile("photo")
+	mf, err := ctx.MultipartForm()
 	if err != nil {
 		log.Error(err)
-		return err
+		return ctx.NoContent(http.StatusBadRequest)
 	}
 
-	err = h.useCase.UploadImage(ctx.Request().Context(), file, uid)
+	err = h.useCase.UploadImage(ctx.Request().Context(), mf.File, uid)
 	if err != nil {
 		log.Error(err)
 		return err
