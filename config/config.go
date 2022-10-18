@@ -25,6 +25,7 @@ type Config struct {
 	Transport TransportConfig      `mapstructure:"transport"`
 	Postgres  postgreslib.Postgres `mapstructure:"postgres"`
 	Vk        VKConfig             `mapstructure:"vk"`
+	BlackList []string             `mapstructure:"blacklist"`
 }
 
 func LoadConfig(config *Config, path string) error {
