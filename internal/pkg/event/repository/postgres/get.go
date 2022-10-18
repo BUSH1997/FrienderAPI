@@ -143,7 +143,7 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		Longitude: longitude,
 		Latitude:  latitude,
 	}
-
+	event.IsActive = event.StartsAt > time.Now().Unix()
 	images := strings.Split(dbEvent.Images, ",")
 	event.Images = images
 

@@ -32,6 +32,7 @@ type Event struct {
 	IsGroup      bool      `json:"is_group,omitempty"`
 	IsPublic     bool      `json:"is_public,omitempty"`
 	IsPrivate    bool      `json:"is_private,omitempty"`
+	IsActive     bool      `json:"is_active"`
 	Category     Category  `json:"category,omitempty"`
 	Avatar       Avatar    `json:"avatar"`
 	MembersLimit int       `json:"members_limit,omitempty"`
