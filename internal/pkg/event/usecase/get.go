@@ -48,6 +48,10 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 		return events[i].StartsAt > events[j].StartsAt
 	})
 
+	if events == nil {
+		events = make([]models.Event, 0)
+	}
+
 	return events, nil
 }
 
