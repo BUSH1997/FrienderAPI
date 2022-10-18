@@ -121,6 +121,10 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		IsPublic:     dbEvent.IsPublic,
 		Category:     models.Category(dbCategory.Name),
 		MembersLimit: dbEvent.MembersLimit,
+		Avatar: models.Avatar{
+			AvatarUrl:  dbEvent.AvatarUrl,
+			AvatarVkId: dbEvent.AvatarVkId,
+		},
 	}
 
 	event.Members = members

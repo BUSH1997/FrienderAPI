@@ -24,14 +24,11 @@ const (
 	vk_api_url      = "https://api.vk.com/method"
 )
 
-func (vk *VKApi) UploadPhoto(file *multipart.FileHeader) error {
+func (vk *VKApi) UploadPhoto(file *multipart.FileHeader) (string, error) {
 	uriServerUpload, err := vk.GetUploadServer()
 	if err != nil {
-		return err
-	}
-
-	if err != nil {
 		fmt.Println(err)
+		return "", err
 	}
 
 	b := new(bytes.Buffer)
@@ -61,13 +58,13 @@ func (vk *VKApi) UploadPhoto(file *multipart.FileHeader) error {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 
 	var jsonResp interface{}
 	err = json.Unmarshal(body, &jsonResp)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	jsonMap := jsonResp.(map[string]interface{})
@@ -76,8 +73,12 @@ func (vk *VKApi) UploadPhoto(file *multipart.FileHeader) error {
 	fmt.Println(photos_list)
 	stringFlaot := fmt.Sprintf("%v", server)
 	hash := jsonMap["hash"].(string)
-	vk.SaveFile(photos_list, stringFlaot, hash)
-	return nil
+	idPhoto, err := vk.SaveFile(photos_list, stringFlaot, hash)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	return idPhoto, nil
 }
 
 func (vk VKApi) GetUploadServer() (string, error) {
@@ -128,29 +129,34 @@ func (vk VKApi) ReadFile() (bytes.Buffer, error) {
 	return wr, nil
 }
 
-func (vk VKApi) SaveFile(photosList string, server string, hash string) error {
+func (vk VKApi) SaveFile(photosList string, server string, hash string) (string, error) {
 	uri := fmt.Sprintf("%s/%s?access_token=%s&album_id=%s&group_id=%s&v=%s&photos_list=%s&server=%s&hash=%s", vk_api_url,
 		"photos.save", vk.AccessToken, vk.AlbumId, vk.GroupId, vk.Version, photosList, server, hash)
 
 	resp, err := http.Post(uri, "application/json", nil)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 
 	var jsonResp interface{}
 	err = json.Unmarshal(body, &jsonResp)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	jsonMap := jsonResp.(map[string]interface{})
-	fmt.Println(jsonMap)
-	return nil
+	fieldResponse := jsonMap["response"].([]interface{})
+	fieldResponse1 := fieldResponse[0].(map[string]interface{})
+	id := fieldResponse1["id"].(float64)
+	ownerId := fieldResponse1["owner_id"].(float64)
+	stringId := fmt.Sprintf("%.0f-%.0f", ownerId, id)
+	fmt.Println(stringId)
+	return stringId, nil
 }

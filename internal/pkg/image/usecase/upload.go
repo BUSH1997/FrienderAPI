@@ -13,11 +13,11 @@ func (us *ImageUseCase) UploadImage(ctx context.Context, file *multipart.FileHea
 		return err
 	}
 
-	err = us.vk.UploadPhoto(file)
+	stringVkId, err := us.vk.UploadPhoto(file)
 	if err != nil {
 		log.Error(err)
 	}
 	link := "https://friender.hb.bizmrg.com/" + file.Filename
 
-	return us.eventRepository.UploadImage(ctx, uid, link)
+	return us.eventRepository.UploadAvatar(ctx, uid, link, stringVkId)
 }

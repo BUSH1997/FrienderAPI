@@ -33,6 +33,7 @@ type Event struct {
 	IsPublic     bool      `json:"is_public,omitempty"`
 	IsPrivate    bool      `json:"is_private,omitempty"`
 	Category     Category  `json:"category,omitempty"`
+	Avatar       Avatar    `json:"avatar"`
 	MembersLimit int       `json:"members_limit,omitempty"`
 }
 
@@ -52,6 +53,11 @@ const (
 type Geo struct {
 	Longitude float64 `json:"longitude,omitempty"`
 	Latitude  float64 `json:"latitude,omitempty"`
+}
+
+type Avatar struct {
+	AvatarUrl  string `json:"avatar_url"`
+	AvatarVkId string `json:"avatar_vk_id"`
 }
 
 func (e Event) GetEtag() string {

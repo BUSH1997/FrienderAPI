@@ -42,3 +42,30 @@ func buildImageLink(dbImages string, link string) string {
 
 	return strings.Join(images, ",")
 }
+
+func (r *eventRepository) UploadAvatar(ctx context.Context, uid string, link string, vkId string) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvent db_models.Event
+
+		res := r.db.Take(&dbEvent, "uid = ?", uid)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get event by uid")
+		}
+
+		res = r.db.Model(&db_models.Event{}).
+			Where("uid = ?", dbEvent.Uid).Updates(map[string]interface{}{
+			"avatar_url":   link,
+			"avatar_vk_id": vkId,
+		})
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update images in event, uid %s", uid)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to make transaction")
+	}
+
+	return nil
+}

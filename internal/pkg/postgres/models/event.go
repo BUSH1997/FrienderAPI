@@ -6,6 +6,8 @@ type Event struct {
 	Title        string `gorm:"column:title"`
 	Description  string `gorm:"column:description"`
 	Images       string `gorm:"column:images"`
+	AvatarUrl    string `gorm:"column:avatar_url"`
+	AvatarVkId   string `gorm:"column:avatar_vk_id"`
 	StartsAt     int64  `gorm:"column:starts_at"`
 	TimeCreated  int64  `gorm:"column:time_created"`
 	TimeUpdated  int64  `gorm:"column:time_updated"`
