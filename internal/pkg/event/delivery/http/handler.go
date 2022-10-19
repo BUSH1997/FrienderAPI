@@ -194,7 +194,7 @@ func (eh *EventHandler) ChangeEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, "successfully changed event")
+	return ctx.JSON(http.StatusOK, event)
 }
 
 func (eh *EventHandler) GetAllCategory(ctx echo.Context) error {
