@@ -24,6 +24,11 @@ func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.E
 		}
 	}
 
+	err = uc.validateEvent(event)
+	if err != nil {
+		return models.Event{}, errors.Wrap(err, " failed to validate event")
+	}
+
 	err = uc.Events.Create(ctx, event)
 	if err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to create public event in usecase")

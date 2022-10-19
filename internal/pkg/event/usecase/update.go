@@ -2,9 +2,12 @@ package usecase
 
 import (
 	"context"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/pkg/errors"
 )
+
+var ErrBlacklistedEvent = errors.New("event data is blacklisted")
 
 func (uc eventUsecase) Update(ctx context.Context, event models.Event) error {
 	err := uc.Events.Update(ctx, event)
@@ -42,9 +45,28 @@ func (uc eventUsecase) Delete(ctx context.Context, event string) error {
 }
 
 func (uc eventUsecase) Change(ctx context.Context, event models.Event) error {
-	err := uc.Events.Update(ctx, event)
+	err := uc.validateEvent(event)
+	if err != nil {
+		return errors.Wrap(err, " failed to validate event")
+	}
+
+	err = uc.Events.Update(ctx, event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to update event %s", event.Uid)
+	}
+
+	return nil
+}
+
+func (uc eventUsecase) validateEvent(event models.Event) error {
+	err := uc.BlackLister.Validate(blacklist.RowData{CheckData: event.Title})
+	if err != nil {
+		return errors.Wrap(ErrBlacklistedEvent, " failed to validate event's title")
+	}
+
+	err = uc.BlackLister.Validate(blacklist.RowData{CheckData: event.Description})
+	if err != nil {
+		return errors.Wrap(ErrBlacklistedEvent, " failed to validate event's description")
 	}
 
 	return nil

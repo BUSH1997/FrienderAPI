@@ -5,6 +5,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/config/configMiddleware"
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
 	awardPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/award/repository/postgres"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist/text_blacklist"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
@@ -41,15 +42,21 @@ func main() {
 		AlbumId:     configApp.Vk.AlbumId,
 		Version:     configApp.Vk.Version,
 	}
-	log.Println(configApp.Vk.AccessToken)
+
 	db, err := postgreslib.InitDB(configApp.Postgres)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	blackLister, err := text_blacklist.New(configApp.BlackList)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	logger := logger2.New(os.Stdout, &logrus.JSONFormatter{}, logrus.InfoLevel)
 	logger.Println(configApp.Vk.AccessToken)
 	eventRepo := postgres.New(db, logger)
-	eventUsecase := usecase.New(eventRepo, logger)
+	eventUsecase := usecase.New(eventRepo, blackLister, logger)
 	eventHandler := http.NewEventHandler(eventUsecase, logger)
 
 	imageRepo := s3.New(logger)

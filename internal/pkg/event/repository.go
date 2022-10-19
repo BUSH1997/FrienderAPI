@@ -9,7 +9,7 @@ type Repository interface {
 	Create(ctx context.Context, event models.Event) error
 	Update(ctx context.Context, event models.Event) error
 	GetAllPublic(ctx context.Context) ([]models.Event, error)
-	GetAll(ctx context.Context) ([]models.Event, error)
+	GetAll(ctx context.Context, params models.GetEventParams) ([]models.Event, error)
 	GetOwnerEvents(ctx context.Context, user int64) ([]models.Event, error)
 	GetEventById(ctx context.Context, id string) (models.Event, error)
 	GetUserEvents(ctx context.Context, user int64) ([]models.Event, error)

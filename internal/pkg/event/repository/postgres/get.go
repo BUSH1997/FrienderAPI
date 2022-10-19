@@ -150,12 +150,22 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 	return event, nil
 }
 
-func (r eventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
+func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	var ret []models.Event
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvents []db_models.Event
-		res := r.db.Where("is_deleted = ?", false).Find(&dbEvents)
+
+		query := r.db.Where("is_deleted = ?", false)
+
+		if params.IsActive.IsDefinedTrue() {
+			query = query.Where("starts_at > ?", time.Now().Unix())
+		}
+		if params.IsActive.IsDefinedFalse() {
+			query = query.Where("starts_at < ?", time.Now().Unix())
+		}
+
+		res := query.Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get all events")
 		}
