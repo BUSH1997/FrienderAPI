@@ -5,6 +5,7 @@ import (
 	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -37,6 +38,8 @@ func (r *ImageRepository) UploadImage(ctx context.Context, file *multipart.FileH
 			&aws.Config{
 				Region:   aws.String("ru-msk"),
 				Endpoint: &endpoint,
+				Credentials: credentials.NewStaticCredentials("rABxzdZ2uErHGWTxFZ4GPw",
+					"7a94iZyVdGABZRT4v395pWpr6iB5fpYMivd2ruPiEFZq", ""),
 			},
 		))
 
