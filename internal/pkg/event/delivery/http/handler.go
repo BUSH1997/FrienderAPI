@@ -1,7 +1,6 @@
 package http
 
 import (
-	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
@@ -64,7 +63,7 @@ func (eh *EventHandler) GetOneEvent(ctx echo.Context) error {
 func (eh *EventHandler) Get(ctx echo.Context) error {
 	eventParams := models.GetEventParams{}
 
-	eventParams.UserID = contextlib.GetUser(ctx.Request().Context())
+	// eventParams.UserID = contextlib.GetUser(ctx.Request().Context())
 
 	idString := ctx.QueryParam("id")
 	if idString != "" {

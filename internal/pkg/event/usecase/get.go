@@ -49,10 +49,10 @@ func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventPara
 	if params.IsOwner.IsDefinedTrue() {
 		return uc.Events.GetOwnerEvents(ctx, params.UserID)
 	}
-	if params.IsActive.IsDefinedTrue() {
+	if params.IsActive.IsDefinedTrue() && params.UserID != 0 {
 		return uc.Events.GetUserActiveEvents(ctx, params.UserID)
 	}
-	if params.IsActive.IsDefinedFalse() {
+	if params.IsActive.IsDefinedFalse() && params.UserID != 0 {
 		return uc.Events.GetUserVisitedEvents(ctx, params.UserID)
 	}
 	if params.IsSubscriber.IsDefinedTrue() {
