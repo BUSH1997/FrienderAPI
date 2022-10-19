@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/pkg/errors"
 	"sort"
@@ -23,15 +22,6 @@ func (uc eventUsecase) GetEventById(ctx context.Context, id string) (models.Even
 
 func (uc eventUsecase) GetUserEvents(ctx context.Context, id int64) ([]models.Event, error) {
 	return uc.Events.GetUserEvents(ctx, id)
-}
-
-func (uc eventUsecase) GetAll(ctx context.Context, filter event.FilterGetAll) ([]models.Event, error) {
-	events, err := uc.Events.GetAll(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get all events in usecase")
-	}
-
-	return events, nil
 }
 
 func (uc eventUsecase) GetAllCategories(ctx context.Context) ([]string, error) {
@@ -69,5 +59,5 @@ func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventPara
 		return uc.Events.GetSubscriptionEvents(ctx, params.UserID)
 	}
 
-	return uc.Events.GetAll(ctx)
+	return uc.Events.GetAll(ctx, params)
 }
