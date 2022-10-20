@@ -9,6 +9,9 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
+	groupHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/group/delivery/http"
+	groupPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/group/repository/postgres"
+	groupUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/group/usecase"
 	image "github.com/BUSH1997/FrienderAPI/internal/pkg/image/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/image/repository/s3"
 	imageUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/image/usecase"
@@ -70,11 +73,17 @@ func main() {
 	profileUseCase := profileUseCase.New(profileRepo, eventRepo, awardRepo, statusRepo, logger)
 	profileHandler := profileHandler.NewProfileHandler(profileUseCase, logger)
 
+	groupRepo := groupPostgres.New(db, logger)
+	groupUseCase := groupUseCase.New(logger, groupRepo)
+	groupHandler := groupHandler.New(logger, groupUseCase)
+
 	serverRouting := configRouting.ServerConfigRouting{
 		EventHandler:   eventHandler,
 		ImageHandler:   imageHandler,
 		ProfileHandler: profileHandler,
+		GroupHandler:   groupHandler,
 	}
+	
 	configMiddleware.ConfigMiddleware(router, profileRepo, logger)
 	serverRouting.ConfigRouting(router)
 
