@@ -52,7 +52,7 @@ func (gh *GroupHandler) CreateGroup(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
 
-	return ctx.NoContent(http.StatusOK)
+	return ctx.JSON(http.StatusOK, newGroup)
 }
 
 func (gh *GroupHandler) GetAdministeredGroup(ctx echo.Context) error {
