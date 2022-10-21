@@ -13,15 +13,10 @@ func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.E
 		return models.Event{}, errors.Wrap(err, "failed to  generate uuid")
 	}
 
-	if !event.IsPublic {
-		event.Uid = uid.String()
-	}
+	event.Uid = uid.String()
 
-	if event.IsPublic {
-		event.GeoData = models.Geo{
-			Longitude: 127,
-			Latitude:  127,
-		}
+	if !event.GroupInfo.CheckExist {
+		event.IsPublic = true
 	}
 
 	err = uc.validateEvent(event)

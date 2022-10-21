@@ -66,20 +66,35 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			return errors.Wrapf(err, "failed to create event, uid %s", event.Uid)
 		}
 
-		var sharingsExist []db_models.EventSharing
-		res = r.db.Model(&db_models.EventSharing{}).Find(&sharingsExist, "user_id = ?", dbUser.ID)
-		if err := res.Error; err != nil {
-			return errors.Wrap(err, "failed to get user event sharings")
-		}
+		if !event.IsPublic {
+			var sharingsExist []db_models.EventSharing
+			res = r.db.Model(&db_models.EventSharing{}).Find(&sharingsExist, "user_id = ?", dbUser.ID)
+			if err := res.Error; err != nil {
+				return errors.Wrap(err, "failed to get user event sharings")
+			}
 
-		dbEventSharing := db_models.EventSharing{}
-		dbEventSharing.EventID = int(dbEvent.ID)
-		dbEventSharing.UserID = int(dbUser.ID)
-		dbEventSharing.Priority = len(sharingsExist) + 1
+			dbEventSharing := db_models.EventSharing{}
+			dbEventSharing.EventID = int(dbEvent.ID)
+			dbEventSharing.UserID = int(dbUser.ID)
+			dbEventSharing.Priority = len(sharingsExist) + 1
 
-		res = r.db.Create(&dbEventSharing)
-		if err := res.Error; err != nil {
-			return errors.Wrapf(err, "failed to create event sharing")
+			res = r.db.Create(&dbEventSharing)
+			if err := res.Error; err != nil {
+				return errors.Wrapf(err, "failed to create event sharing")
+			}
+		} else {
+			var dbGroup db_models.Group
+			res = r.db.Find(&dbGroup, "group_id = ?", event.GroupInfo.GroupId)
+
+			dbGroupsEventsSharing := db_models.GroupsEventsSharing{
+				EventID: dbEvent.ID,
+				GroupID: dbGroup.ID,
+			}
+
+			res = r.db.Create(&dbGroupsEventsSharing)
+			if err := res.Error; err != nil {
+				return errors.Wrapf(err, "failed to create group event sharing")
+			}
 		}
 
 		return nil
