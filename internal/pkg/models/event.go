@@ -18,6 +18,12 @@ type PriorityEvent struct {
 	Event    Event `json:"event,omitempty"`
 }
 
+type GroupInfo struct {
+	IsAdmin    bool `json:"is_admin"`
+	GroupId    int  `json:"group_id"`
+	CheckExist bool `json:"-"`
+}
+
 type Event struct {
 	Uid          string    `json:"id,omitempty"`
 	Title        string    `json:"title,omitempty"`
@@ -36,6 +42,7 @@ type Event struct {
 	Category     Category  `json:"category,omitempty"`
 	Avatar       Avatar    `json:"avatar"`
 	MembersLimit int       `json:"members_limit,omitempty"`
+	GroupInfo    GroupInfo `json:"group_info, omitempty"`
 }
 
 type GetEventParams struct {
@@ -43,6 +50,7 @@ type GetEventParams struct {
 	IsOwner      Bool
 	IsActive     Bool
 	IsSubscriber Bool
+	GroupId      int64
 }
 
 type Category string

@@ -2,6 +2,7 @@ package configRouting
 
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
+	group "github.com/BUSH1997/FrienderAPI/internal/pkg/group/delivery/http"
 	image "github.com/BUSH1997/FrienderAPI/internal/pkg/image/delivery/http"
 	profileHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/delivery/http"
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ type ServerConfigRouting struct {
 	EventHandler   *http.EventHandler
 	ImageHandler   *image.ImageHandler
 	ProfileHandler *profileHandler.ProfileHandler
+	GroupHandler   *group.GroupHandler
 }
 
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -27,4 +29,6 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.PUT("event/:id/delete", sc.EventHandler.DeleteEvent)
 	router.PUT("event/change", sc.EventHandler.ChangeEvent)
 	router.GET("categories", sc.EventHandler.GetAllCategory)
+	router.POST("group/create", sc.GroupHandler.CreateGroup)
+	router.GET("group", sc.GroupHandler.GetAdministeredGroup)
 }

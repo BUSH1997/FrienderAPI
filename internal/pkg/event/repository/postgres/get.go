@@ -416,3 +416,41 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 
 	return ret, nil
 }
+
+func (r eventRepository) GetGroupEvent(ctx context.Context, group int64) ([]models.Event, error) {
+	var ret []models.Event
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbGroup db_models.Group
+		res := r.db.Take(&dbGroup).Where("group_id = ?", group)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get groups events sharings")
+		}
+
+		var dbEvents []db_models.Event
+		res = r.db.Model(&db_models.Event{}).
+			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
+			Where("groups_events_sharing.group_id = ?", dbGroup.ID).
+			Find(&dbEvents)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get events group")
+		}
+
+		ret = make([]models.Event, 0, len(dbEvents))
+		for _, dbEvent := range dbEvents {
+			event, err := r.GetEventById(ctx, dbEvent.Uid)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
+			}
+
+			ret = append(ret, event)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction")
+	}
+
+	return ret, nil
+}
