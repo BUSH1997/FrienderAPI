@@ -6,5 +6,10 @@ import (
 )
 
 type PublicEventsClient interface {
-	UploadPublicEvents(ctx context.Context, url string) ([]models.Event, error)
+	UploadPublicEvents(ctx context.Context, syncData SyncData) ([]models.Event, error)
+}
+
+type SyncData interface {
+	GetURLs() []string
+	GetFormData() []map[string]string
 }

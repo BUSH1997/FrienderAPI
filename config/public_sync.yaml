@@ -2,15 +2,23 @@ syncer:
   sync_offset: 24h
   wait_time: 1s
   resync_delay_after_fail: 1h
-  url: https://api.timepad.ru/v1/events.json?limit=100&skip=0&cities=Москва&fields=location,description_short&sort=+starts_at&starts_at_min=2022-10-08T21:00:00
+  timepad:
+    url: https://api.timepad.ru/v1/events.json?limit=100&skip=0&cities=Москва&fields=location,description_short&sort=+starts_at&starts_at_min=2022-10-08T21:00:00
+  vk:
+    get_events: https://api.vk.com/method/groups.search
+    get_events_data: https://api.vk.com/method/groups.getById
+
 postgres:
   host: localhost
   port: 5432
   dbname: friender
   user: postgres
-  password: 1234
+  password: Nw7358228
+
 transport:
   timepad:
+    download_limit_bytes: 2000000000
+  vk:
     download_limit_bytes: 2000000000
   http:
     connect_timeout: 500ms

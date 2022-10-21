@@ -3,6 +3,7 @@ package syncer
 import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/cmd/public_sync/client"
+	context2 "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/syncer"
@@ -15,38 +16,53 @@ type SyncerConfig struct {
 	SyncOffset           time.Duration `mapstructure:"sync_offset"`
 	WaitTime             time.Duration `mapstructure:"wait_time"`
 	ResyncDelayAfterFail time.Duration `mapstructure:"resync_delay_after_fail"`
-	URL                  string        `mapstructure:"url"`
+	Timepad              Timepad       `mapstructure:"timepad"`
+	VK                   VK            `mapstructure:"vk"`
 }
 
-type PublicSyncer struct {
-	Logger             *logrus.Logger
-	Syncer             SyncerConfig
-	PublicEventsClient client.PublicEventsClient
-	Events             event.Usecase
-	Repository         syncer.Repository
+type Timepad struct {
+	URL string `mapstructure:"url"`
+}
+
+type VK struct {
+	GetEventsURL     string `mapstructure:"get_events"`
+	GetEventsDataURL string `mapstructure:"get_events_data"`
+}
+
+type Syncer interface {
+	SyncData() client.SyncData
+	Client() client.PublicEventsClient
+}
+
+type SyncManager struct {
+	Config     SyncerConfig
+	Logger     *logrus.Logger
+	Syncers    []Syncer
+	Events     event.Usecase
+	Repository syncer.Repository
 }
 
 func New(
 	config SyncerConfig,
 	logger *logrus.Logger,
-	client client.PublicEventsClient,
+	syncers []Syncer,
 	usecase event.Usecase,
 	repository syncer.Repository,
-) PublicSyncer {
-	return PublicSyncer{
-		Logger:             logger,
-		Syncer:             config,
-		PublicEventsClient: client,
-		Events:             usecase,
-		Repository:         repository,
+) SyncManager {
+	return SyncManager{
+		Config:     config,
+		Logger:     logger,
+		Syncers:    syncers,
+		Events:     usecase,
+		Repository: repository,
 	}
 }
 
-func (s PublicSyncer) RunPublicSync() {
+func (s SyncManager) RunPublicSync() {
 	ctx := context.Background()
 
 	for {
-		time.Sleep(s.Syncer.WaitTime)
+		time.Sleep(s.Config.WaitTime)
 
 		updatedAt, err := s.Repository.GetUpdatedTime(ctx)
 		if err != nil {
@@ -54,7 +70,7 @@ func (s PublicSyncer) RunPublicSync() {
 			continue
 		}
 
-		if time.Since(updatedAt) < s.Syncer.SyncOffset {
+		if time.Since(updatedAt) < s.Config.SyncOffset {
 			continue
 		}
 
@@ -62,7 +78,7 @@ func (s PublicSyncer) RunPublicSync() {
 		if err != nil {
 			s.Logger.Warnf("failed to process sync with error: %s", err.Error())
 
-			err = s.Repository.Update(ctx, time.Now().Add(-s.Syncer.ResyncDelayAfterFail))
+			err = s.Repository.Update(ctx, time.Now().Add(-s.Config.ResyncDelayAfterFail))
 			if err != nil {
 				s.Logger.Warnf("failed to update sync after fail with error: %s", err.Error())
 			}
@@ -77,34 +93,40 @@ func (s PublicSyncer) RunPublicSync() {
 	}
 }
 
-func (s PublicSyncer) syncPublicEvents(ctx context.Context) error {
-	externalEvents, err := s.PublicEventsClient.UploadPublicEvents(ctx, s.Syncer.URL)
-	if err != nil {
-		return errors.Wrap(err, "failed to upload public events")
-	}
+func (s SyncManager) syncPublicEvents(ctx context.Context) error {
+	for _, syncer := range s.Syncers {
+		ctx = context2.SetUser(ctx, 1) // TODO: authorize users for public syncers(in config)
 
-	existingEvents, err := s.Events.GetAllPublic(ctx)
-	if err != nil {
-		return errors.Wrap(err, "failed to get existing events")
-	}
-
-	newEvents, changedEvents := getEventsToImport(existingEvents, externalEvents)
-
-	for _, newEvent := range newEvents {
-		_, err = s.Events.Create(ctx, newEvent)
+		externalEvents, err := syncer.Client().UploadPublicEvents(ctx, syncer.SyncData())
 		if err != nil {
-			return errors.Wrapf(err, "failed to create public event, uid: %d", newEvent.Uid)
+			return errors.Wrap(err, "failed to upload public events")
 		}
-	}
 
-	for _, changedEvent := range changedEvents {
-		err = s.Events.Update(ctx, changedEvent)
+		existingEvents, err := s.Events.GetAllPublic(ctx)
 		if err != nil {
-			return errors.Wrapf(err, "failed to update public event, uid: %d", changedEvent.Uid)
+			return errors.Wrap(err, "failed to get existing events")
 		}
-	}
 
-	s.Logger.Info("successfully synced public events")
+		newEvents, changedEvents := getEventsToImport(existingEvents, externalEvents)
+
+		for _, newEvent := range newEvents {
+			_, err = s.Events.Create(ctx, newEvent)
+			if err != nil {
+				return errors.Wrapf(err, "failed to create public event, uid: %d", newEvent.Uid)
+			}
+		}
+
+		for _, changedEvent := range changedEvents {
+			err = s.Events.Update(ctx, changedEvent)
+			if err != nil {
+				return errors.Wrapf(err, "failed to update public event, uid: %d", changedEvent.Uid)
+			}
+		}
+
+		s.Logger.Info("successfully synced public events")
+
+		return nil
+	}
 
 	return nil
 }
