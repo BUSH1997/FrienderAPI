@@ -20,3 +20,13 @@ func (gu *groupUseCase) GetAdministeredGroupByUserId(ctx context.Context, userId
 
 	return groups, err
 }
+
+func (gu *groupUseCase) CheckIfAdmin(ctx context.Context, userId string, groupId int) (bool, error) {
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		gu.logger.WithError(err).Error("[GetAdministeredGroupByUserId] bad user id")
+		return false, err
+	}
+
+	return gu.repository.CheckIfAdmin(ctx, userIdInt, groupId)
+}

@@ -56,7 +56,7 @@ func (gh *GroupHandler) CreateGroup(ctx echo.Context) error {
 }
 
 func (gh *GroupHandler) GetAdministeredGroup(ctx echo.Context) error {
-	userId := ctx.Request().Header.Get("X-User-ID")
+	userId := ctx.QueryParam("user_id")
 	if userId == "" {
 		gh.logger.Error("[GetAdministeredGroup], bad x-user-id")
 		return ctx.JSON(http.StatusBadRequest, errors.New("bad x-user-id"))
@@ -69,4 +69,26 @@ func (gh *GroupHandler) GetAdministeredGroup(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, groups)
+}
+
+func (gh *GroupHandler) IsAdmin(ctx echo.Context) error {
+	userId := ctx.Request().Header.Get("X-User-ID")
+	if userId == "" {
+		gh.logger.Error("[IsAdmin], bad x-user-id")
+		return ctx.JSON(http.StatusBadRequest, errors.New("bad x-user-id"))
+	}
+
+	var group models.Group
+	if err := ctx.Bind(&group); err != nil {
+		gh.logger.WithError(err).Errorf("[IsAdmin], error json")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	isAdmin, err := gh.useCase.CheckIfAdmin(ctx.Request().Context(), userId, group.GroupId)
+	if err != nil {
+		gh.logger.WithError(err).Errorf("[IsAdmin], error in useCase")
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, isAdmin)
 }

@@ -89,6 +89,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			dbGroupsEventsSharing := db_models.GroupsEventsSharing{
 				EventID: dbEvent.ID,
 				GroupID: dbGroup.ID,
+				IsAdmin: event.GroupInfo.IsAdmin,
 			}
 
 			res = r.db.Create(&dbGroupsEventsSharing)

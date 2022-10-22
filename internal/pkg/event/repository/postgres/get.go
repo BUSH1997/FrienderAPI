@@ -417,7 +417,7 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 	return ret, nil
 }
 
-func (r eventRepository) GetGroupEvent(ctx context.Context, group int64) ([]models.Event, error) {
+func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActive models.Bool) ([]models.Event, error) {
 	var ret []models.Event
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group
@@ -442,7 +442,57 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, group int64) ([]mode
 				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
 			}
 
-			ret = append(ret, event)
+			if !isActive.IsDefined() {
+				ret = append(ret, event)
+			} else if isActive.IsDefinedTrue() && event.IsActive {
+				ret = append(ret, event)
+			} else if isActive.IsDefinedFalse() && !event.IsActive {
+				ret = append(ret, event)
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction")
+	}
+
+	return ret, nil
+}
+
+func (r eventRepository) GetGroupAdminEvent(ctx context.Context, group int64, isAdmin models.Bool, isActive models.Bool) ([]models.Event, error) {
+	var ret []models.Event
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbGroup db_models.Group
+		res := r.db.Take(&dbGroup).Where("group_id = ?", group, isAdmin.Value)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get groups events sharings")
+		}
+
+		var dbEvents []db_models.Event
+		res = r.db.Model(&db_models.Event{}).
+			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
+			Where("groups_events_sharing.group_id = ? and groups_events_sharing.is_admin = ?", dbGroup.ID, isAdmin.Value).
+			Find(&dbEvents)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get events group")
+		}
+
+		ret = make([]models.Event, 0, len(dbEvents))
+		for _, dbEvent := range dbEvents {
+			event, err := r.GetEventById(ctx, dbEvent.Uid)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
+			}
+
+			if !isActive.IsDefined() {
+				ret = append(ret, event)
+			} else if isActive.IsDefinedTrue() && event.IsActive {
+				ret = append(ret, event)
+			} else if isActive.IsDefinedFalse() && !event.IsActive {
+				ret = append(ret, event)
+			}
 		}
 
 		return nil

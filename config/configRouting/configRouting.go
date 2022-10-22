@@ -31,4 +31,5 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("categories", sc.EventHandler.GetAllCategory)
 	router.POST("group/create", sc.GroupHandler.CreateGroup)
 	router.GET("group", sc.GroupHandler.GetAdministeredGroup)
+	router.GET("group/admin/check", sc.GroupHandler.IsAdmin)
 }

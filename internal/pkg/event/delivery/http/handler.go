@@ -128,6 +128,19 @@ func (eh *EventHandler) Get(ctx echo.Context) error {
 		eventParams.GroupId = groupId
 	}
 
+	isAdminString := ctx.QueryParam("is_admin")
+	if isAdminString != "" {
+		isAdmin, err := strconv.ParseBool(isAdminString)
+		if err != nil {
+			eh.logger.WithError(errors.Wrap(err, "failed to parse owner param")).
+				Errorf("failed to get user events")
+
+			return ctx.JSON(http.StatusBadRequest, err.Error())
+		}
+
+		eventParams.IsOwner = models.DefinedBool(isAdmin)
+	}
+
 	events, err := eh.useCase.Get(ctx.Request().Context(), eventParams)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to get user events")
