@@ -38,17 +38,18 @@ create table syncer(
     updated_at timestamptz
 );
 
-create table groups_events_sharing (
-                                       id serial primary key,
-                                       group_id int references groups(id),
-                                       event_id int references events(id)
-);
-
 create table groups(
                        id serial primary key,
                        user_id int references users(uid),
                        group_id int,
                        UNIQUE (user_id, group_id)
+);
+
+create table groups_events_sharing (
+                                       id serial primary key,
+                                       group_id int references groups(id),
+                                       event_id int references events(id),
+                                       is_admin bool
 );
 
 insert into syncer(updated_at) values (now());
