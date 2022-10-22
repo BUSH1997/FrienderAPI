@@ -59,10 +59,10 @@ func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventPara
 		return uc.Events.GetSubscriptionEvents(ctx, params.UserID)
 	}
 	if params.GroupId != 0 && (params.IsAdmin.IsDefinedTrue() || params.IsAdmin.IsDefinedFalse()) {
-		return uc.Events.GetGroupAdminEvent(ctx, params.GroupId, params.IsAdmin)
+		return uc.Events.GetGroupAdminEvent(ctx, params.GroupId, params.IsAdmin, params.IsActive)
 	}
 	if params.GroupId != 0 {
-		return uc.Events.GetGroupEvent(ctx, params.GroupId)
+		return uc.Events.GetGroupEvent(ctx, params.GroupId, params.IsActive)
 	}
 	return uc.Events.GetAll(ctx, params)
 }

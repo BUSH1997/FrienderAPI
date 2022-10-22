@@ -78,13 +78,20 @@ func (gh *GroupHandler) IsAdmin(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, errors.New("bad x-user-id"))
 	}
 
-	var group models.Group
-	if err := ctx.Bind(&group); err != nil {
-		gh.logger.WithError(err).Errorf("[IsAdmin], error json")
-		return ctx.JSON(http.StatusBadRequest, err)
+	groupIdString := ctx.QueryParam("group_id")
+	if groupIdString == "" {
+		gh.logger.Error("[IsAdmin], bad group_id")
+		return ctx.JSON(http.StatusBadRequest, errors.New("bad group_id"))
 	}
 
-	isAdmin, err := gh.useCase.CheckIfAdmin(ctx.Request().Context(), userId, group.GroupId)
+	groupId, err := strconv.ParseInt(groupIdString, 10, 32)
+	if err != nil {
+		gh.logger.WithError(errors.Wrap(err, "failed to parse owner param")).
+			Errorf("failed to get group id")
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	isAdmin, err := gh.useCase.CheckIfAdmin(ctx.Request().Context(), userId, groupId)
 	if err != nil {
 		gh.logger.WithError(err).Errorf("[IsAdmin], error in useCase")
 		return ctx.JSON(http.StatusInternalServerError, err)

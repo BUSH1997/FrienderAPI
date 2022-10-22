@@ -38,7 +38,7 @@ func (gr *groupRepository) GetAdministeredGroupByUserId(ctx context.Context, use
 	return ret, nil
 }
 
-func (gr *groupRepository) CheckIfAdmin(ctx context.Context, userId int, groupId int) (bool, error) {
+func (gr *groupRepository) CheckIfAdmin(ctx context.Context, userId int, groupId int64) (bool, error) {
 	isAdmin := true
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group

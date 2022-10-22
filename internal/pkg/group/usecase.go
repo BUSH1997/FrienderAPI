@@ -8,5 +8,5 @@ import (
 type UseCase interface {
 	Create(ctx context.Context, group models.Group) error
 	GetAdministeredGroupByUserId(ctx context.Context, userId string) ([]models.Group, error)
-	CheckIfAdmin(ctx context.Context, userId string, groupId int) (bool, error)
+	CheckIfAdmin(ctx context.Context, userId string, groupId int64) (bool, error)
 }
