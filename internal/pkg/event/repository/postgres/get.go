@@ -441,6 +441,15 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActiv
 			if err != nil {
 				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
 			}
+			var eventSharing db_models.GroupsEventsSharing
+
+			q := r.db.Model(&eventSharing).Where("group_id = ?", dbGroup.ID).Find(&eventSharing)
+			if err := q.Error; err != nil {
+				return errors.Wrap(err, "failed to get eventSharing")
+			}
+
+			event.GroupInfo.GroupId = group
+			event.GroupInfo.IsAdmin = eventSharing.IsAdmin
 
 			if !isActive.IsDefined() {
 				ret = append(ret, event)
@@ -485,7 +494,8 @@ func (r eventRepository) GetGroupAdminEvent(ctx context.Context, group int64, is
 			if err != nil {
 				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
 			}
-
+			event.GroupInfo.IsAdmin = isAdmin.Value
+			event.GroupInfo.GroupId = group
 			if !isActive.IsDefined() {
 				ret = append(ret, event)
 			} else if isActive.IsDefinedTrue() && event.IsActive {
