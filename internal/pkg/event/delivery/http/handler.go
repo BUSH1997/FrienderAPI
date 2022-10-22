@@ -138,7 +138,7 @@ func (eh *EventHandler) Get(ctx echo.Context) error {
 			return ctx.JSON(http.StatusBadRequest, err.Error())
 		}
 
-		eventParams.IsOwner = models.DefinedBool(isAdmin)
+		eventParams.IsAdmin = models.DefinedBool(isAdmin)
 	}
 
 	events, err := eh.useCase.Get(ctx.Request().Context(), eventParams)

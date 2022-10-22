@@ -465,7 +465,7 @@ func (r eventRepository) GetGroupAdminEvent(ctx context.Context, group int64, is
 	var ret []models.Event
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group
-		res := r.db.Take(&dbGroup).Where("group_id = ?", group, isAdmin.Value)
+		res := r.db.Take(&dbGroup).Where("group_id = ?", group)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get groups events sharings")
 		}
