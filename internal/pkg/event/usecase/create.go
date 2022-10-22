@@ -15,7 +15,7 @@ func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.E
 
 	event.Uid = uid.String()
 
-	if !event.GroupInfo.CheckExist {
+	if event.GroupInfo.GroupId != 0 {
 		event.IsPublic = true
 	}
 
