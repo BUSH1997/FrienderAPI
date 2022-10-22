@@ -14,7 +14,7 @@ func (gr *groupRepository) GetAdministeredGroupByUserId(ctx context.Context, use
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroups []models.Group
 
-		res := gr.db.Find(&dbGroups).Where("user_id = ?", userId)
+		res := gr.db.Find(&dbGroups, "user_id = ?", userId)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get all events")
 		}
