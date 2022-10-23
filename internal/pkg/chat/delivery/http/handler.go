@@ -35,6 +35,7 @@ var (
 func (ch *ChatHandler) GetChats(ctx echo.Context) error {
 	chats, err := ch.useCase.GetChats(ctx.Request().Context())
 	if err != nil {
+		ch.logger.WithError(err).Errorf("failed to get chats")
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
@@ -48,6 +49,7 @@ func (ch *ChatHandler) GetMessages(ctx echo.Context) error {
 	if pageString != "" {
 		page, err := strconv.ParseInt(pageString, 10, 32)
 		if err != nil {
+			ch.logger.WithError(err).Errorf("failed to parse page param")
 			return ctx.JSON(http.StatusBadRequest, err.Error())
 		}
 
@@ -58,6 +60,7 @@ func (ch *ChatHandler) GetMessages(ctx echo.Context) error {
 	if limitString != "" {
 		limit, err := strconv.ParseInt(limitString, 10, 32)
 		if err != nil {
+			ch.logger.WithError(err).Errorf("failed to parse limit param")
 			return ctx.JSON(http.StatusBadRequest, err.Error())
 		}
 
@@ -68,6 +71,7 @@ func (ch *ChatHandler) GetMessages(ctx echo.Context) error {
 
 	messages, err := ch.useCase.GetMessages(ctx.Request().Context(), opts)
 	if err != nil {
+		ch.logger.WithError(err).Errorf("failed to get messages")
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
@@ -78,12 +82,14 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 	eventID := ctx.Param("id")
 	if eventID == "" {
 		err := errors.New("event id is empty")
+		ch.logger.WithError(err).Errorf("failed to get event id")
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	ws, err := upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
 	if err != nil {
-		return err
+		ch.logger.WithError(err).Errorf("failed to upgrade http request")
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	user := context.GetUser(ctx.Request().Context())
@@ -109,6 +115,7 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 	for {
 		mt, msg, err := ws.ReadMessage()
 		if err != nil || mt == websocket.CloseMessage {
+			ch.logger.WithError(err).Error("failed to read message from socket")
 			break
 			// TODO: return
 		}
@@ -120,19 +127,17 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 			TimeCreated: time.Now().Unix(),
 		})
 		if err != nil {
+			ch.logger.WithError(err).Error("failed to create message")
 			return ctx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to create message").Error())
 		}
 
 		for _, client := range ch.messenger.Chat.Clients {
-			if client.UserID == user {
-				continue
-			}
-
 			fmt.Printf("write to client %d message: %s \n", client.UserID, msg)
 
 			err := client.Socket.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {
-				ctx.Logger().Error(err)
+				ch.logger.WithError(err).Errorf("failed to write message to %d", client.UserID)
+				return ctx.JSON(http.StatusInternalServerError, err.Error())
 			}
 		}
 	}
