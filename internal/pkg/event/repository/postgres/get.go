@@ -125,6 +125,17 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 			AvatarUrl:  dbEvent.AvatarUrl,
 			AvatarVkId: dbEvent.AvatarVkId,
 		},
+		Source: dbEvent.Source,
+	}
+
+	if dbEvent.Source == "group" {
+		var groupEventSharing db_models.GroupsEventsSharing
+		res := r.db.Take(&groupEventSharing, "event_id = ?", dbEvent.ID)
+		if err := res.Error; err != nil {
+			return models.Event{}, errors.Wrap(err, "failed to get groupEventSharing")
+		}
+		event.GroupInfo.GroupId = int64(groupEventSharing.GroupID)
+		event.GroupInfo.IsAdmin = groupEventSharing.IsAdmin
 	}
 
 	event.Members = members
