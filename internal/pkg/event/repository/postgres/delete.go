@@ -3,12 +3,13 @@ package postgres
 import (
 	"context"
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
-func (r eventRepository) Delete(ctx context.Context, event string) error {
+func (r eventRepository) Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := r.db.Take(&dbEvent, "uid = ?", event)
@@ -30,8 +31,28 @@ func (r eventRepository) Delete(ctx context.Context, event string) error {
 			return errors.Wrap(err, "failed to update user created events")
 		}
 
-		if dbEvent.Owner != int(dbUser.ID) {
-			return errors.New("user is not events owner, cannot delete")
+		if groupInfo.GroupId == 0 {
+			if dbEvent.Owner != int(userID) {
+				return errors.New("user is not events owner, cannot delete")
+			}
+		} else {
+			//надо проверить является ли юзер админом
+			var groups []db_models.Group
+			res = r.db.Find(&groups, "user_id = ?", userID)
+			if err := res.Error; err != nil {
+				return errors.Wrap(err, "failed to get admin group")
+			}
+
+			checkAdmin := false
+			for _, group := range groups {
+				if int64(group.GroupId) == groupInfo.GroupId {
+					checkAdmin = true
+				}
+			}
+
+			if !checkAdmin {
+				return errors.New("user is not admin, cannot delete")
+			}
 		}
 
 		dbEventSharing := db_models.EventSharing{}

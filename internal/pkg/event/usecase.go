@@ -23,7 +23,7 @@ type Usecase interface {
 	GetUserEvents(ctx context.Context, id int64) ([]models.Event, error)
 	SubscribeEvent(ctx context.Context, event string) error
 	UnsubscribeEvent(ctx context.Context, event string) error
-	Delete(ctx context.Context, event string) error
+	Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error
 	Change(ctx context.Context, event models.Event) error
 	GetAllCategories(ctx context.Context) ([]string, error)
 }

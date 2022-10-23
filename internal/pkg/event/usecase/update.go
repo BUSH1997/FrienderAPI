@@ -35,7 +35,7 @@ func (uc eventUsecase) UnsubscribeEvent(ctx context.Context, event string) error
 	return nil
 }
 
-func (uc eventUsecase) Delete(ctx context.Context, event string) error {
+func (uc eventUsecase) Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error {
 	err := uc.Events.Delete(ctx, event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to delete event %s", event)

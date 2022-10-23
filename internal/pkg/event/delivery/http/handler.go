@@ -197,6 +197,12 @@ func (eh *EventHandler) DeleteEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 
+	var groupInfo models.GroupInfo
+	if err := ctx.Bind(&groupInfo); err != nil {
+		eh.logger.WithError(err).Errorf("failed to bind group info event")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
 	err := eh.useCase.Delete(ctx.Request().Context(), eventID)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to delete event")

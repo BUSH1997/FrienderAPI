@@ -19,8 +19,8 @@ type PriorityEvent struct {
 }
 
 type GroupInfo struct {
-	IsAdmin    bool  `json:"is_admin"`
-	GroupId    int64 `json:"group_id"`
+	IsAdmin    bool  `json:"is_admin, omitempty"`
+	GroupId    int64 `json:"group_id, omitempty"`
 	CheckExist bool  `json:"-"`
 }
 
