@@ -9,19 +9,26 @@ create table users(
 );
 
 create table events(
-    id serial primary key,
-    uid varchar(256),
-    title varchar(256),
-    description text,
-    images text,
-    starts_at bigserial,
-    time_created timestamptz,
-    time_updated timestamptz,
-    geo varchar(256),
-    category_id int references categories(id),
-    is_group bool,
-    is_public bool,
-    owner_id int references users(id)
+                       id serial primary key,
+                       uid varchar(256) UNIQUE,
+                       title varchar(256),
+                       description text,
+                       images text,
+                       avatar_url text,
+                       avatar_vk_id text,
+                       starts_at bigserial,
+                       time_created bigserial,
+                       time_updated bigserial,
+                       geo varchar(256),
+                       category_id int references categories(id),
+                       count_members int,
+                       is_public bool,
+                       is_private bool,
+                       owner_id int references users(id),
+                       is_deleted bool,
+                       photos text,
+                       members_limit int,
+                       source varchar(256)
 );
 
 

@@ -67,7 +67,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			return errors.Wrapf(err, "failed to create event, uid %s", event.Uid)
 		}
 
-		if !event.IsPublic {
+		if event.Source != "group" {
 			var sharingsExist []db_models.EventSharing
 			res = r.db.Model(&db_models.EventSharing{}).Find(&sharingsExist, "user_id = ?", dbUser.ID)
 			if err := res.Error; err != nil {
