@@ -1,6 +1,7 @@
 package configRouting
 
 import (
+	chat "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	group "github.com/BUSH1997/FrienderAPI/internal/pkg/group/delivery/http"
 	image "github.com/BUSH1997/FrienderAPI/internal/pkg/image/delivery/http"
@@ -13,6 +14,7 @@ type ServerConfigRouting struct {
 	ImageHandler   *image.ImageHandler
 	ProfileHandler *profileHandler.ProfileHandler
 	GroupHandler   *group.GroupHandler
+	ChatHandler    *chat.ChatHandler
 }
 
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -32,4 +34,7 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("group/create", sc.GroupHandler.CreateGroup)
 	router.GET("group", sc.GroupHandler.GetAdministeredGroup)
 	router.GET("group/admin/check", sc.GroupHandler.IsAdmin)
+	router.GET("chat/:id", sc.ChatHandler.ProcessMessage)
+	router.GET("messages", sc.ChatHandler.GetMessages)
+	router.GET("chats", sc.ChatHandler.GetChats)
 }

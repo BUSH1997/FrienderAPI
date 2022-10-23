@@ -6,6 +6,10 @@ import (
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
 	awardPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/award/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist/text_blacklist"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/chat"
+	chatHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/delivery/http"
+	chatPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/repository/postgres"
+	chatUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/usecase"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
@@ -77,13 +81,20 @@ func main() {
 	groupUseCase := groupUseCase.New(logger, groupRepo)
 	groupHandler := groupHandler.New(logger, groupUseCase)
 
+	messenger := chat.NewMessenger()
+
+	chatRepo := chatPostgres.New(db, logger)
+	chatUseCase := chatUsecase.New(chatRepo)
+	chatHandler := chatHandler.NewChatHandler(chatUseCase, messenger, logger)
+
 	serverRouting := configRouting.ServerConfigRouting{
 		EventHandler:   eventHandler,
 		ImageHandler:   imageHandler,
 		ProfileHandler: profileHandler,
 		GroupHandler:   groupHandler,
+		ChatHandler:    chatHandler,
 	}
-	
+
 	configMiddleware.ConfigMiddleware(router, profileRepo, logger)
 	serverRouting.ConfigRouting(router)
 

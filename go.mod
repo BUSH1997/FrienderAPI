@@ -14,6 +14,7 @@ require github.com/spf13/viper v1.13.0
 require (
 	github.com/aws/aws-sdk-go v1.44.114
 	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/gorilla/websocket v1.5.0
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/labstack/gommon v0.3.1
 	github.com/sirupsen/logrus v1.6.0
