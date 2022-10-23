@@ -43,6 +43,7 @@ type Event struct {
 	Avatar       Avatar    `json:"avatar"`
 	MembersLimit int       `json:"members_limit,omitempty"`
 	GroupInfo    GroupInfo `json:"group_info, omitempty"`
+	Source       string    `json:"source, omitempty"`
 }
 
 type GetEventParams struct {

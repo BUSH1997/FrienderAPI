@@ -23,6 +23,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			TimeUpdated: time.Now().Unix(),
 			IsPublic:    event.IsPublic,
 			IsPrivate:   event.IsPrivate,
+			Source:      event.Source,
 		}
 
 		dbCategory := db_models.Category{}

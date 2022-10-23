@@ -22,13 +22,16 @@ type HTTPTimePadClient struct {
 	client httplib.Client
 }
 
-func New(client httplib.Client) client.PublicEventsClient {
+func New(config TimePadTransportConfig, client httplib.Client) client.PublicEventsClient {
 	return &HTTPTimePadClient{
+		config: config,
 		client: client,
 	}
 }
 
-func (c HTTPTimePadClient) UploadPublicEvents(ctx context.Context, url string) ([]models.Event, error) {
+func (c HTTPTimePadClient) UploadPublicEvents(ctx context.Context, syncData client.SyncData) ([]models.Event, error) {
+	url := syncData.GetURLs()[0]
+
 	resp := Response{
 		downloadLimitBytes: c.config.DownloadLimitBytes,
 	}
