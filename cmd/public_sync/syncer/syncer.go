@@ -9,6 +9,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/syncer"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"strconv"
 	"time"
 )
 
@@ -97,30 +98,45 @@ func (s SyncManager) syncPublicEvents(ctx context.Context) error {
 	for _, syncer := range s.Syncers {
 		ctx = context2.SetUser(ctx, 1) // TODO: authorize users for public syncers(in config)
 
-		externalEvents, err := syncer.Client().UploadPublicEvents(ctx, syncer.SyncData())
+		countItem, err := syncer.Client().GetCountPublicEventsWithSyncData(ctx, syncer.SyncData())
 		if err != nil {
-			return errors.Wrap(err, "failed to upload public events")
+			return errors.Wrap(err, "failed to get count event")
 		}
+		var currentItem int = 0
 
-		existingEvents, err := s.Events.GetAllPublic(ctx)
-		if err != nil {
-			return errors.Wrap(err, "failed to get existing events")
-		}
+		for currentItem < countItem && currentItem < 1000 {
+			syncData := syncer.SyncData()
+			syncData.GetFormData()[0]["offset"] = strconv.Itoa(currentItem)
 
-		newEvents, changedEvents := getEventsToImport(existingEvents, externalEvents)
-
-		for _, newEvent := range newEvents {
-			_, err = s.Events.Create(ctx, newEvent)
+			externalEvents, err := syncer.Client().UploadPublicEvents(ctx, syncer.SyncData())
 			if err != nil {
-				return errors.Wrapf(err, "failed to create public event, uid: %d", newEvent.Uid)
+				return errors.Wrap(err, "failed to upload public events")
 			}
-		}
 
-		for _, changedEvent := range changedEvents {
-			err = s.Events.Update(ctx, changedEvent)
+			existingEvents, err := s.Events.GetAllPublic(ctx)
 			if err != nil {
-				return errors.Wrapf(err, "failed to update public event, uid: %d", changedEvent.Uid)
+				return errors.Wrap(err, "failed to get existing events")
 			}
+
+			newEvents, changedEvents := getEventsToImport(existingEvents, externalEvents)
+
+			for _, newEvent := range newEvents {
+				if newEvent.StartsAt > time.Now().Unix() {
+					_, err = s.Events.Create(ctx, newEvent)
+					if err != nil {
+						return errors.Wrapf(err, "failed to create public event, uid: %d", newEvent.Uid)
+					}
+				}
+			}
+
+			for _, changedEvent := range changedEvents {
+				err = s.Events.Update(ctx, changedEvent)
+				if err != nil {
+					return errors.Wrapf(err, "failed to update public event, uid: %d", changedEvent.Uid)
+				}
+			}
+
+			currentItem += 100
 		}
 
 		s.Logger.Info("successfully synced public events")

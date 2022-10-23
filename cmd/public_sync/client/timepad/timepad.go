@@ -46,6 +46,10 @@ func (c HTTPTimePadClient) UploadPublicEvents(ctx context.Context, syncData clie
 	return convertEventsToModes(resp.PublicEventsData), nil
 }
 
+func (c HTTPTimePadClient) GetCountPublicEventsWithSyncData(ctx context.Context, data client.SyncData) (int, error) {
+	return 100, nil
+}
+
 func convertEventsToModes(data PublicEventsData) []models.Event {
 	events := make([]models.Event, 0, len(data.Values))
 	for _, value := range data.Values {

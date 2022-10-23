@@ -64,6 +64,9 @@ func Run() {
 			"type":         "event",
 			"v":            "5.131",
 			"offset":       "3",
+			"count":        "100",
+			"future":       "1",
+			"sort":         "6",
 		}
 		vkSyncData := vk.NewData(
 			configApp.Syncer.VK.GetEventsURL,

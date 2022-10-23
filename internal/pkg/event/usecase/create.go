@@ -13,7 +13,9 @@ func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.E
 		return models.Event{}, errors.Wrap(err, "failed to  generate uuid")
 	}
 
-	event.Uid = uid.String()
+	if event.Source != "vk_event" {
+		event.Uid = uid.String()
+	}
 
 	if event.GroupInfo.GroupId != 0 {
 		event.IsPublic = true

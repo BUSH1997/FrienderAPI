@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type VKTransportConfig struct {
@@ -43,6 +44,7 @@ func (c HTTPVKClient) UploadPublicEvents(ctx context.Context, data client.SyncDa
 	respEvents := GetEventsResponse{
 		downloadLimitBytes: c.config.DownloadLimitBytes,
 	}
+	time.Sleep(time.Second * 10)
 	err := c.client.PerformRequest(ctx, GetEventsRequestWithBody{
 		GetEventsRequest: GetEventsRequest{
 			RequestURL: getVKEventsURL,
@@ -79,6 +81,26 @@ func (c HTTPVKClient) UploadPublicEvents(ctx context.Context, data client.SyncDa
 		Source:   SourceTypeEventVK,
 	}
 	return convertEventsToModel(respEventsData.VKEventsData.VKEventsData, eventsInfo), nil
+}
+
+func (c HTTPVKClient) GetCountPublicEventsWithSyncData(ctx context.Context, data client.SyncData) (int, error) {
+	getVKEventsURL := data.GetURLs()[0]
+	getVKEventsFormData := data.GetFormData()[0]
+
+	respEvents := GetEventsResponse{
+		downloadLimitBytes: c.config.DownloadLimitBytes,
+	}
+	err := c.client.PerformRequest(ctx, GetEventsRequestWithBody{
+		GetEventsRequest: GetEventsRequest{
+			RequestURL: getVKEventsURL,
+		},
+		FormData: getVKEventsFormData,
+	}, &respEvents)
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to perform request for events to vk api")
+	}
+
+	return respEvents.VKEvents.VKEventsResponse.Count, nil
 }
 
 func convertEventsToModel(vkEvents []VKEventData, eventsInfo EventInfo) []models.Event {
