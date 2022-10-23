@@ -203,7 +203,7 @@ func (eh *EventHandler) DeleteEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	err := eh.useCase.Delete(ctx.Request().Context(), eventID)
+	err := eh.useCase.Delete(ctx.Request().Context(), eventID, groupInfo)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to delete event")
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
