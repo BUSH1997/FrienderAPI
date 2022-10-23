@@ -1,16 +1,16 @@
 package models
 
 type Chat struct {
-	EventUID    string
-	EventTitle  string
-	EventAvatar string
+	EventUID    string `json:"event_uid,omitempty"`
+	EventTitle  string `json:"event_title,omitempty"`
+	EventAvatar string `json:"event_avatar,omitempty"`
 }
 
 type Message struct {
-	UserID      int64
-	EventID     string
-	Text        string
-	TimeCreated int64
+	UserID      int64  `json:"user_id,omitempty"`
+	EventID     string `json:"event_id,omitempty"`
+	Text        string `json:"text,omitempty"`
+	TimeCreated int64  `json:"time_created,omitempty"`
 }
 
 type GetMessageOpts struct {
