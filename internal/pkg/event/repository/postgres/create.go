@@ -24,6 +24,8 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			IsPublic:    event.IsPublic,
 			IsPrivate:   event.IsPrivate,
 			Source:      event.Source,
+			AvatarUrl:   event.Avatar.AvatarUrl,
+			AvatarVkId:  event.Avatar.AvatarVkId,
 		}
 
 		dbCategory := db_models.Category{}

@@ -115,6 +115,9 @@ func convertEventsToModel(vkEvents []VKEventData, eventsInfo EventInfo) []models
 			Images:      []string{vkEvent.Photo200},
 			Category:    models.Category(eventsInfo.Category),
 			Source:      eventsInfo.Source,
+			Avatar: models.Avatar{
+				AvatarUrl:  vkEvent.Photo200,
+				AvatarVkId: "0"},
 		}
 
 		if vkEvent.Photo200 == "" {

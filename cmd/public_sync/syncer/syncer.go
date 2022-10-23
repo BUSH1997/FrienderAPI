@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -121,6 +122,13 @@ func (s SyncManager) syncPublicEvents(ctx context.Context) error {
 			newEvents, changedEvents := getEventsToImport(existingEvents, externalEvents)
 
 			for _, newEvent := range newEvents {
+				if err != nil {
+					return errors.Wrapf(err, "failed to build blackList")
+				}
+				if strings.Contains(strings.ToLower(newEvent.Title), "отме") {
+					continue
+				}
+
 				if newEvent.StartsAt > time.Now().Unix() {
 					_, err = s.Events.Create(ctx, newEvent)
 					if err != nil {
