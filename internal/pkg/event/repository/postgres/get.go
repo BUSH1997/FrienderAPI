@@ -134,7 +134,13 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		if err := res.Error; err != nil {
 			return models.Event{}, errors.Wrap(err, "failed to get groupEventSharing")
 		}
-		event.GroupInfo.GroupId = int64(groupEventSharing.GroupID)
+
+		var group db_models.Group
+		res = r.db.Take(&group, "id = ?", groupEventSharing.GroupID)
+		if err := res.Error; err != nil {
+			return models.Event{}, errors.Wrap(err, "failed to get group with id")
+		}
+		event.GroupInfo.GroupId = int64(group.GroupId)
 		event.GroupInfo.IsAdmin = groupEventSharing.IsAdmin
 	}
 
