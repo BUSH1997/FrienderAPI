@@ -157,7 +157,10 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 		var dbEvents []db_models.Event
 
 		query := r.db.Where("is_deleted = ?", false)
-		if params.Source != "" {
+		if params.Source == "not_vk" {
+			query = query.Where("source <> ?", "not_vk")
+		}
+		if params.Source == "vk_event" {
 			query = query.Where("source = ?", params.Source)
 		}
 		if params.IsActive.IsDefinedTrue() {
