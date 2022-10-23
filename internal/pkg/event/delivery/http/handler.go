@@ -141,6 +141,11 @@ func (eh *EventHandler) Get(ctx echo.Context) error {
 		eventParams.IsAdmin = models.DefinedBool(isAdmin)
 	}
 
+	sourceString := ctx.QueryParam("source")
+	if sourceString != "" {
+		eventParams.Source = sourceString
+	}
+
 	events, err := eh.useCase.Get(ctx.Request().Context(), eventParams)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to get user events")

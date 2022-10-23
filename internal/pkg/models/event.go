@@ -53,6 +53,7 @@ type GetEventParams struct {
 	IsSubscriber Bool
 	GroupId      int64
 	IsAdmin      Bool
+	Source       string
 }
 
 type Category string
