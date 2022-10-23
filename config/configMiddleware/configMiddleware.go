@@ -29,7 +29,7 @@ func GetCORSConfigStruct() middleware.CORSConfig {
 func ConfigMiddleware(router *echo.Echo, profileRepository profile.Repository, logger *logrus.Logger) {
 	router.Use(
 		middleware.CORSWithConfig(GetCORSConfigStruct()),
-		custommiddleware.Auth,
+		custommiddleware.Auth(logger),
 		custommiddleware.CreateUser(profileRepository, logger),
 	)
 }
