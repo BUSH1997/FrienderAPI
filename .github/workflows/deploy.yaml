@@ -12,7 +12,7 @@ jobs:
       - uses: kolpav/purge-artifacts-action@v1
         with:
           token: ${{ secrets.GIT_TOKEN }}
-          expire-in: 1days
+          expire-in: 0days
   build:
     runs-on: ubuntu-latest
     
