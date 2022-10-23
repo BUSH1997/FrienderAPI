@@ -314,6 +314,10 @@ func (r eventRepository) GetUserVisitedEvents(ctx context.Context, user int64) (
 			eventIDs = append(eventIDs, sharing.EventID)
 		}
 
+		if len(dbEventSharings) == 0 {
+			return nil
+		}
+
 		var dbEvents []db_models.Event
 		res = r.db.Find(&dbEvents, eventIDs)
 		if err := res.Error; err != nil {
