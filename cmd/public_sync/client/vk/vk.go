@@ -74,11 +74,14 @@ func (c HTTPVKClient) UploadPublicEvents(ctx context.Context, data client.SyncDa
 	}
 
 	// fmt.Println(respEventsData.VKEventsData[0].Name)
-
-	return convertEventsToModel(respEventsData.VKEventsData.VKEventsData), nil
+	eventsInfo := EventInfo{
+		Category: data.GetFormData()[0]["q"],
+		Source:   SourceTypeEventVK,
+	}
+	return convertEventsToModel(respEventsData.VKEventsData.VKEventsData, eventsInfo), nil
 }
 
-func convertEventsToModel(vkEvents []VKEventData) []models.Event {
+func convertEventsToModel(vkEvents []VKEventData, eventsInfo EventInfo) []models.Event {
 	events := make([]models.Event, 0, len(vkEvents))
 	for _, vkEvent := range vkEvents {
 		event := models.Event{
@@ -88,6 +91,8 @@ func convertEventsToModel(vkEvents []VKEventData) []models.Event {
 			IsPublic:    true,
 			Description: vkEvent.Description,
 			Images:      []string{vkEvent.Photo200},
+			Category:    models.Category(eventsInfo.Category),
+			Source:      eventsInfo.Source,
 		}
 
 		if vkEvent.Photo200 == "" {

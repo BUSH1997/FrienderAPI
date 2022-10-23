@@ -13,7 +13,7 @@ postgres:
   port: 5432
   dbname: friender
   user: postgres
-  password: Nw7358228
+  password: 1234
 
 transport:
   timepad:

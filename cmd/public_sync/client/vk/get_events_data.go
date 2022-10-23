@@ -67,6 +67,7 @@ type VKEventData struct {
 	Photo200     string    `json:"photo_200,omitempty"`
 	StartDate    int64     `json:"start_date,omitempty"`
 	FinishDate   int64     `json:"finish_date,omitempty"`
+	Category     string    `json:"-"`
 }
 
 type Addresses struct {
@@ -86,6 +87,13 @@ type City struct {
 
 type Country struct {
 	Title string `json:"title"`
+}
+
+const SourceTypeEventVK = "vk_event"
+
+type EventInfo struct {
+	Category string
+	Source   string
 }
 
 func (r *GetEventsDataResponse) ReadFrom(resp *http.Response) error {

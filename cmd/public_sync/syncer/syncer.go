@@ -124,8 +124,6 @@ func (s SyncManager) syncPublicEvents(ctx context.Context) error {
 		}
 
 		s.Logger.Info("successfully synced public events")
-
-		return nil
 	}
 
 	return nil
