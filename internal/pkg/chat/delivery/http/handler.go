@@ -29,7 +29,11 @@ func NewChatHandler(usecase chat.Usecase, messenger *chat.Messenger, logger *log
 }
 
 var (
-	upgrader = websocket.Upgrader{}
+	upgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
 )
 
 func (ch *ChatHandler) GetChats(ctx echo.Context) error {
