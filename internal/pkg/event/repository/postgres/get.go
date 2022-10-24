@@ -456,6 +456,7 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActiv
 		res = r.db.Model(&db_models.Event{}).
 			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
 			Where("groups_events_sharing.group_id = ?", dbGroup.ID).
+			Where("events.is_deleted = ?", false).
 			Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get events group")
@@ -509,6 +510,7 @@ func (r eventRepository) GetGroupAdminEvent(ctx context.Context, group int64, is
 		res = r.db.Model(&db_models.Event{}).
 			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
 			Where("groups_events_sharing.group_id = ? and groups_events_sharing.is_admin = ?", dbGroup.ID, isAdmin.Value).
+			Where("events.is_deleted = ?", false).
 			Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get events group")
