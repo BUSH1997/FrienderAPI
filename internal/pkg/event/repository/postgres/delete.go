@@ -32,7 +32,7 @@ func (r eventRepository) Delete(ctx context.Context, event string, groupInfo mod
 		}
 
 		if groupInfo.GroupId == 0 {
-			if dbEvent.Owner != int(userID) {
+			if dbEvent.Owner != int(dbUser.ID) {
 				return errors.New("user is not events owner, cannot delete")
 			}
 		} else {
