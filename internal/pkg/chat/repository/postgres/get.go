@@ -12,7 +12,7 @@ import (
 func (r chatRepository) GetMessages(ctx context.Context, opts models.GetMessageOpts) ([]models.Message, error) {
 	var messages []models.Message
 
-	offset := (opts.Page - 1) * opts.Limit
+	offset := opts.Page * opts.Limit
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbMessages []db_models.Message
