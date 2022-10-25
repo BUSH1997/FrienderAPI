@@ -21,7 +21,7 @@ func (r eventRepository) Update(ctx context.Context, event models.Event) error {
 			"description":  event.Description,
 			"starts_at":    event.StartsAt,
 			"time_updated": time.Now().Unix(),
-			"geo":          fmt.Sprintf("%f", event.GeoData.Longitude) + "," + fmt.Sprintf("%f", event.GeoData.Latitude),
+			"geo":          fmt.Sprintf("%f;;%f;;%s", event.GeoData.Longitude, event.GeoData.Latitude, event.GeoData.Address),
 			"is_public":    event.IsPublic,
 			"is_private":   event.IsPrivate,
 		})

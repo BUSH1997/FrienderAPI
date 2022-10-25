@@ -44,7 +44,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 
 		dbEvent.Category = int(dbCategory.ID)
 		dbEvent.Images = strings.Join(event.Images, ",")
-		dbEvent.Geo = fmt.Sprintf("%f", event.GeoData.Longitude) + "," + fmt.Sprintf("%f", event.GeoData.Latitude)
+		dbEvent.Geo = fmt.Sprintf("%f;;%f;;%s", event.GeoData.Longitude, event.GeoData.Latitude, event.GeoData.Address)
 
 		dbUser := db_models.User{}
 

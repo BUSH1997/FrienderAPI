@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
@@ -145,26 +144,37 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 	}
 
 	event.Members = members
-	fmt.Println(strings.Split(dbEvent.Geo, ",")[0])
-	longitude, err := strconv.ParseFloat(strings.Split(dbEvent.Geo, ",")[0], 32)
+
+	geoData, err := getGeoData(dbEvent.Geo)
 	if err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to parse longitude")
+		return models.Event{}, errors.Wrap(err, "failed to get event geo data")
 	}
 
-	latitude, err := strconv.ParseFloat(strings.Split(dbEvent.Geo, ",")[1], 32)
-	if err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to parse latitude")
-	}
-
-	event.GeoData = models.Geo{
-		Longitude: longitude,
-		Latitude:  latitude,
-	}
+	event.GeoData = geoData
 	event.IsActive = event.StartsAt > time.Now().Unix()
 	images := strings.Split(dbEvent.Images, ",")
 	event.Images = images
 
 	return event, nil
+}
+
+func getGeoData(geo string) (models.Geo, error) {
+	geoData := strings.Split(geo, ";;")
+	longitude, err := strconv.ParseFloat(geoData[0], 32)
+	if err != nil {
+		return models.Geo{}, errors.Wrap(err, "failed to parse longitude")
+	}
+
+	latitude, err := strconv.ParseFloat(geoData[1], 32)
+	if err != nil {
+		return models.Geo{}, errors.Wrap(err, "failed to parse latitude")
+	}
+
+	return models.Geo{
+		Longitude: longitude,
+		Latitude:  latitude,
+		Address:   geoData[2],
+	}, nil
 }
 
 func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {

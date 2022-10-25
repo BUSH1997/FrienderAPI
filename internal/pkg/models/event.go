@@ -65,6 +65,7 @@ const (
 type Geo struct {
 	Longitude float64 `json:"longitude,omitempty"`
 	Latitude  float64 `json:"latitude,omitempty"`
+	Address   string  `json:"address,omitempty"`
 }
 
 type Avatar struct {
