@@ -7,12 +7,21 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func Auth(logger *logrus.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(context echo.Context) error {
-			userIDString := context.Request().Header.Get("X-User-ID")
+			var userIDString string
+
+			path := context.Path()
+			if strings.Contains(path, "ws/") {
+				userIDString = context.QueryParam("user_id")
+			} else {
+				userIDString = context.Request().Header.Get("X-User-ID")
+			}
+
 			if userIDString == "" {
 				logger.WithError(errors.New("empty X-User-ID")).Errorf("failed to get user header")
 				return context.NoContent(http.StatusUnauthorized)

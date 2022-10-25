@@ -1,6 +1,7 @@
 package configMiddleware
 
 import (
+	custommiddleware "github.com/BUSH1997/FrienderAPI/cmd/main_server/middleware"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -28,7 +29,7 @@ func GetCORSConfigStruct() middleware.CORSConfig {
 func ConfigMiddleware(router *echo.Echo, profileRepository profile.Repository, logger *logrus.Logger) {
 	router.Use(
 		middleware.CORSWithConfig(GetCORSConfigStruct()),
-		//custommiddleware.Auth(logger),
-		//custommiddleware.CreateUser(profileRepository, logger),
+		custommiddleware.Auth(logger),
+		custommiddleware.CreateUser(profileRepository, logger),
 	)
 }

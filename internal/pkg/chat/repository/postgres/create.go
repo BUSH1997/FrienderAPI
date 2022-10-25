@@ -11,7 +11,7 @@ import (
 func (r chatRepository) CreateMessage(ctx context.Context, message models.Message) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbUser db_models.User
-		res := r.db.Take(&dbUser, "uid = ?", 111111) //message.UserID)
+		res := r.db.Take(&dbUser, "uid = ?", message.UserID) //message.UserID)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user")
 		}
