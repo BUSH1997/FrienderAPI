@@ -34,7 +34,7 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("group/create", sc.GroupHandler.CreateGroup)
 	router.GET("group", sc.GroupHandler.GetAdministeredGroup)
 	router.GET("group/admin/check", sc.GroupHandler.IsAdmin)
-	router.GET("ws/chat/:id", sc.ChatHandler.ProcessMessage)
+	router.GET("ws/messenger/:id", sc.ChatHandler.ProcessMessage)
 	router.GET("messages", sc.ChatHandler.GetMessages)
 	router.GET("chats", sc.ChatHandler.GetChats)
 }
