@@ -1,6 +1,7 @@
 package http
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/chat"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/context"
@@ -124,21 +125,28 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 			// TODO: return
 		}
 
-		err = ch.useCase.CreateMessage(ctx.Request().Context(), models.Message{
+		message := models.Message{
 			UserID:      user,
 			EventID:     eventID,
 			Text:        string(msg),
 			TimeCreated: time.Now().Unix(),
-		})
+		}
+
+		err = ch.useCase.CreateMessage(ctx.Request().Context(), message)
 		if err != nil {
 			ch.logger.WithError(err).Error("failed to create message")
 			return ctx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to create message").Error())
 		}
 
+		jsonMessage, err := json.Marshal(&message)
+		if err != nil {
+			return ctx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to unmarshal json message").Error())
+		}
+
 		for _, client := range ch.messenger.Chat.Clients {
 			fmt.Printf("write to client %d message: %s \n", client.UserID, msg)
 
-			err := client.Socket.WriteMessage(websocket.TextMessage, msg)
+			err := client.Socket.WriteMessage(websocket.TextMessage, jsonMessage)
 			if err != nil {
 				ch.logger.WithError(err).Errorf("failed to write message to %d", client.UserID)
 				return ctx.JSON(http.StatusInternalServerError, err.Error())
