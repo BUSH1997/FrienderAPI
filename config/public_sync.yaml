@@ -13,7 +13,7 @@ postgres:
   port: 5432
   dbname: friender
   user: postgres
-  password: 1234
+  password: Nw7358228
 transport:
   timepad:
     download_limit_bytes: 2000000000

@@ -12,6 +12,7 @@ import (
 	chatUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/usecase"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/revindex"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
 	groupHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/group/delivery/http"
 	groupPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/group/repository/postgres"
@@ -63,6 +64,7 @@ func main() {
 	logger := logger2.New(os.Stdout, &logrus.JSONFormatter{}, logrus.InfoLevel)
 	logger.Println(configApp.Vk.AccessToken)
 	eventRepo := postgres.New(db, logger)
+	eventRepo = revindex.New(db, logger, eventRepo)
 	eventUsecase := usecase.New(eventRepo, blackLister, logger)
 	eventHandler := http.NewEventHandler(eventUsecase, logger)
 
