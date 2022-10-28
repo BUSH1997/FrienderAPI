@@ -4,21 +4,13 @@ import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/goodsign/snowball"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"sort"
-	"strings"
 )
 
 func (r eventRepository) Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error {
-	stemmer, err := snowball.NewWordStemmer("ru", "UTF_8")
-	if err != nil {
-		return errors.Wrap(err, "failed to init stammer")
-	}
-
-	defer stemmer.Close()
-
 	existEvent, err := r.GetEventById(ctx, event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get event by uid %s", event)
@@ -29,9 +21,9 @@ func (r eventRepository) Delete(ctx context.Context, event string, groupInfo mod
 		return errors.Wrapf(err, "failed to get revindex event by uid %s", event)
 	}
 
-	oldTerms, err := getTerms(strings.Split(existEvent.Title, " "), stemmer)
+	oldTerms, err := stammer.GetStammersFromTitle(existEvent.Title)
 	if err != nil {
-		return errors.Wrap(err, "failed to get old terms")
+		return errors.Wrap(err, "failed to get stammers from title")
 	}
 
 	for _, term := range oldTerms {

@@ -1,7 +1,10 @@
 package search
 
-import "github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+import (
+	"context"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+)
 
 type UseCase interface {
-	Search(words []string) ([]models.Event, error)
+	Search(ctx context.Context, words []string) ([]models.Event, error)
 }

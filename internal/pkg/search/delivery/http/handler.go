@@ -27,7 +27,7 @@ func (sh *SearchHandler) Search(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	events, err := sh.useCase.Search(wordList.Words)
+	events, err := sh.useCase.Search(ctx.Request().Context(), wordList.Words)
 	if err != nil {
 		sh.logger.WithError(err).Errorf("failed to get events by search")
 		return ctx.JSON(http.StatusInternalServerError, err)

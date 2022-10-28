@@ -1,7 +1,7 @@
 package search
 
-import "github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+import "context"
 
 type Repository interface {
-	Search(words []string) ([]models.Event, error)
+	GetEventUIDs(ctx context.Context, terms []string) ([]string, error)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/goodsign/snowball"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"sort"
@@ -12,16 +12,9 @@ import (
 )
 
 func (r eventRepository) Create(ctx context.Context, event models.Event) error {
-	stemmer, err := snowball.NewWordStemmer("ru", "UTF_8")
+	terms, err := stammer.GetStammers(stammer.FilterSkipList(strings.Split(event.Title, " "), r.skipList))
 	if err != nil {
-		return errors.Wrap(err, "failed to init stammer")
-	}
-
-	defer stemmer.Close()
-
-	terms, err := getTerms(strings.Split(event.Title, " "), stemmer)
-	if err != nil {
-		return errors.Wrap(err, "failed to get terms")
+		return errors.Wrap(err, "failed to get stammers from title")
 	}
 
 	dbRevindexEvent := db_models.RevindexEvent{
@@ -95,18 +88,4 @@ func (r eventRepository) updateRevindexWord(term string, eventIDs []int64, ID in
 	}
 
 	return nil
-}
-
-func getTerms(words []string, stemmer *snowball.WordStemmer) ([]string, error) {
-	var ret []string
-	for _, word := range words {
-		term, err := stemmer.Stem([]byte(word))
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get term of word %s", word)
-		}
-
-		ret = append(ret, string(term))
-	}
-
-	return ret, nil
 }

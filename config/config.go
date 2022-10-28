@@ -28,6 +28,7 @@ type Config struct {
 	Postgres  postgreslib.Postgres `mapstructure:"postgres"`
 	Vk        VKConfig             `mapstructure:"vk"`
 	BlackList []string             `mapstructure:"blacklist"`
+	SkipList  []string             `mapstructure:"skiplist"`
 }
 
 func LoadConfig(config *Config, path string) error {

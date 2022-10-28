@@ -3,7 +3,7 @@ package revindex
 import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
-	"github.com/goodsign/snowball"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
 	"github.com/pkg/errors"
 	"strings"
 )
@@ -30,21 +30,14 @@ func (r eventRepository) Update(ctx context.Context, event models.Event) error {
 }
 
 func (r eventRepository) updateRevindex(newTitle string, oldTitle string, uid string) error {
-	stemmer, err := snowball.NewWordStemmer("ru", "UTF_8")
-	if err != nil {
-		return errors.Wrap(err, "failed to init stammer")
-	}
-
-	defer stemmer.Close()
-
 	dbRevindexEvent, err := r.getRevindexEvent(uid)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get revindex event by uid %s", uid)
 	}
 
-	oldTerms, err := getTerms(strings.Split(oldTitle, " "), stemmer)
+	oldTerms, err := stammer.GetStammers(stammer.FilterSkipList(strings.Split(oldTitle, " "), r.skipList))
 	if err != nil {
-		return errors.Wrap(err, "failed to get old terms")
+		return errors.Wrap(err, "failed to get stammers from title")
 	}
 
 	for _, term := range oldTerms {
@@ -54,9 +47,9 @@ func (r eventRepository) updateRevindex(newTitle string, oldTitle string, uid st
 		}
 	}
 
-	newTerms, err := getTerms(strings.Split(newTitle, " "), stemmer)
+	newTerms, err := stammer.GetStammers(stammer.FilterSkipList(strings.Split(newTitle, " "), r.skipList))
 	if err != nil {
-		return errors.Wrap(err, "failed to get new terms")
+		return errors.Wrap(err, "failed to get stammers from title")
 	}
 
 	for _, term := range newTerms {
