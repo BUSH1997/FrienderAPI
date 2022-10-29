@@ -73,6 +73,11 @@ type Avatar struct {
 	AvatarVkId string `json:"avatar_vk_id"`
 }
 
+type SubscribeType struct {
+	Id      int64
+	IsGroup bool
+}
+
 func (e Event) GetEtag() string {
 	s := []byte(e.Title)
 

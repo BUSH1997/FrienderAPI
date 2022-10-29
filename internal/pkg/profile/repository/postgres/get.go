@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -29,8 +30,8 @@ func (r profileRepository) CheckUserExists(ctx context.Context, user int64) (boo
 	return userExists, nil
 }
 
-func (r profileRepository) GetSubscribe(cxt context.Context, userId int64) ([]int, error) {
-	var result []int
+func (r profileRepository) GetSubscribe(cxt context.Context, userId int64) ([]models.SubscribeType, error) {
+	var result []models.SubscribeType
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var currentUser db_models.User
 		res := r.db.Take(&currentUser, "uid = ?", userId)
@@ -52,7 +53,12 @@ func (r profileRepository) GetSubscribe(cxt context.Context, userId int64) ([]in
 				return errors.Wrap(err, "failed to get subscribe")
 			}
 
-			result = append(result, user.Uid)
+			subscribeType := models.SubscribeType{
+				Id:      dbSubscribe.ProfileId,
+				IsGroup: user.IsGroup,
+			}
+
+			result = append(result, subscribeType)
 		}
 
 		return nil

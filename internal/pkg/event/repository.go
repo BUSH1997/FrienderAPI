@@ -20,6 +20,7 @@ type Repository interface {
 	GetUserVisitedEvents(ctx context.Context, user int64) ([]models.Event, error)
 	GetSubscriptionEvents(ctx context.Context, user int64) ([]models.Event, error)
 	GetGroupEvent(ctx context.Context, group int64, isActive models.Bool) ([]models.Event, error)
+	GetSubscribeEvent(ctx context.Context, user int64) ([]models.Event, error)
 	GetGroupAdminEvent(ctx context.Context, group int64, isAdmin models.Bool, isActive models.Bool) ([]models.Event, error)
 	UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
 	Subscribe(ctx context.Context, event string) error

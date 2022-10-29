@@ -45,6 +45,36 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 	return events, nil
 }
 
+func (uc eventUsecase) GetSubscribeEvent(ctx context.Context, user int64) ([]models.Event, error) {
+	subscribes, err := uc.ProfileRepository.GetSubscribe(ctx, user)
+	if err != nil {
+		uc.logger.WithError(err).Errorf("[GetSubscribeEvent]")
+		return []models.Event{}, err
+	}
+
+	var result []models.Event
+	for _, subscribe := range subscribes {
+		var profileEvents []models.Event
+		if subscribe.IsGroup {
+			profileEvents, err = uc.Events.GetGroupEvent(ctx, subscribe.Id, models.Bool{Defined: true, Value: true})
+			if err != nil {
+				uc.logger.WithError(err).Errorf("[GetSubscribeEvent] faile getgroup event")
+				return []models.Event{}, err
+			}
+		} else {
+			profileEvents, err = uc.Events.GetUserEvents(ctx, subscribe.Id)
+			if err != nil {
+				uc.logger.WithError(err).Errorf("[GetSubscribeEvent] faile getgroup event")
+				return []models.Event{}, err
+			}
+		}
+
+		result = append(result, profileEvents...)
+	}
+
+	return result, nil
+}
+
 func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	if params.IsOwner.IsDefinedTrue() {
 		return uc.Events.GetOwnerEvents(ctx, params.UserID)
@@ -63,6 +93,9 @@ func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventPara
 	}
 	if params.GroupId != 0 {
 		return uc.Events.GetGroupEvent(ctx, params.GroupId, params.IsActive)
+	}
+	if params.Source == "subscribe" {
+		return uc.Events.GetSubscribeEvent(ctx, int64(params.UserID))
 	}
 	return uc.Events.GetAll(ctx, params)
 }
