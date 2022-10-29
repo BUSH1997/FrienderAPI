@@ -33,8 +33,8 @@ func (r eventRepository) GetAllCategories(ctx context.Context) ([]string, error)
 	return r.events.GetAllCategories(ctx)
 }
 
-func (r eventRepository) GetUserActiveEvents(ctx context.Context, user int64) ([]models.Event, error) {
-	return r.events.GetUserActiveEvents(ctx, user)
+func (r eventRepository) GetUserActiveEvents(ctx context.Context, user int64, params models.GetEventParams) ([]models.Event, error) {
+	return r.events.GetUserActiveEvents(ctx, user, params)
 }
 
 func (r eventRepository) GetUserVisitedEvents(ctx context.Context, user int64) ([]models.Event, error) {
@@ -49,8 +49,8 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 	return r.events.GetSubscriptionEvents(ctx, user)
 }
 
-func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActive models.Bool) ([]models.Event, error) {
-	return r.events.GetGroupEvent(ctx, group, isActive)
+func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActive models.Bool, params models.GetEventParams) ([]models.Event, error) {
+	return r.events.GetGroupEvent(ctx, group, isActive, params)
 }
 
 func (r eventRepository) GetGroupAdminEvent(

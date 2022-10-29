@@ -278,7 +278,7 @@ func (r eventRepository) GetUserEvents(ctx context.Context, user int64) ([]model
 	return ret, nil
 }
 
-func (r eventRepository) GetUserActiveEvents(ctx context.Context, user int64) ([]models.Event, error) {
+func (r eventRepository) GetUserActiveEvents(ctx context.Context, user int64, params models.GetEventParams) ([]models.Event, error) {
 	var ret []models.Event
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -288,8 +288,23 @@ func (r eventRepository) GetUserActiveEvents(ctx context.Context, user int64) ([
 			Joins("JOIN events on event_sharings.event_id = events.id").
 			Where("users.uid = ?", user).
 			Where("events.starts_at >= ?", time.Now().Unix()).
-			Where("event_sharings.is_deleted = ?", false).
-			Find(&dbEventSharings)
+			Where("event_sharings.is_deleted = ?", false)
+
+		if params.Category != "" {
+			dbCategory, err := r.getCategory(string(params.Category))
+			if err != nil {
+				return errors.Wrap(err, "failed to get category")
+			}
+
+			res = res.Where("events.category_id = ?", dbCategory.ID)
+		}
+
+		if params.City != "" {
+			res = res.Where("events.geo LIKE ?", "%"+params.City+"%")
+		}
+
+		res.Find(&dbEventSharings)
+
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user event sharings")
 		}
@@ -461,7 +476,7 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 		}
 
 		for _, dbSubscription := range dbSubscriptions {
-			subscriptionEvents, err := r.GetUserActiveEvents(ctx, int64(dbSubscription.UserID))
+			subscriptionEvents, err := r.GetUserActiveEvents(ctx, int64(dbSubscription.UserID), models.GetEventParams{})
 			if err != nil {
 				return errors.Wrap(err, "failed to get subscription events")
 			}
@@ -478,7 +493,7 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 	return ret, nil
 }
 
-func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActive models.Bool) ([]models.Event, error) {
+func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActive models.Bool, params models.GetEventParams) ([]models.Event, error) {
 	var ret []models.Event
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group
@@ -491,8 +506,22 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActiv
 		res = r.db.Model(&db_models.Event{}).
 			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
 			Where("groups_events_sharing.group_id = ?", dbGroup.ID).
-			Where("events.is_deleted = ?", false).
-			Find(&dbEvents)
+			Where("events.is_deleted = ?", false)
+
+		if params.Category != "" {
+			dbCategory, err := r.getCategory(string(params.Category))
+			if err != nil {
+				return errors.Wrap(err, "failed to get category")
+			}
+
+			res = res.Where("events.category_id = ?", dbCategory.ID)
+		}
+
+		if params.City != "" {
+			res = res.Where("events.geo LIKE ?", "%"+params.City+"%")
+		}
+
+		res.Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get events group")
 		}
