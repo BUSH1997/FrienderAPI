@@ -126,6 +126,12 @@ create table messages(
                          text text,
                          time_created bigint
 );
+create table subscribe_profile_sharing (
+                                           id serial primary key,
+                                           profile_id int references users(id),
+                                           user_id int references users(id)
+
+);
 
 insert into categories(name) values ('Концерт'), ('Выставка'), ('Кино'), ('Экскурсия'), ('Спорт'), ('Театр'), ('Шоу');
 insert into conditions(created_events, visited_events) values (0, 0);

@@ -135,3 +135,20 @@ func (eh *ProfileHandler) UnSubscribe(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, profileForSubscribeId)
 }
+
+func (eh *ProfileHandler) GetSubscribe(ctx echo.Context) error {
+	userIDString := ctx.Request().Header.Get("X-User-ID")
+	userIdInt, err := strconv.Atoi(userIDString)
+	if err != nil {
+		eh.logger.WithError(err).Errorf("[GetSubscribe] failed get x-user-id")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	subscribe, err := eh.useCase.GetSubscribe(ctx.Request().Context(), int64(userIdInt))
+	if err != nil {
+		eh.logger.WithError(err).Errorf("[GetSubscribe] failed getSubscribe")
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, subscribe)
+}

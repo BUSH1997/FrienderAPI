@@ -48,3 +48,17 @@ func (uc *UseCase) GetAllProfileStatuses(ctx context.Context) ([]models.Status, 
 
 	return statuses, nil
 }
+
+func (uc *UseCase) GetSubscribe(cxt context.Context, userId int64) ([]int, error) {
+	subscribe, err := uc.profileRepository.GetSubscribe(cxt, userId)
+	if err != nil {
+		uc.Logger.WithError(err).Errorf("[GetSubscribe] failed get subscribe")
+		return []int{}, nil
+	}
+
+	if subscribe == nil {
+		return []int{}, nil
+	}
+
+	return subscribe, nil
+}

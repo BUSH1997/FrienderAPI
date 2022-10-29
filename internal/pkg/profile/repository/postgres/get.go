@@ -28,3 +28,33 @@ func (r profileRepository) CheckUserExists(ctx context.Context, user int64) (boo
 
 	return userExists, nil
 }
+
+func (r profileRepository) GetSubscribe(cxt context.Context, userId int64) ([]int, error) {
+	var result []int
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbSubscribers []db_models.SubscribeProfileSharing
+
+		res := r.db.Find(&dbSubscribers, "user_id = ?", userId)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get subscribe")
+		}
+
+		for _, dbSubscribe := range dbSubscribers {
+			var user db_models.User
+			res := r.db.Take(&user, "id = ?", dbSubscribe.ProfileId)
+			if err := res.Error; err != nil {
+				return errors.Wrap(err, "failed to get subscribe")
+			}
+
+			result = append(result, user.Uid)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction")
+	}
+
+	return result, nil
+
+}

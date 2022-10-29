@@ -11,4 +11,5 @@ type Repository interface {
 	Create(ctx context.Context, user int64, isGroup bool) error
 	Subscribe(ctx context.Context, userId int64, groupId int64) error
 	UnSubscribe(ctx context.Context, userId int64, groupId int64) error
+	GetSubscribe(cxt context.Context, userId int64) ([]int, error)
 }
