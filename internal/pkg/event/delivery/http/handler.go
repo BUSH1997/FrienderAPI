@@ -156,6 +156,11 @@ func (eh *EventHandler) Get(ctx echo.Context) error {
 		eventParams.City = cityString
 	}
 
+	sortMembersString := ctx.QueryParam("sort_members")
+	if sortMembersString != "" {
+		eventParams.SortMembers = sortMembersString
+	}
+
 	events, err := eh.useCase.Get(ctx.Request().Context(), eventParams)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to get user events")
