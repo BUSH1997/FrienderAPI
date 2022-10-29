@@ -56,6 +56,7 @@ type GetEventParams struct {
 	Source       string
 	City         string
 	Category     Category
+	SortMembers  string
 }
 
 type Category string
