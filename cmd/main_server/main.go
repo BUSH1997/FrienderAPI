@@ -66,9 +66,10 @@ func main() {
 
 	logger := logger2.New(os.Stdout, &logrus.JSONFormatter{}, logrus.InfoLevel)
 	logger.Println(configApp.Vk.AccessToken)
+	profileRepo := profilePostgres.New(db, logger)
 	eventRepo := postgres.New(db, logger)
 	eventRepo = revindex.New(db, logger, eventRepo, configApp.SkipList)
-	eventUsecase := usecase.New(eventRepo, blackLister, logger)
+	eventUsecase := usecase.New(eventRepo, profileRepo, blackLister, logger)
 	eventHandler := http.NewEventHandler(eventUsecase, logger)
 
 	imageRepo := s3.New(logger)
@@ -78,7 +79,6 @@ func main() {
 	awardRepo := awardPostgres.New(db, logger)
 	statusRepo := statusPostgres.New(db, logger)
 
-	profileRepo := profilePostgres.New(db, logger)
 	profileUseCase := profileUseCase.New(profileRepo, eventRepo, awardRepo, statusRepo, logger)
 	profileHandler := profileHandler.NewProfileHandler(profileUseCase, logger)
 
