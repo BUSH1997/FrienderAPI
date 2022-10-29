@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"sort"
 	"strings"
+	"time"
 )
 
 func (uc UseCase) Search(ctx context.Context, searchData models.Search) ([]models.Event, error) {
@@ -40,12 +41,15 @@ func (uc UseCase) Search(ctx context.Context, searchData models.Search) ([]model
 		return eventRatesMap[events[i].Uid] > eventRatesMap[events[j].Uid]
 	})
 
-	events = FilterBySource(events, searchData.Sources)
+	events = Filter(events, searchData.Sources)
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].StartsAt < events[j].StartsAt
+	})
 
 	return events, nil
 }
 
-func FilterBySource(events []models.Event, sources []string) []models.Event {
+func Filter(events []models.Event, sources []string) []models.Event {
 	if len(sources) == 0 {
 		return events
 	}
@@ -57,7 +61,7 @@ func FilterBySource(events []models.Event, sources []string) []models.Event {
 
 	ret := make([]models.Event, 0, len(events))
 	for _, event := range events {
-		if sourceMap[event.Source] {
+		if sourceMap[event.Source] && event.StartsAt > time.Now().Unix() {
 			ret = append(ret, event)
 		}
 	}

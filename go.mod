@@ -3,23 +3,19 @@ module github.com/BUSH1997/FrienderAPI
 go 1.17
 
 require (
-	github.com/pkg/errors v0.9.1
-	github.com/rs/xid v1.4.0
-	gorm.io/driver/postgres v1.3.10
-	gorm.io/gorm v1.23.10
-)
-
-require github.com/spf13/viper v1.13.0
-
-require (
-	github.com/aws/aws-sdk-go v1.44.114
-	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/aws/aws-sdk-go v1.44.126
+	github.com/gofrs/uuid v4.3.0+incompatible
 	github.com/goodsign/snowball v0.0.0-20121211175237-4619f991afaf
 	github.com/gorilla/websocket v1.5.0
-	github.com/labstack/echo/v4 v4.9.0
-	github.com/labstack/gommon v0.3.1
-	github.com/lib/pq v1.10.2
-	github.com/sirupsen/logrus v1.6.0
+	github.com/labstack/echo/v4 v4.9.1
+	github.com/labstack/gommon v0.4.0
+	github.com/lib/pq v1.10.7
+	github.com/pkg/errors v0.9.1
+	github.com/rs/xid v1.4.0
+	github.com/sirupsen/logrus v1.9.0
+	github.com/spf13/viper v1.13.0
+	gorm.io/driver/postgres v1.4.5
+	gorm.io/gorm v1.24.1-0.20221019064659-5dd2bb482755
 )
 
 require (
@@ -37,7 +33,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -53,7 +48,7 @@ require (
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
