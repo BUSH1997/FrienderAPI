@@ -38,7 +38,7 @@ func Run() {
 
 	vkEventsDataFormData := map[string]string{
 		"access_token": "vk1.a.3v18zK0yJZRszF9FRAvhVhACDcDYPqZeeEkaehZ0k-qli2EIioZif1R4mI1cfQuwxH7cqLXG2JmDGHcf4AiTma5MpwGnhyZ3FBWjMbLqlbvCjRk1AbK8_7oWxO0DZBRySBUh2XDWCtXY6SVRRl4gDq07_U3IC-IdASY5nzcVTgZ7-qoib3C8fhoU-6I1U7-e",
-		"fields":       "addresses ,description ,start_date, finish_date",
+		"fields":       "addresses ,description ,start_date, finish_date, place",
 		"v":            "5.131",
 	}
 

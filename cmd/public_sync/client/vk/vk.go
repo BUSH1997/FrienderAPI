@@ -118,6 +118,10 @@ func convertEventsToModel(vkEvents []VKEventData, eventsInfo EventInfo) []models
 			Avatar: models.Avatar{
 				AvatarUrl:  vkEvent.Photo200,
 				AvatarVkId: "0"},
+			GeoData: models.Geo{
+				Latitude:  vkEvent.Place.Latitude,
+				Longitude: vkEvent.Place.Longitude,
+			},
 		}
 
 		if vkEvent.Photo200 == "" {

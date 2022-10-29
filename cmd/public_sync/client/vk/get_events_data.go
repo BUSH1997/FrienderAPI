@@ -68,6 +68,18 @@ type VKEventData struct {
 	StartDate    int64     `json:"start_date,omitempty"`
 	FinishDate   int64     `json:"finish_date,omitempty"`
 	Category     string    `json:"-"`
+	Place        Place     `json:"place,omitempty"`
+}
+
+type Place struct {
+	Id        int     `json:"id,omitempty"`
+	Title     string  `json:"title,omitempty"`
+	Longitude float64 `json:"longitude,omitempty"`
+	Latitude  float64 `json:"latitude,omitempty"`
+	Type      string  `json:"type,omitempty"`
+	Country   int     `json:"country,omitempty"`
+	City      int     `json:"city,omitempty"`
+	Addresses string  `json:"addresses,omitempty"`
 }
 
 type Addresses struct {
