@@ -110,5 +110,5 @@ func (eh *ProfileHandler) Subscribe(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	return ctx.NoContent(http.StatusOK)
+	return ctx.JSON(http.StatusOK, profileForSubscribeId)
 }
