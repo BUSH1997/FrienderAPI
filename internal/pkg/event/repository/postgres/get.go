@@ -229,7 +229,7 @@ func (r eventRepository) GetUserEvents(ctx context.Context, user int64) ([]model
 		res := r.db.Model(&db_models.Event{}).
 			Joins("JOIN event_sharings on event_sharings.event_id = events.id").
 			Joins("JOIN users on event_sharings.user_id = users.id").
-			Find(&dbEvents, "users.uid = ? AND is_deleted = ?", user, false)
+			Find(&dbEvents, "users.uid = ? AND event_sharings.is_deleted = ?", user, false)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user events")
 		}
