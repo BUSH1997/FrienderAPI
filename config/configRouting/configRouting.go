@@ -6,6 +6,7 @@ import (
 	group "github.com/BUSH1997/FrienderAPI/internal/pkg/group/delivery/http"
 	image "github.com/BUSH1997/FrienderAPI/internal/pkg/image/delivery/http"
 	profileHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/delivery/http"
+	search "github.com/BUSH1997/FrienderAPI/internal/pkg/search/delivery/http"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,6 +16,7 @@ type ServerConfigRouting struct {
 	ProfileHandler *profileHandler.ProfileHandler
 	GroupHandler   *group.GroupHandler
 	ChatHandler    *chat.ChatHandler
+	SearchHandler  *search.SearchHandler
 }
 
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -39,4 +41,5 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("ws/messenger/:id", sc.ChatHandler.ProcessMessage)
 	router.GET("messages", sc.ChatHandler.GetMessages)
 	router.GET("chats", sc.ChatHandler.GetChats)
+	router.POST("search", sc.SearchHandler.Search)
 }
