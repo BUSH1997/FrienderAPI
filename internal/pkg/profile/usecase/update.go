@@ -32,3 +32,12 @@ func (uc *UseCase) Subscribe(ctx context.Context, userId int64, groupId int64) e
 
 	return nil
 }
+
+func (uc *UseCase) UnSubscribe(ctx context.Context, userId int64, groupId int64) error {
+	err := uc.profileRepository.UnSubscribe(ctx, userId, groupId)
+	if err != nil {
+		return errors.Wrap(err, "failed subscribe")
+	}
+
+	return nil
+}

@@ -112,3 +112,26 @@ func (eh *ProfileHandler) Subscribe(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, profileForSubscribeId)
 }
+
+func (eh *ProfileHandler) UnSubscribe(ctx echo.Context) error {
+	var profileForSubscribeId models.UserId
+	if err := ctx.Bind(&profileForSubscribeId); err != nil {
+		eh.logger.WithError(err).Errorf("[UnSubscribe] failed bind data")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	userIDString := ctx.Request().Header.Get("X-User-ID")
+	userIdInt, err := strconv.Atoi(userIDString)
+	if err != nil {
+		eh.logger.WithError(err).Errorf("[UnSubscribe] failed get x-user-id")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	err = eh.useCase.UnSubscribe(ctx.Request().Context(), int64(userIdInt), int64(profileForSubscribeId.Id))
+	if err != nil {
+		eh.logger.WithError(err).Errorf("[UnSubscrivbe] error in usecase")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	return ctx.JSON(http.StatusOK, profileForSubscribeId)
+}

@@ -29,11 +29,55 @@ func (r profileRepository) UpdateProfile(ctx context.Context, profile models.Cha
 
 func (r profileRepository) Subscribe(ctx context.Context, userId int64, groupId int64) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-		dbSubscribe := db_models.SubscribeProfileSharing{
-			ProfileId: groupId,
-			UserId:    userId,
+		var dbUser db_models.User
+		res := r.db.Take(&dbUser, "uid = ?", userId)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user by id")
 		}
-		res := r.db.Create(&dbSubscribe)
+
+		var dbProfile db_models.User
+		res = r.db.Take(&dbProfile, "uid = ?", groupId)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user by id")
+		}
+
+		dbSubscribe := db_models.SubscribeProfileSharing{
+			ProfileId: int64(dbProfile.ID),
+			UserId:    int64(dbUser.ID),
+		}
+		res = r.db.Create(&dbSubscribe)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to create user")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to make transaction")
+	}
+
+	return nil
+}
+
+func (r profileRepository) UnSubscribe(ctx context.Context, userId int64, groupId int64) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbUser db_models.User
+		res := r.db.Take(&dbUser, "uid = ?", userId)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user by id")
+		}
+
+		var dbProfile db_models.User
+		res = r.db.Take(&dbProfile, "uid = ?", groupId)
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user by id")
+		}
+
+		dbSubscribe := db_models.SubscribeProfileSharing{
+			ProfileId: int64(dbProfile.ID),
+			UserId:    int64(dbUser.ID),
+		}
+		res = r.db.Delete(&dbSubscribe, "")
 		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to create user")
 		}

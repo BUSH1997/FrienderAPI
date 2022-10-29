@@ -11,4 +11,5 @@ type UseCase interface {
 	UpdateProfile(ctx context.Context, profile models.ChangeProfile) error
 	ChangeEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
 	Subscribe(ctx context.Context, userId int64, groupId int64) error
+	UnSubscribe(ctx context.Context, userId int64, groupId int64) error
 }
