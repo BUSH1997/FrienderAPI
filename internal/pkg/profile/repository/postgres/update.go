@@ -77,7 +77,7 @@ func (r profileRepository) UnSubscribe(ctx context.Context, userId int64, groupI
 			ProfileId: int64(dbProfile.ID),
 			UserId:    int64(dbUser.ID),
 		}
-		res = r.db.Delete(&dbSubscribe, "")
+		res = r.db.Delete(&dbSubscribe, "profile_id = ? and user_id = ?", dbSubscribe.ProfileId, dbSubscribe.UserId)
 		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to create user")
 		}
