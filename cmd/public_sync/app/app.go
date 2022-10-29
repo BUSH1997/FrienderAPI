@@ -7,6 +7,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/cmd/public_sync/syncer/vk"
 	"github.com/BUSH1997/FrienderAPI/config"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/revindex"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
 	postgreslib "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
 	syncer_postgres "github.com/BUSH1997/FrienderAPI/internal/pkg/syncer/repository/postgres"
@@ -48,6 +49,7 @@ func Run() {
 	}
 
 	eventRepo := postgres.New(db, logger)
+	eventRepo = revindex.New(db, logger, eventRepo, configApp.SkipList)
 	eventUsecase := usecase.New(eventRepo, nil, logger)
 	categories, err := eventUsecase.GetAllCategories(context.Background())
 	if err != nil {
