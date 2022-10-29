@@ -29,6 +29,7 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.PUT("profile/change", sc.ProfileHandler.ChangeProfile)
 	router.POST("profile/subscribe", sc.ProfileHandler.Subscribe)
 	router.POST("profile/unsubscribe", sc.ProfileHandler.UnSubscribe)
+	router.GET("profile/get", sc.ProfileHandler.GetSubscribe)
 	router.PUT("profile/events/priority", sc.ProfileHandler.ChangePriorityEvent)
 	router.PUT("event/:id/subscribe", sc.EventHandler.SubscribeEvent)
 	router.PUT("event/:id/unsubscribe", sc.EventHandler.UnsubscribeEvent)
