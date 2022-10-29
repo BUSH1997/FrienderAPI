@@ -26,3 +26,23 @@ func (r profileRepository) UpdateProfile(ctx context.Context, profile models.Cha
 
 	return nil
 }
+
+func (r profileRepository) Subscribe(ctx context.Context, userId int64, groupId int64) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		dbSubscribe := db_models.SubscribeProfileSharing{
+			ProfileId: groupId,
+			UserId:    userId,
+		}
+		res := r.db.Create(&dbSubscribe)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to create user")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to make transaction")
+	}
+
+	return nil
+}

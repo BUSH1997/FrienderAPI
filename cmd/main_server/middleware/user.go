@@ -22,7 +22,7 @@ func CreateUser(profileRepository profile.Repository, logger *logrus.Logger) ech
 				return next(context)
 			}
 
-			err = profileRepository.Create(ctx, userID)
+			err = profileRepository.Create(ctx, userID, false)
 			if err != nil {
 				logger.WithError(err).Errorf("failed to create user")
 				return context.JSON(http.StatusBadRequest, err)

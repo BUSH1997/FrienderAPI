@@ -23,3 +23,8 @@ func (uc *UseCase) ChangeEventPriority(ctx context.Context, eventPriority models
 
 	return nil
 }
+
+func (uc *UseCase) Subscribe(ctx context.Context, userId int64, groupId int64) error {
+
+	return nil
+}

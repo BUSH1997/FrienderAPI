@@ -7,11 +7,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r profileRepository) Create(ctx context.Context, user int64) error {
+func (r profileRepository) Create(ctx context.Context, user int64, isGroup bool) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		dbUser := db_models.User{
 			Uid:           int(user),
 			CurrentStatus: 1,
+			IsGroup:       isGroup,
 		}
 		res := r.db.Create(&dbUser)
 		if err := res.Error; err != nil {
@@ -32,6 +33,6 @@ func (r profileRepository) Create(ctx context.Context, user int64) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to make transaction")
 	}
-	
+
 	return nil
 }

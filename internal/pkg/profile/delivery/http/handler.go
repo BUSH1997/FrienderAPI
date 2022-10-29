@@ -89,3 +89,26 @@ func (eh *ProfileHandler) ChangePriorityEvent(ctx echo.Context) error {
 
 	return ctx.NoContent(http.StatusOK)
 }
+
+func (eh *ProfileHandler) Subscribe(ctx echo.Context) error {
+	var profileForSubscribeId models.UserId
+	if err := ctx.Bind(&profileForSubscribeId); err != nil {
+		eh.logger.WithError(err).Errorf("[Subscribe] failed bind data")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	userIDString := ctx.Request().Header.Get("X-User-ID")
+	userIdInt, err := strconv.Atoi(userIDString)
+	if err != nil {
+		eh.logger.WithError(err).Errorf("[Subscribe] failed get x-user-id")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	err = eh.useCase.Subscribe(ctx.Request().Context(), int64(userIdInt), int64(profileForSubscribeId.Id))
+	if err != nil {
+		eh.logger.WithError(err).Errorf("[Subscrivbe] error in usecase")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	return ctx.NoContent(http.StatusOK)
+}

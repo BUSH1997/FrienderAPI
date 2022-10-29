@@ -6,5 +6,15 @@ import (
 )
 
 func (gu *groupUseCase) Create(ctx context.Context, group models.Group) error {
-	return gu.repository.Create(ctx, group)
+	if err := gu.repository.Create(ctx, group); err != nil {
+		gu.logger.WithError(err).Errorf("[Create] use case")
+		return err
+	}
+
+	if err := gu.repositoryUser.Create(ctx, int64(group.GroupId), true); err != nil {
+		gu.logger.WithError(err).Errorf("[Create] use case")
+		return err
+	}
+
+	return nil
 }

@@ -78,7 +78,7 @@ func main() {
 	profileHandler := profileHandler.NewProfileHandler(profileUseCase, logger)
 
 	groupRepo := groupPostgres.New(db, logger)
-	groupUseCase := groupUseCase.New(logger, groupRepo)
+	groupUseCase := groupUseCase.New(logger, groupRepo, profileRepo)
 	groupHandler := groupHandler.New(logger, groupUseCase)
 
 	messenger := chat.NewMessenger()
