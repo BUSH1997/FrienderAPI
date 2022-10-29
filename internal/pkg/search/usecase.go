@@ -6,5 +6,5 @@ import (
 )
 
 type UseCase interface {
-	Search(ctx context.Context, words []string) ([]models.Event, error)
+	Search(ctx context.Context, searchData models.Search) ([]models.Event, error)
 }

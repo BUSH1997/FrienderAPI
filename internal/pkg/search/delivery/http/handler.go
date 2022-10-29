@@ -21,13 +21,13 @@ func NewSearchHandler(useCase search.UseCase, logger *logrus.Logger) *SearchHand
 }
 
 func (sh *SearchHandler) Search(ctx echo.Context) error {
-	var wordList models.WordList
-	if err := ctx.Bind(&wordList); err != nil {
+	var searchData models.Search
+	if err := ctx.Bind(&searchData); err != nil {
 		sh.logger.WithError(err).Errorf("failed to bind wordlist")
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	events, err := sh.useCase.Search(ctx.Request().Context(), wordList.Words)
+	events, err := sh.useCase.Search(ctx.Request().Context(), searchData)
 	if err != nil {
 		sh.logger.WithError(err).Errorf("failed to get events by search")
 		return ctx.JSON(http.StatusInternalServerError, err)

@@ -9,10 +9,8 @@ import (
 	"strings"
 )
 
-func (uc UseCase) Search(ctx context.Context, words []string) ([]models.Event, error) {
-	words = stammer.FilterSkipList(words, uc.skipList)
-
-	stammers, err := stammer.GetStammers(words)
+func (uc UseCase) Search(ctx context.Context, searchData models.Search) ([]models.Event, error) {
+	stammers, err := stammer.GetStammers(stammer.FilterSkipList(searchData.Words, uc.skipList))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get stammers")
 	}
@@ -35,12 +33,27 @@ func (uc UseCase) Search(ctx context.Context, words []string) ([]models.Event, e
 	}
 
 	for _, event := range events {
-		eventRatesMap[event.Uid] = float64(len(words)) / float64(len(strings.Split(event.Title, " ")))
+		eventRatesMap[event.Uid] = float64(len(stammers)) / float64(len(strings.Split(event.Title, " ")))
 	}
 
 	sort.Slice(events, func(i, j int) bool {
 		return eventRatesMap[events[i].Uid] > eventRatesMap[events[j].Uid]
 	})
 
+	events = FilterBySource(events, searchData.Source)
+
 	return events, nil
+}
+
+func FilterBySource(events []models.Event, source string) []models.Event {
+	ret := make([]models.Event, 0, len(events))
+	for _, event := range events {
+		if event.Source != source {
+			continue
+		}
+
+		ret = append(ret, event)
+	}
+
+	return ret
 }

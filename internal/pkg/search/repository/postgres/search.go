@@ -4,6 +4,7 @@ import (
 	"context"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 func (r searchRepository) GetEventUIDs(ctx context.Context, terms []string) ([]string, error) {
@@ -13,6 +14,9 @@ func (r searchRepository) GetEventUIDs(ctx context.Context, terms []string) ([]s
 		res := r.db.Model(&db_models.RevindexWord{}).
 			Where("word = ?", term).
 			Take(&dbRevindexWord)
+		if err := res.Error; err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
 		if err := res.Error; err != nil {
 			return nil, errors.Wrapf(err, "failed to get revindex for word %s", term)
 		}

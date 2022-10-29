@@ -1,5 +1,6 @@
 package models
 
-type WordList struct {
-	Words []string `json:"words,omitempty"`
+type Search struct {
+	Words  []string `json:"words,omitempty"`
+	Source string   `json:"source,omitempty"`
 }
