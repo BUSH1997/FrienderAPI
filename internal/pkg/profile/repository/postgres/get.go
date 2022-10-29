@@ -54,7 +54,7 @@ func (r profileRepository) GetSubscribe(cxt context.Context, userId int64) ([]mo
 			}
 
 			subscribeType := models.SubscribeType{
-				Id:      dbSubscribe.ProfileId,
+				Id:      int64(user.Uid),
 				IsGroup: user.IsGroup,
 			}
 
