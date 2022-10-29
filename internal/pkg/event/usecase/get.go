@@ -34,6 +34,13 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 		return nil, errors.Wrap(err, "failed to get events in usecase")
 	}
 
+<<<<<<< HEAD
+=======
+	sort.SliceStable(events, func(i, j int) bool {
+		return events[i].StartsAt < events[j].StartsAt
+	})
+
+>>>>>>> 692b20d6794dd668804d25e92e03f68202604fd6
 	if params.SortMembers != "" {
 		sort.SliceStable(events, func(i, j int) bool {
 			if params.SortMembers == "asc" {
@@ -43,10 +50,6 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 			return len(events[i].Members) < len(events[j].Members)
 		})
 	}
-
-	sort.SliceStable(events, func(i, j int) bool {
-		return events[i].StartsAt > events[j].StartsAt
-	})
 
 	if events == nil {
 		events = make([]models.Event, 0)

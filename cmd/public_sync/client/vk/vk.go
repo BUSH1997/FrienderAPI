@@ -121,6 +121,7 @@ func convertEventsToModel(vkEvents []VKEventData, eventsInfo EventInfo) []models
 			GeoData: models.Geo{
 				Latitude:  vkEvent.Place.Latitude,
 				Longitude: vkEvent.Place.Longitude,
+				Address:   vkEvent.Addresses.MainAddress.City.Title,
 			},
 		}
 

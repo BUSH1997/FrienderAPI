@@ -82,7 +82,7 @@ type SubscribeType struct {
 }
 
 func (e Event) GetEtag() string {
-	s := []byte(e.Title)
+	s := []byte(e.Title + e.Description)
 
 	hasher := sha256.New()
 	hasher.Write(s)
