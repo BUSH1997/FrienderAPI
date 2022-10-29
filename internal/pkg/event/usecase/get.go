@@ -95,7 +95,7 @@ func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventPara
 		return uc.Events.GetGroupEvent(ctx, params.GroupId, params.IsActive)
 	}
 	if params.Source == "subscribe" {
-		return uc.Events.GetSubscribeEvent(ctx, int64(params.UserID))
+		return uc.GetSubscribeEvent(ctx, int64(params.UserID))
 	}
 	return uc.Events.GetAll(ctx, params)
 }

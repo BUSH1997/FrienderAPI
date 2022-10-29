@@ -56,9 +56,10 @@ func (uc *UseCase) GetSubscribe(cxt context.Context, userId int64) ([]int, error
 		return []int{}, nil
 	}
 
-	if subscribe == nil {
-		return []int{}, nil
+	result := make([]int, len(subscribe))
+	for _, v := range subscribe {
+		result = append(result, int(v.Id))
 	}
 
-	return subscribe, nil
+	return result, nil
 }
