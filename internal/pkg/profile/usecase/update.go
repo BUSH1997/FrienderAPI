@@ -25,6 +25,10 @@ func (uc *UseCase) ChangeEventPriority(ctx context.Context, eventPriority models
 }
 
 func (uc *UseCase) Subscribe(ctx context.Context, userId int64, groupId int64) error {
+	err := uc.profileRepository.Subscribe(ctx, userId, groupId)
+	if err != nil {
+		return errors.Wrap(err, "failed subscribe")
+	}
 
 	return nil
 }
