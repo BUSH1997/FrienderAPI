@@ -12,6 +12,7 @@ import (
 	chatUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/usecase"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/revindex"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
 	groupHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/group/delivery/http"
 	groupPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/group/repository/postgres"
@@ -23,6 +24,9 @@ import (
 	profileHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/delivery/http"
 	profilePostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/repository/postgres"
 	profileUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/usecase"
+	searchHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/search/delivery/http"
+	searchPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/search/repository/postgres"
+	searchUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/search/usecase"
 	statusPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/status/repository/postgres"
 	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/vk_api"
@@ -63,6 +67,7 @@ func main() {
 	logger := logger2.New(os.Stdout, &logrus.JSONFormatter{}, logrus.InfoLevel)
 	logger.Println(configApp.Vk.AccessToken)
 	eventRepo := postgres.New(db, logger)
+	eventRepo = revindex.New(db, logger, eventRepo, configApp.SkipList)
 	eventUsecase := usecase.New(eventRepo, blackLister, logger)
 	eventHandler := http.NewEventHandler(eventUsecase, logger)
 
@@ -87,12 +92,17 @@ func main() {
 	chatUseCase := chatUsecase.New(chatRepo)
 	chatHandler := chatHandler.NewChatHandler(chatUseCase, messenger, logger)
 
+	searchRepo := searchPostgres.New(db, logger)
+	searchUseCase := searchUsecase.New(searchRepo, eventRepo, configApp.SkipList, logger)
+	searchHandler := searchHandler.NewSearchHandler(searchUseCase, logger)
+
 	serverRouting := configRouting.ServerConfigRouting{
 		EventHandler:   eventHandler,
 		ImageHandler:   imageHandler,
 		ProfileHandler: profileHandler,
 		GroupHandler:   groupHandler,
 		ChatHandler:    chatHandler,
+		SearchHandler:  searchHandler,
 	}
 
 	configMiddleware.ConfigMiddleware(router, profileRepo, logger)
