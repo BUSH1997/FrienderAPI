@@ -197,6 +197,19 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 			query = query.Where("starts_at < ?", time.Now().Unix())
 		}
 
+		if params.Category != "" {
+			dbCategory, err := r.getCategory(string(params.Category))
+			if err != nil {
+				return errors.Wrap(err, "failed to get category")
+			}
+
+			query = query.Where("category_id = ?", dbCategory.ID)
+		}
+
+		if params.City != "" {
+			query = query.Where("geo LIKE ?", "%"+params.City+"%")
+		}
+
 		res := query.Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get all events")
@@ -219,6 +232,18 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 	}
 
 	return ret, nil
+}
+
+func (r eventRepository) getCategory(name string) (db_models.Category, error) {
+	var dbCategory db_models.Category
+	res := r.db.Model(&db_models.Category{}).
+		Where("name = ?", name).
+		Take(&dbCategory)
+	if err := res.Error; err != nil {
+		return db_models.Category{}, errors.Wrapf(err, "failed to get category by name %s", name)
+	}
+
+	return dbCategory, nil
 }
 
 func (r eventRepository) GetUserEvents(ctx context.Context, user int64) ([]models.Event, error) {
