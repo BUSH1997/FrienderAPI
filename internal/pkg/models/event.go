@@ -54,6 +54,8 @@ type GetEventParams struct {
 	GroupId      int64
 	IsAdmin      Bool
 	Source       string
+	City         string
+	Category     Category
 }
 
 type Category string

@@ -146,6 +146,16 @@ func (eh *EventHandler) Get(ctx echo.Context) error {
 		eventParams.Source = sourceString
 	}
 
+	categoryString := ctx.QueryParam("category")
+	if categoryString != "" {
+		eventParams.Category = models.Category(categoryString)
+	}
+
+	cityString := ctx.QueryParam("city")
+	if cityString != "" {
+		eventParams.City = cityString
+	}
+
 	events, err := eh.useCase.Get(ctx.Request().Context(), eventParams)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to get user events")
