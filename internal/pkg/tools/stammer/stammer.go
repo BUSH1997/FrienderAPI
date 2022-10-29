@@ -34,6 +34,10 @@ func GetStammers(words []string) ([]string, error) {
 func getTerms(words []string, stemmer *snowball.WordStemmer) ([]string, error) {
 	var ret []string
 	for _, word := range words {
+		if word == "" {
+			continue
+		}
+
 		term, err := stemmer.Stem([]byte(strings.ToLower(word)))
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to get term of word %s", word)

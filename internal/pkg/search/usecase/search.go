@@ -40,19 +40,26 @@ func (uc UseCase) Search(ctx context.Context, searchData models.Search) ([]model
 		return eventRatesMap[events[i].Uid] > eventRatesMap[events[j].Uid]
 	})
 
-	events = FilterBySource(events, searchData.Source)
+	events = FilterBySource(events, searchData.Sources)
 
 	return events, nil
 }
 
-func FilterBySource(events []models.Event, source string) []models.Event {
+func FilterBySource(events []models.Event, sources []string) []models.Event {
+	if len(sources) == 0 {
+		return events
+	}
+
+	sourceMap := make(map[string]bool)
+	for _, source := range sources {
+		sourceMap[source] = true
+	}
+
 	ret := make([]models.Event, 0, len(events))
 	for _, event := range events {
-		if event.Source != source {
-			continue
+		if sourceMap[event.Source] {
+			ret = append(ret, event)
 		}
-
-		ret = append(ret, event)
 	}
 
 	return ret
