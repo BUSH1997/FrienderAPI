@@ -66,8 +66,8 @@ func (uc *UseCase) GetSubscribe(cxt context.Context, userId int64) (models.Subsc
 		}, nil
 	}
 
-	var Users []int64
-	var Groups []int64
+	Users := make([]int64, 0)
+	Groups := make([]int64, 0)
 	for _, v := range subscribe {
 		if v.IsGroup {
 			Groups = append(Groups, int64(v.Id))
