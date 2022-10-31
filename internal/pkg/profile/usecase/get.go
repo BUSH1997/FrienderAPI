@@ -99,7 +99,7 @@ func (uc *UseCase) GetFriends(ctx context.Context, userId string) ([]int64, erro
 		FormData: getFriendsFormData,
 	}, &respFriends)
 
-	var result []int64
+	result := make([]int64, 0)
 	for _, v := range respFriends.VkFriendsData.Ids {
 		isExist, err := uc.profileRepository.CheckUserExists(ctx, v)
 		if err != nil {
