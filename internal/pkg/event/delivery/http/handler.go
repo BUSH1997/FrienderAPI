@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"strconv"
 )
 
 type EventHandler struct {
@@ -62,105 +61,12 @@ func (eh *EventHandler) GetOneEvent(ctx echo.Context) error {
 
 func (eh *EventHandler) Get(ctx echo.Context) error {
 	eventParams := models.GetEventParams{}
+	if err := ctx.Bind(&eventParams); err != nil {
+		eh.logger.WithError(err).Errorf("failed to bind events get params")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
 
 	// eventParams.UserID = contextlib.GetUser(ctx.Request().Context())
-
-	idString := ctx.QueryParam("id")
-	if idString != "" {
-		userID, err := strconv.ParseInt(idString, 10, 32)
-		if err != nil {
-			eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
-				Errorf("failed to get user events")
-
-			return ctx.JSON(http.StatusBadRequest, err.Error())
-		}
-
-		eventParams.UserID = userID
-	}
-
-	isSubString := ctx.QueryParam("is_sub")
-	if isSubString != "" {
-		isSub, err := strconv.ParseBool(isSubString)
-		if err != nil {
-			eh.logger.WithError(errors.Wrap(err, "failed to parse sub param")).
-				Errorf("failed to get user events")
-
-			return ctx.JSON(http.StatusBadRequest, err.Error())
-		}
-
-		eventParams.IsSubscriber = models.DefinedBool(isSub)
-	}
-
-	isActiveString := ctx.QueryParam("is_active")
-	if isActiveString != "" {
-		isActive, err := strconv.ParseBool(isActiveString)
-		if err != nil {
-			eh.logger.WithError(errors.Wrap(err, "failed to parse active param")).Errorf("failed to get user events")
-
-			return ctx.JSON(http.StatusBadRequest, err.Error())
-		}
-
-		eventParams.IsActive = models.DefinedBool(isActive)
-	}
-
-	isOwnerString := ctx.QueryParam("is_owner")
-	if isOwnerString != "" {
-		isOwner, err := strconv.ParseBool(isOwnerString)
-		if err != nil {
-			eh.logger.WithError(errors.Wrap(err, "failed to parse owner param")).
-				Errorf("failed to get user events")
-
-			return ctx.JSON(http.StatusBadRequest, err.Error())
-		}
-
-		eventParams.IsOwner = models.DefinedBool(isOwner)
-	}
-
-	groupIdString := ctx.QueryParam("group_id")
-	if groupIdString != "" {
-		groupId, err := strconv.ParseInt(groupIdString, 10, 32)
-		if err != nil {
-			eh.logger.WithError(errors.Wrap(err, "failed to parse owner param")).
-				Errorf("failed to get group id")
-			return ctx.JSON(http.StatusBadRequest, err.Error())
-		}
-
-		eventParams.GroupId = groupId
-	}
-
-	isAdminString := ctx.QueryParam("is_admin")
-	if isAdminString != "" {
-		isAdmin, err := strconv.ParseBool(isAdminString)
-		if err != nil {
-			eh.logger.WithError(errors.Wrap(err, "failed to parse owner param")).
-				Errorf("failed to get user events")
-
-			return ctx.JSON(http.StatusBadRequest, err.Error())
-		}
-
-		eventParams.IsAdmin = models.DefinedBool(isAdmin)
-	}
-
-	sourceString := ctx.QueryParam("source")
-	if sourceString != "" {
-		eventParams.Source = sourceString
-	}
-
-	categoryString := ctx.QueryParam("category")
-	if categoryString != "" {
-		eventParams.Category = models.Category(categoryString)
-	}
-
-	cityString := ctx.QueryParam("city")
-	if cityString != "" {
-		eventParams.City = cityString
-	}
-
-	sortMembersString := ctx.QueryParam("sort_members")
-	if sortMembersString != "" {
-		eventParams.SortMembers = sortMembersString
-	}
-
 	events, err := eh.useCase.Get(ctx.Request().Context(), eventParams)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to get user events")
