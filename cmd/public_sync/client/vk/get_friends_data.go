@@ -9,8 +9,8 @@ import (
 )
 
 type ResponseFriends struct {
-	Count int
-	Ids   [][]int
+	Count int   `json:"count,omitempty"`
+	Ids   []int `json:"items,omitempty"`
 }
 
 type GetFriendsResponse struct {

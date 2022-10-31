@@ -28,6 +28,7 @@ import (
 	searchPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/search/repository/postgres"
 	searchUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/search/usecase"
 	statusPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/status/repository/postgres"
+	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
 	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/vk_api"
 	"github.com/labstack/echo/v4"
@@ -79,7 +80,11 @@ func main() {
 	awardRepo := awardPostgres.New(db, logger)
 	statusRepo := statusPostgres.New(db, logger)
 
-	profileUseCase := profileUseCase.New(profileRepo, eventRepo, awardRepo, statusRepo, logger)
+	HTTPClient, err := httplib.NewSimpleHTTPClient(configApp.Transport.HTTP)
+	if err != nil {
+		panic(err)
+	}
+	profileUseCase := profileUseCase.New(profileRepo, eventRepo, awardRepo, statusRepo, logger, HTTPClient)
 	profileHandler := profileHandler.NewProfileHandler(profileUseCase, logger)
 
 	groupRepo := groupPostgres.New(db, logger)
