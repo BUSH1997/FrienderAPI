@@ -17,6 +17,6 @@ type UserId struct {
 }
 
 type Subscriptions struct {
-	Groups []int64 `json:"group"`
+	Groups []int64 `json:"groups"`
 	Users  []int64 `json:"users"`
 }
