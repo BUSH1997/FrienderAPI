@@ -8,13 +8,16 @@ import (
 	"net/http"
 )
 
+type UnmarshalResponseFriends struct {
+	ResponseFriends `json:"response,omitempty"`
+}
 type ResponseFriends struct {
-	Count int   `json:"count,omitempty"`
-	Ids   []int `json:"items,omitempty"`
+	Count int     `json:"count,omitempty"`
+	Ids   []int64 `json:"items,omitempty"`
 }
 
 type GetFriendsResponse struct {
-	VkFriendsData      ResponseFriends
+	VkFriendsData      UnmarshalResponseFriends `json:"vk_friends_data"`
 	DownloadLimitBytes int64
 }
 

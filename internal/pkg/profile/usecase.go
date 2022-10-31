@@ -2,7 +2,6 @@ package profile
 
 import (
 	"context"
-	"github.com/BUSH1997/FrienderAPI/cmd/public_sync/client/vk"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 )
 
@@ -14,5 +13,5 @@ type UseCase interface {
 	Subscribe(ctx context.Context, userId int64, groupId int64) error
 	UnSubscribe(ctx context.Context, userId int64, groupId int64) error
 	GetSubscribe(cxt context.Context, userId int64) (models.Subscriptions, error)
-	GetFriends(ctx context.Context, userId string) (vk.GetFriendsResponse, error)
+	GetFriends(ctx context.Context, userId string) ([]int64, error)
 }

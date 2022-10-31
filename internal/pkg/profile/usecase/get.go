@@ -76,10 +76,11 @@ func (uc *UseCase) GetSubscribe(cxt context.Context, userId int64) (models.Subsc
 	}, nil
 }
 
-func (uc *UseCase) GetFriends(ctx context.Context, userId string) (vk.GetFriendsResponse, error) {
+func (uc *UseCase) GetFriends(ctx context.Context, userId string) ([]int64, error) {
 	getFriendsFormData := map[string]string{
 		"access_token": "vk1.a.3v18zK0yJZRszF9FRAvhVhACDcDYPqZeeEkaehZ0k-qli2EIioZif1R4mI1cfQuwxH7cqLXG2JmDGHcf4AiTma5MpwGnhyZ3FBWjMbLqlbvCjRk1AbK8_7oWxO0DZBRySBUh2XDWCtXY6SVRRl4gDq07_U3IC-IdASY5nzcVTgZ7-qoib3C8fhoU-6I1U7-e",
 		"user_id":      userId,
+		"v":            "5.131",
 	}
 	respFriends := vk.GetFriendsResponse{
 		DownloadLimitBytes: 2000000000,
@@ -92,5 +93,17 @@ func (uc *UseCase) GetFriends(ctx context.Context, userId string) (vk.GetFriends
 		FormData: getFriendsFormData,
 	}, &respFriends)
 
-	return respFriends, nil
+	var result []int64
+	for _, v := range respFriends.VkFriendsData.Ids {
+		isExist, err := uc.profileRepository.CheckUserExists(ctx, v)
+		if err != nil {
+			uc.Logger.WithError(err).Errorf("[CheckUserExists] failed in repo")
+			return []int64{}, err
+		}
+		if isExist {
+			result = append(result, v)
+		}
+	}
+
+	return result, nil
 }
