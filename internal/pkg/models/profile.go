@@ -15,3 +15,8 @@ type ChangeProfile struct {
 type UserId struct {
 	Id int `json:"user_id"`
 }
+
+type Subscriptions struct {
+	Groups []int64 `json:"group,omitempty"`
+	Users  []int64 `json:"users,omitempty"`
+}

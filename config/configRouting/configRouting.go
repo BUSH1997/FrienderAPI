@@ -24,6 +24,7 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("event/get/:id", sc.EventHandler.GetOneEvent)
 	router.GET("events", sc.EventHandler.Get)
 	router.POST("image/upload", sc.ImageHandler.UploadImage)
+	router.GET("profile/friends", sc.ProfileHandler.GetFriends)
 	router.GET("profile/:id", sc.ProfileHandler.GetOneProfile)
 	router.GET("profile/statuses", sc.ProfileHandler.GetAllStatusesUser)
 	router.PUT("profile/change", sc.ProfileHandler.ChangeProfile)

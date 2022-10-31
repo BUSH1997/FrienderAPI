@@ -9,30 +9,30 @@ import (
 	"net/url"
 )
 
-type GetEventsDataRequest struct {
+type GetRequest struct {
 	RequestURL string
 }
 
-func (r GetEventsDataRequest) URL() string {
+func (r GetRequest) URL() string {
 	return r.RequestURL
 }
 
-func (r GetEventsDataRequest) Method() string {
+func (r GetRequest) Method() string {
 	return http.MethodPost
 }
 
-func (r GetEventsDataRequest) Headers() http.Header {
+func (r GetRequest) Headers() http.Header {
 	return map[string][]string{
 		"Content-Type": {"application/x-www-form-urlencoded"},
 	}
 }
 
-type GetEventsDataRequestWithBody struct {
-	GetEventsDataRequest
+type GetRequestWithBody struct {
+	GetRequest
 	FormData map[string]string
 }
 
-func (rb GetEventsDataRequestWithBody) Body() ([]byte, error) {
+func (rb GetRequestWithBody) Body() ([]byte, error) {
 	form := url.Values{}
 	for k, v := range rb.FormData {
 		form.Add(k, v)

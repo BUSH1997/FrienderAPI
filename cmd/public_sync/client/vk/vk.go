@@ -65,8 +65,8 @@ func (c HTTPVKClient) UploadPublicEvents(ctx context.Context, data client.SyncDa
 	respEventsData := GetEventsDataResponse{
 		downloadLimitBytes: c.config.DownloadLimitBytes,
 	}
-	err = c.client.PerformRequest(ctx, GetEventsDataRequestWithBody{
-		GetEventsDataRequest: GetEventsDataRequest{
+	err = c.client.PerformRequest(ctx, GetRequestWithBody{
+		GetRequest: GetRequest{
 			RequestURL: getVKEventsDataURL,
 		},
 		FormData: getVKEventsDataFormData,

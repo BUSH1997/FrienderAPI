@@ -152,3 +152,19 @@ func (eh *ProfileHandler) GetSubscribe(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, subscribe)
 }
+
+func (eh *ProfileHandler) GetFriends(ctx echo.Context) error {
+	userIDString := ctx.Request().Header.Get("X-User-ID")
+	if userIDString == "" {
+		eh.logger.Errorf("[GetSubscribe] failed get x-user-id")
+		return ctx.JSON(http.StatusBadRequest, errors.New("failed get x-user-id"))
+	}
+
+	friends, err := eh.useCase.GetFriends(ctx.Request().Context(), userIDString)
+	if err != nil {
+		eh.logger.WithError(err).Errorf("[GetFriends] failed in usecase")
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, friends)
+}

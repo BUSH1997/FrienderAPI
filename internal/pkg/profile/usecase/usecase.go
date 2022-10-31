@@ -5,6 +5,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/status"
+	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,6 +15,7 @@ type UseCase struct {
 	awardRepository   award.Repository
 	statusRepository  status.Repository
 	Logger            *logrus.Logger
+	httpClient        httplib.Client
 }
 
 func New(
@@ -22,6 +24,7 @@ func New(
 	awardRepository award.Repository,
 	statusRepository status.Repository,
 	logger *logrus.Logger,
+	client httplib.Client,
 ) profile.UseCase {
 	return &UseCase{
 		profileRepository: profileRepository,
@@ -29,5 +32,6 @@ func New(
 		awardRepository:   awardRepository,
 		statusRepository:  statusRepository,
 		Logger:            logger,
+		httpClient:        client,
 	}
 }
