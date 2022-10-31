@@ -38,25 +38,28 @@ type Event struct {
 	IsGroup      bool      `json:"is_group,omitempty"`
 	IsPublic     bool      `json:"is_public,omitempty"`
 	IsPrivate    bool      `json:"is_private,omitempty"`
-	IsActive     bool      `json:"is_active, omitempty"`
+	IsActive     bool      `json:"is_active,omitempty"`
 	Category     Category  `json:"category,omitempty"`
 	Avatar       Avatar    `json:"avatar"`
 	MembersLimit int       `json:"members_limit,omitempty"`
-	GroupInfo    GroupInfo `json:"group_info, omitempty"`
-	Source       string    `json:"source, omitempty"`
+	GroupInfo    GroupInfo `json:"group_info,omitempty"`
+	Source       string    `json:"source,omitempty"`
 }
 
 type GetEventParams struct {
-	UserID       int64
-	IsOwner      Bool
-	IsActive     Bool
-	IsSubscriber Bool
-	GroupId      int64
-	IsAdmin      Bool
-	Source       string
-	City         string
-	Category     Category
-	SortMembers  string
+	UserID       int64       `json:"members_limit,omitempty"`
+	IsOwner      Bool        `json:"is_owner,omitempty"`
+	IsActive     Bool        `json:"is_active,omitempty"`
+	IsSubscriber Bool        `json:"is_subscriber,omitempty"`
+	GroupId      int64       `json:"group_id,omitempty"`
+	IsAdmin      Bool        `json:"is_admin,omitempty"`
+	Source       string      `json:"source,omitempty"`
+	City         string      `json:"city,omitempty"`
+	Category     Category    `json:"category,omitempty"`
+	SortMembers  string      `json:"sort_members,omitempty"`
+	Search       SearchInput `json:"search,omitempty"`
+	UIDs         []string    `json:"-"`
+	IsPublic     Bool        `json:"-"`
 }
 
 type Category string

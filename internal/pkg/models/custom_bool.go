@@ -1,8 +1,8 @@
 package models
 
 type Bool struct {
-	Value   bool
-	Defined bool
+	Value   bool `json:"value,omitempty"`
+	Defined bool `json:"defined,omitempty"`
 }
 
 func (b Bool) IsDefined() bool {

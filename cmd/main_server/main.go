@@ -24,9 +24,7 @@ import (
 	profileHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/delivery/http"
 	profilePostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/repository/postgres"
 	profileUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/usecase"
-	searchHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/search/delivery/http"
 	searchPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/search/repository/postgres"
-	searchUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/search/usecase"
 	statusPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/status/repository/postgres"
 	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
 	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
@@ -70,7 +68,10 @@ func main() {
 	profileRepo := profilePostgres.New(db, logger)
 	eventRepo := postgres.New(db, logger)
 	eventRepo = revindex.New(db, logger, eventRepo, configApp.SkipList)
-	eventUsecase := usecase.New(eventRepo, profileRepo, blackLister, logger)
+
+	searchRepo := searchPostgres.New(db, logger)
+
+	eventUsecase := usecase.New(eventRepo, profileRepo, searchRepo, blackLister, configApp.SkipList, logger)
 	eventHandler := http.NewEventHandler(eventUsecase, logger)
 
 	imageRepo := s3.New(logger)
@@ -97,17 +98,12 @@ func main() {
 	chatUseCase := chatUsecase.New(chatRepo)
 	chatHandler := chatHandler.NewChatHandler(chatUseCase, messenger, logger)
 
-	searchRepo := searchPostgres.New(db, logger)
-	searchUseCase := searchUsecase.New(searchRepo, eventRepo, configApp.SkipList, logger)
-	searchHandler := searchHandler.NewSearchHandler(searchUseCase, logger)
-
 	serverRouting := configRouting.ServerConfigRouting{
 		EventHandler:   eventHandler,
 		ImageHandler:   imageHandler,
 		ProfileHandler: profileHandler,
 		GroupHandler:   groupHandler,
 		ChatHandler:    chatHandler,
-		SearchHandler:  searchHandler,
 	}
 
 	configMiddleware.ConfigMiddleware(router, profileRepo, logger)

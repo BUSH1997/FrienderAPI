@@ -50,7 +50,7 @@ func Run() {
 
 	eventRepo := postgres.New(db, logger)
 	eventRepo = revindex.New(db, logger, eventRepo, configApp.SkipList)
-	eventUsecase := usecase.New(eventRepo, nil, nil, logger)
+	eventUsecase := usecase.New(eventRepo, nil, nil, nil, nil, logger)
 	categories, err := eventUsecase.GetAllCategories(context.Background())
 	if err != nil {
 		log.Fatal(err)

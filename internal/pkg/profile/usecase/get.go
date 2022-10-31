@@ -14,12 +14,18 @@ func (uc *UseCase) GetOneProfile(ctx context.Context, userID int64) (models.Prof
 		return models.Profile{}, errors.Wrap(err, "failed to get profile status")
 	}
 
-	activeEvents, err := uc.eventRepository.GetUserActiveEvents(ctx, userID, models.GetEventParams{})
+	activeEvents, err := uc.eventRepository.GetSharings(ctx, models.GetEventParams{
+		UserID:   userID,
+		IsActive: models.DefinedBool(true),
+	})
 	if err != nil {
 		return models.Profile{}, errors.Wrap(err, "failed to get user active events")
 	}
 
-	visitedEvents, err := uc.eventRepository.GetUserActiveEvents(ctx, userID, models.GetEventParams{})
+	visitedEvents, err := uc.eventRepository.GetSharings(ctx, models.GetEventParams{
+		UserID:   userID,
+		IsActive: models.DefinedBool(false),
+	})
 	if err != nil {
 		return models.Profile{}, errors.Wrap(err, "failed to get user visited events")
 	}
