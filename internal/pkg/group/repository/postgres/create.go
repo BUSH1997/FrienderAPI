@@ -11,8 +11,9 @@ import (
 func (gr *groupRepository) Create(ctx context.Context, group models.Group) error {
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
 		dbGroup := db_models.Group{
-			UserId:  group.UserId,
-			GroupId: group.GroupId,
+			UserId:          group.UserId,
+			GroupId:         group.GroupId,
+			AllowUserEvents: group.AllowUserEvents,
 		}
 		res := gr.db.Create(&dbGroup)
 		if err := res.Error; err != nil {
