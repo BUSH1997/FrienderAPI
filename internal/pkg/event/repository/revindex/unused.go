@@ -29,21 +29,16 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 	return r.events.GetSubscriptionEvents(ctx, user)
 }
 
-func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActive models.Bool, params models.GetEventParams) ([]models.Event, error) {
-	return r.events.GetGroupEvent(ctx, group, isActive, params)
+func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	return r.events.GetGroupEvent(ctx, params)
 }
 
 func (r eventRepository) GetSharings(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	return r.events.GetSharings(ctx, params)
 }
 
-func (r eventRepository) GetGroupAdminEvent(
-	ctx context.Context,
-	group int64,
-	isAdmin models.Bool,
-	isActive models.Bool,
-) ([]models.Event, error) {
-	return r.events.GetGroupAdminEvent(ctx, group, isAdmin, isActive)
+func (r eventRepository) GetGroupAdminEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	return r.events.GetGroupAdminEvent(ctx, params)
 }
 
 func (r eventRepository) UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error {
