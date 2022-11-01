@@ -44,6 +44,12 @@ type Event struct {
 	MembersLimit int       `json:"members_limit,omitempty"`
 	GroupInfo    GroupInfo `json:"group_info,omitempty"`
 	Source       string    `json:"source,omitempty"`
+	Ticket       Ticket    `json:"ticket,omitempty"`
+}
+
+type Ticket struct {
+	Link string `json:"link,omitempty"`
+	Cost string `json:"cost,omitempty"`
 }
 
 type GetEventParams struct {

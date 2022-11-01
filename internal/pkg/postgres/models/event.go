@@ -21,6 +21,7 @@ type Event struct {
 	Photos       string `gorm:"column:photos"`
 	MembersLimit int    `gorm:"column:members_limit"`
 	Source       string `gorm:"column:source"`
+	Ticket       string `gorm:"column:ticket"`
 }
 
 func (Event) TableName() string {

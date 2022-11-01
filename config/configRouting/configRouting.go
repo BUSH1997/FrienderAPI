@@ -20,7 +20,7 @@ type ServerConfigRouting struct {
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.POST("event/create", sc.EventHandler.Create)
 	router.GET("event/get/:id", sc.EventHandler.GetOneEvent)
-	router.GET("events", sc.EventHandler.Get)
+	router.POST("events", sc.EventHandler.Get)
 	router.POST("image/upload", sc.ImageHandler.UploadImage)
 	router.GET("profile/friends", sc.ProfileHandler.GetFriends)
 	router.GET("profile/:id", sc.ProfileHandler.GetOneProfile)

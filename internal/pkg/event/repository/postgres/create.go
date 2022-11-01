@@ -26,6 +26,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			Source:      event.Source,
 			AvatarUrl:   event.Avatar.AvatarUrl,
 			AvatarVkId:  event.Avatar.AvatarVkId,
+			Ticket:      fmt.Sprintf("%s;;%s", event.Ticket.Link, event.Ticket.Cost),
 		}
 
 		dbCategory := db_models.Category{}

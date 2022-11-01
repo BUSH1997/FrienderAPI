@@ -93,6 +93,16 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		Source: dbEvent.Source,
 	}
 
+	if strings.Contains(dbEvent.Ticket, ";;") {
+		ticketData := strings.Split(dbEvent.Ticket, ";;")
+		if len(ticketData) != 2 {
+			return models.Event{}, errors.New("assumed two items in ticket data")
+		}
+
+		event.Ticket.Link = ticketData[0]
+		event.Ticket.Cost = ticketData[1]
+	}
+
 	if dbEvent.Source == "group" {
 		var groupEventSharing db_models.GroupsEventsSharing
 		res := r.db.Take(&groupEventSharing, "event_id = ?", dbEvent.ID)
