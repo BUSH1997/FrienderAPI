@@ -64,6 +64,8 @@ type GetEventParams struct {
 	Category     Category    `json:"category,omitempty"`
 	SortMembers  string      `json:"sort_members,omitempty"`
 	Search       SearchInput `json:"search,omitempty"`
+	Limit        int         `json:"limit,omitempty"`
+	Page         int         `json:"page,omitempty"`
 	UIDs         []string    `json:"-"`
 	IsPublic     Bool        `json:"-"`
 }

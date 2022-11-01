@@ -198,6 +198,12 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 
 	query = query.Where("is_deleted = ?", false)
 
+	query = query.Offset(params.Page * params.Limit)
+
+	if params.Limit != 0 {
+		query = query.Limit(params.Limit)
+	}
+
 	res := query.Find(&dbEvents)
 	if err := res.Error; err != nil {
 		return nil, errors.Wrap(err, "failed to get all events")
@@ -234,6 +240,12 @@ func (r eventRepository) GetSharings(ctx context.Context, params models.GetEvent
 	}
 
 	query = query.Where("event_sharings.is_deleted = ?", false)
+
+	query = query.Offset(params.Page * params.Limit)
+
+	if params.Limit != 0 {
+		query = query.Limit(params.Limit)
+	}
 
 	res := query.Find(&dbEventSharings)
 	if err := res.Error; err != nil {
@@ -349,17 +361,17 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 	return ret, nil
 }
 
-func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActive models.Bool, params models.GetEventParams) ([]models.Event, error) {
+func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	var ret []models.Event
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group
-		res := r.db.Take(&dbGroup).Where("group_id = ?", group)
+		res := r.db.Take(&dbGroup).Where("group_id = ?", params.GroupId)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get groups events sharings")
 		}
 
 		var dbEvents []db_models.Event
-		res = r.db.Model(&db_models.Event{}).
+		query := r.db.Model(&db_models.Event{}).
 			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
 			Where("groups_events_sharing.group_id = ?", dbGroup.ID).
 			Where("events.is_deleted = ?", false)
@@ -370,14 +382,20 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActiv
 				return errors.Wrap(err, "failed to get category")
 			}
 
-			res = res.Where("events.category_id = ?", dbCategory.ID)
+			query = query.Where("events.category_id = ?", dbCategory.ID)
 		}
 
 		if params.City != "" {
-			res = res.Where("events.geo LIKE ?", "%"+params.City+"%")
+			query = query.Where("events.geo LIKE ?", "%"+params.City+"%")
 		}
 
-		res.Find(&dbEvents)
+		query = query.Offset(params.Page * params.Limit)
+
+		if params.Limit != 0 {
+			query = query.Limit(params.Limit)
+		}
+
+		res = query.Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get events group")
 		}
@@ -395,14 +413,14 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActiv
 				return errors.Wrap(err, "failed to get eventSharing")
 			}
 
-			event.GroupInfo.GroupId = group
+			event.GroupInfo.GroupId = params.GroupId
 			event.GroupInfo.IsAdmin = eventSharing.IsAdmin
 
-			if !isActive.IsDefined() {
+			if !params.IsActive.IsDefined() {
 				ret = append(ret, event)
-			} else if isActive.IsDefinedTrue() && event.IsActive {
+			} else if params.IsActive.IsDefinedTrue() && event.IsActive {
 				ret = append(ret, event)
-			} else if isActive.IsDefinedFalse() && !event.IsActive {
+			} else if params.IsActive.IsDefinedFalse() && !event.IsActive {
 				ret = append(ret, event)
 			}
 		}
@@ -417,21 +435,29 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, group int64, isActiv
 	return ret, nil
 }
 
-func (r eventRepository) GetGroupAdminEvent(ctx context.Context, group int64, isAdmin models.Bool, isActive models.Bool) ([]models.Event, error) {
+func (r eventRepository) GetGroupAdminEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	var ret []models.Event
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group
-		res := r.db.Take(&dbGroup).Where("group_id = ?", group)
+		res := r.db.Take(&dbGroup).Where("group_id = ?", params.GroupId)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get groups events sharings")
 		}
 
 		var dbEvents []db_models.Event
-		res = r.db.Model(&db_models.Event{}).
+
+		query := r.db.Model(&db_models.Event{}).
 			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
-			Where("groups_events_sharing.group_id = ? and groups_events_sharing.is_admin = ?", dbGroup.ID, isAdmin.Value).
-			Where("events.is_deleted = ?", false).
-			Find(&dbEvents)
+			Where("groups_events_sharing.group_id = ? and groups_events_sharing.is_admin = ?", dbGroup.ID, params.IsAdmin.Value).
+			Where("events.is_deleted = ?", false)
+
+		query = query.Offset(params.Page * params.Limit)
+
+		if params.Limit != 0 {
+			query = query.Limit(params.Limit)
+		}
+
+		res = query.Find(&dbEvents)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get events group")
 		}
@@ -442,13 +468,13 @@ func (r eventRepository) GetGroupAdminEvent(ctx context.Context, group int64, is
 			if err != nil {
 				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
 			}
-			event.GroupInfo.IsAdmin = isAdmin.Value
-			event.GroupInfo.GroupId = group
-			if !isActive.IsDefined() {
+			event.GroupInfo.IsAdmin = params.IsAdmin.Value
+			event.GroupInfo.GroupId = params.GroupId
+			if !params.IsActive.IsDefined() {
 				ret = append(ret, event)
-			} else if isActive.IsDefinedTrue() && event.IsActive {
+			} else if params.IsActive.IsDefinedTrue() && event.IsActive {
 				ret = append(ret, event)
-			} else if isActive.IsDefinedFalse() && !event.IsActive {
+			} else if params.IsActive.IsDefinedFalse() && !event.IsActive {
 				ret = append(ret, event)
 			}
 		}
