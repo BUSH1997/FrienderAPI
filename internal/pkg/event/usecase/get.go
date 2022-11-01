@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	context2 "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
 	"github.com/pkg/errors"
@@ -57,7 +58,7 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 }
 
 func (uc eventUsecase) GetSubscribeEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
-	subscribes, err := uc.ProfileRepository.GetSubscribe(ctx, params.UserID)
+	subscribes, err := uc.ProfileRepository.GetSubscribe(ctx, context2.GetUser(ctx))
 	if err != nil {
 		uc.logger.WithError(err).Errorf("[GetSubscribeEvent]")
 		return []models.Event{}, err

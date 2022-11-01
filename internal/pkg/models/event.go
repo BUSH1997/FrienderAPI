@@ -53,7 +53,7 @@ type Ticket struct {
 }
 
 type GetEventParams struct {
-	UserID       int64       `json:"members_limit,omitempty"`
+	UserID       int64       `json:"id,omitempty"`
 	IsOwner      Bool        `json:"is_owner,omitempty"`
 	IsActive     Bool        `json:"is_active,omitempty"`
 	IsSubscriber Bool        `json:"is_subscriber,omitempty"`
