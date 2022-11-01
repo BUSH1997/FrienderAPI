@@ -23,7 +23,7 @@ func New(logger *logrus.Logger, useCase group.UseCase) *GroupHandler {
 }
 
 func (gh *GroupHandler) CreateGroup(ctx echo.Context) error {
-	var newGroup models.Group
+	var newGroup models.GroupInput
 	userId := ctx.Request().Header.Get("X-User-ID")
 	if userId == "" {
 		gh.logger.Error("[GetAdministeredGroup], bad x-user-id")
@@ -56,7 +56,7 @@ func (gh *GroupHandler) CreateGroup(ctx echo.Context) error {
 }
 
 func (gh *GroupHandler) Update(ctx echo.Context) error {
-	var newGroupData models.Group
+	var newGroupData models.GroupInput
 	if err := ctx.Bind(&newGroupData); err != nil {
 		gh.logger.WithError(err).Errorf("failed to bind group data")
 		return ctx.JSON(http.StatusBadRequest, err)

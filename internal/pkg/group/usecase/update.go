@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (gu *groupUseCase) Update(ctx context.Context, group models.Group) error {
+func (gu *groupUseCase) Update(ctx context.Context, group models.GroupInput) error {
 	err := gu.repository.Update(ctx, group)
 	if err != nil {
 		return errors.Wrap(err, "failed to update group in usecase")

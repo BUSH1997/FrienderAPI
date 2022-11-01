@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (gr *groupRepository) Create(ctx context.Context, group models.Group) error {
+func (gr *groupRepository) Create(ctx context.Context, group models.GroupInput) error {
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
 		dbGroup := db_models.Group{
 			UserId:          group.UserId,

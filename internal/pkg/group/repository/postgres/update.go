@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (gr *groupRepository) Update(ctx context.Context, group models.Group) error {
+func (gr *groupRepository) Update(ctx context.Context, group models.GroupInput) error {
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
 		res := gr.db.Model(&db_models.Group{}).
 			Where("group_id = ?", group.GroupId).

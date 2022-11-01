@@ -5,7 +5,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 )
 
-func (gu *groupUseCase) Create(ctx context.Context, group models.Group) error {
+func (gu *groupUseCase) Create(ctx context.Context, group models.GroupInput) error {
 	if err := gu.repository.Create(ctx, group); err != nil {
 		gu.logger.WithError(err).Errorf("[Create] use case")
 		return err
