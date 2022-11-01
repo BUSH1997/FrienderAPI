@@ -55,6 +55,22 @@ func (gh *GroupHandler) CreateGroup(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, newGroup)
 }
 
+func (gh *GroupHandler) Update(ctx echo.Context) error {
+	var newGroupData models.Group
+	if err := ctx.Bind(&newGroupData); err != nil {
+		gh.logger.WithError(err).Errorf("failed to bind group data")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	err := gh.useCase.Update(ctx.Request().Context(), newGroupData)
+	if err != nil {
+		gh.logger.WithError(err).Errorf("failed to update group data")
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, newGroupData)
+}
+
 func (gh *GroupHandler) GetAdministeredGroup(ctx echo.Context) error {
 	userId := ctx.QueryParam("user_id")
 	if userId == "" {
@@ -69,6 +85,28 @@ func (gh *GroupHandler) GetAdministeredGroup(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, groups)
+}
+
+func (gh *GroupHandler) Get(ctx echo.Context) error {
+	groupIdString := ctx.QueryParam("group_id")
+	if groupIdString == "" {
+		gh.logger.Error("[Get], bad group_id")
+		return ctx.JSON(http.StatusBadRequest, errors.New(" bad group_id").Error())
+	}
+
+	groupId, err := strconv.Atoi(groupIdString)
+	if err != nil {
+		gh.logger.WithError(err).Error("failed to parse user id from string")
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	group, err := gh.useCase.Get(ctx.Request().Context(), int64(groupId))
+	if err != nil {
+		gh.logger.WithError(err).Errorf("failed to get group by id %d", groupId)
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, group)
 }
 
 func (gh *GroupHandler) IsAdmin(ctx echo.Context) error {

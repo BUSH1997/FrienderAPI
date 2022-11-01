@@ -38,6 +38,25 @@ func (gr *groupRepository) GetAdministeredGroupByUserId(ctx context.Context, use
 	return ret, nil
 }
 
+func (gr *groupRepository) Get(ctx context.Context, groupID int64) (models.Group, error) {
+	var dbGroup db_models.Group
+	res := gr.db.Take(&dbGroup, "group_id = ?", groupID)
+	if err := res.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		return models.Group{}, nil
+	}
+	if err := res.Error; err != nil {
+		return models.Group{}, errors.Wrap(err, "failed to get group by id")
+	}
+
+	group := models.Group{
+		GroupId:         dbGroup.GroupId,
+		UserId:          dbGroup.UserId,
+		AllowUserEvents: dbGroup.AllowUserEvents,
+	}
+
+	return group, nil
+}
+
 func (gr *groupRepository) CheckIfAdmin(ctx context.Context, userId int, groupId int64) (bool, error) {
 	isAdmin := true
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
