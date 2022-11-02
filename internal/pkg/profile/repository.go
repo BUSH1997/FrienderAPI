@@ -12,4 +12,5 @@ type Repository interface {
 	Subscribe(ctx context.Context, userId int64, groupId int64) error
 	UnSubscribe(ctx context.Context, userId int64, groupId int64) error
 	GetSubscribe(cxt context.Context, userId int64) ([]models.SubscribeType, error)
+	GetCities(ctx context.Context) ([]string, error)
 }

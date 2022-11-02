@@ -113,3 +113,13 @@ func (uc *UseCase) GetFriends(ctx context.Context, userId string) ([]int64, erro
 
 	return result, nil
 }
+
+func (uc *UseCase) GetCities(ctx context.Context) ([]string, error) {
+	cities, err := uc.profileRepository.GetCities(ctx)
+	if err != nil {
+		uc.Logger.WithError(err).Errorf("[GetCities] repository")
+		return cities, err
+	}
+
+	return cities, nil
+}

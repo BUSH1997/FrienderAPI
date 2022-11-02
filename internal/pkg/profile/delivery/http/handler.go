@@ -168,3 +168,13 @@ func (eh *ProfileHandler) GetFriends(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, friends)
 }
+
+func (eh *ProfileHandler) GetAllCities(ctx echo.Context) error {
+	cities, err := eh.useCase.GetCities(ctx.Request().Context())
+	if err != nil {
+		eh.logger.WithError(err).Errorf("[GetAllCities]")
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, cities)
+}

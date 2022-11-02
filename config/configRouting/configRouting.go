@@ -43,4 +43,5 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("ws/messenger/:id", sc.ChatHandler.ProcessMessage)
 	router.GET("messages", sc.ChatHandler.GetMessages)
 	router.GET("chats", sc.ChatHandler.GetChats)
+	router.GET("cities", sc.ProfileHandler.GetAllCities)
 }

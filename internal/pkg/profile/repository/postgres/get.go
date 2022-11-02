@@ -6,6 +6,7 @@ import (
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"strings"
 )
 
 func (r profileRepository) CheckUserExists(ctx context.Context, user int64) (bool, error) {
@@ -69,4 +70,35 @@ func (r profileRepository) GetSubscribe(cxt context.Context, userId int64) ([]mo
 
 	return result, nil
 
+}
+
+func (r profileRepository) GetCities(ctx context.Context) ([]string, error) {
+	cities := make([]string, 0)
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvents []db_models.Event
+		res := r.db.Find(&dbEvents, "geo LIKE ?", "%;;%;;_%")
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get all categories")
+		}
+
+		for _, v := range dbEvents {
+			geoArray := strings.Split(v.Geo, ";;")
+			city := strings.Split(geoArray[2], ",")
+			for _, v := range cities {
+				if v == city[0] {
+					continue
+				}
+			}
+			cities = append(cities, city[0])
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to make transaction GetAllCategories")
+	}
+
+	return cities, nil
 }
