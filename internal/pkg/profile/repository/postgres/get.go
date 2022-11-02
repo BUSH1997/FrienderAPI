@@ -81,18 +81,16 @@ func (r profileRepository) GetCities(ctx context.Context) ([]string, error) {
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get all categories")
 		}
-
+		var mapCities map[string]bool
 		for _, v := range dbEvents {
 			geoArray := strings.Split(v.Geo, ";;")
 			city := strings.Split(geoArray[2], ",")
-			for _, v := range cities {
-				if v == city[0] {
-					continue
-				}
-			}
-			cities = append(cities, city[0])
+			mapCities[city[0]] = true
 		}
 
+		for k, _ := range mapCities {
+			cities = append(cities, k)
+		}
 		return nil
 	})
 
