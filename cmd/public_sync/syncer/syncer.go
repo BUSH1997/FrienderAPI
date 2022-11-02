@@ -129,7 +129,7 @@ func (s SyncManager) syncPublicEvents(ctx context.Context) error {
 					continue
 				}
 
-				if newEvent.StartsAt > time.Now().Unix() {
+				if newEvent.StartsAt > time.Now().Unix() && newEvent.GeoData.Address != "" {
 					_, err = s.Events.Create(ctx, newEvent)
 					if err != nil {
 						return errors.Wrapf(err, "failed to create public event, uid: %d", newEvent.Uid)

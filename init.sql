@@ -133,7 +133,8 @@ create table subscribe_profile_sharing (
 
 );
 
-insert into categories(name) values ('Концерт'), ('Выставка'), ('Кино'), ('Экскурсия'), ('Спорт'), ('Театр'), ('Шоу');
+insert into categories(name) values ('Концерт'), ('Выставка'), ('Кино'), ('Экскурсия'), ('Спорт'), ('Театр'), ('Шоу'),
+                                    ('Мастер-класс'), ('Бизнес'), ('It'), ('Воркшоп'), ('Флешмоб');
 insert into conditions(created_events, visited_events) values (0, 0);
 insert into statuses(uid, title, condition_id) values (1, 'DEFAULT STATUS', 1);
 insert into syncer(updated_at) values (now());
