@@ -3,19 +3,28 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/gofrs/uuid"
 	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
 	"mime/multipart"
 	"strings"
 )
 
 func (us *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*multipart.FileHeader, uid string) error {
+	var links string
 	for i := 0; i < len(files); i++ {
 		currentFieldName := fmt.Sprintf("photo%d", i)
-		err := us.imageRepository.UploadImage(ctx, files[currentFieldName][0])
+		fileName, err := uuid.NewV4()
 		if err != nil {
-			log.Error(err)
+			return errors.Wrap(err, "failed to generate filename")
+		}
+
+		err = us.imageRepository.UploadImage(ctx, files[currentFieldName][0], fileName.String())
+		if err != nil {
 			return err
 		}
+
+		links += "https://friender.hb.bizmrg.com/" + fileName.String() + ","
 	}
 
 	stringVkId, err := us.vk.UploadPhoto(files["photo0"][0])
@@ -27,12 +36,6 @@ func (us *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*mul
 	if err != nil {
 		log.Error(err)
 		return err
-	}
-
-	links := ""
-	for i := 1; i < len(files); i++ {
-		currentFieldName := fmt.Sprintf("photo%d", i)
-		links += "https://friender.hb.bizmrg.com/" + files[currentFieldName][0].Filename + ","
 	}
 
 	if links == "" {

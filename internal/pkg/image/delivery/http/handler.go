@@ -20,7 +20,6 @@ func NewImageHandler(usecase image.UseCase) *ImageHandler {
 func (h *ImageHandler) UploadImage(ctx echo.Context) error {
 	uid := ctx.QueryParam("uid")
 	if uid == "" {
-		log.Error("Baduid")
 		return ctx.NoContent(http.StatusBadRequest)
 	}
 	mf, err := ctx.MultipartForm()

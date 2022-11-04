@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	context2 "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -65,6 +66,30 @@ func (r *eventRepository) UploadAvatar(ctx context.Context, uid string, link str
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to make transaction")
+	}
+
+	return nil
+}
+
+func (r *eventRepository) UploadPhotos(ctx context.Context, uid string, links []string) error {
+	var dbUser db_models.User
+	res := r.db.Take(&dbUser, "uid = ?", context2.GetUser(ctx))
+	if err := res.Error; err != nil {
+		return errors.Wrap(err, "failed to get user by id")
+	}
+
+	var dbEvent db_models.Event
+	res = r.db.Take(&dbEvent, "uid = ?", uid)
+	if err := res.Error; err != nil {
+		return errors.Wrap(err, "failed to get event by uid")
+	}
+
+	res = r.db.Model(&db_models.EventSharing{}).
+		Where("event_id = ?", dbEvent.ID).
+		Where("user_id = ?", dbUser.ID).
+		Update("photos", gorm.Expr("array_cat(photos, ?)", links))
+	if err := res.Error; err != nil {
+		return errors.Wrapf(err, "failed to upload photos in event, uid %s", uid)
 	}
 
 	return nil
