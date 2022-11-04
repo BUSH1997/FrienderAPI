@@ -30,6 +30,7 @@ type Event struct {
 	Description  string    `json:"description,omitempty"`
 	Members      []int     `json:"members,omitempty"`
 	Images       []string  `json:"images,omitempty"`
+	Photos       []string  `json:"photos,omitempty"`
 	TimeCreated  time.Time `json:"time_created,omitempty"`
 	TimeUpdated  time.Time `json:"time_update,omitempty"`
 	GeoData      Geo       `json:"geo,omitempty"`
