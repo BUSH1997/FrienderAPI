@@ -132,7 +132,7 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		images := strings.Split(dbEvent.Images, ",")
 		event.Images = images
 	} else {
-		event.Images = []string{}
+		event.Images = make([]string, 0)
 	}
 
 	return event, nil
