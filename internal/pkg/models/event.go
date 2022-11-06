@@ -29,7 +29,7 @@ type Event struct {
 	Title        string    `json:"title,omitempty"`
 	Description  string    `json:"description,omitempty"`
 	Members      []int     `json:"members,omitempty"`
-	Images       []string  `json:"images,omitempty"`
+	Images       []string  `json:"images"`
 	TimeCreated  time.Time `json:"time_created,omitempty"`
 	TimeUpdated  time.Time `json:"time_update,omitempty"`
 	GeoData      Geo       `json:"geo,omitempty"`
