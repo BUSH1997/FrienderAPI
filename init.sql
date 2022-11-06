@@ -1,3 +1,6 @@
+drop table subscribe_profile_sharing;
+drop table revindex_words;
+drop table revindex_events;
 drop table unlocked_awards;
 drop table messages;
 drop table awards;
@@ -37,7 +40,8 @@ create table users(
                       uid int UNIQUE,
                       current_status int references statuses(id),
                       created_events int,
-                      visited_events int
+                      visited_events int,
+                      is_group bool
 );
 
 create table events(
@@ -60,7 +64,8 @@ create table events(
                        is_deleted bool,
                        photos text,
                        members_limit int,
-                       source varchar(256)
+                       source varchar(256),
+                       ticket varchar(256)
 );
 
 create table event_sharings(
@@ -75,6 +80,7 @@ create table groups(
                        id serial primary key,
                        user_id int references users(uid),
                        group_id int,
+                       allow_user_events bool,
                        UNIQUE (user_id, group_id)
 );
 
@@ -111,7 +117,6 @@ create table unlocked_awards(
                                 award_id int references awards(id)
 );
 
-
 create table syncer(
                        id serial primary key,
                        updated_at timestamptz
@@ -126,6 +131,18 @@ create table messages(
                          text text,
                          time_created bigint
 );
+
+create table revindex_words(
+                               id serial primary key,
+                               word varchar(256) UNIQUE,
+                               events int[]
+);
+
+create table revindex_events(
+                                id serial primary key,
+                                uid varchar(256) UNIQUE
+);
+
 create table subscribe_profile_sharing (
                                            id serial primary key,
                                            profile_id int references users(id),
@@ -134,7 +151,9 @@ create table subscribe_profile_sharing (
 );
 
 insert into categories(name) values ('Концерт'), ('Выставка'), ('Кино'), ('Экскурсия'), ('Спорт'), ('Театр'), ('Шоу'),
-                                    ('Мастер-класс'), ('Бизнес'), ('It'), ('Воркшоп'), ('Флешмоб');
+                                    ('Мастер-класс'), ('Бизнес'), ('It'), ('Воркшоп'), ('Флешмоб'), ('Другое');
 insert into conditions(created_events, visited_events) values (0, 0);
 insert into statuses(uid, title, condition_id) values (1, 'DEFAULT STATUS', 1);
 insert into syncer(updated_at) values (now());
+
+insert into users(uid, current_status) values (1,1);

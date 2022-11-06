@@ -60,6 +60,9 @@ func Run() {
 
 	var syncers []syncer.Syncer
 	for _, category := range categories {
+		if category == "Другое" {
+			continue
+		}
 		vkEventsFormData := map[string]string{
 			"access_token": "vk1.a.3v18zK0yJZRszF9FRAvhVhACDcDYPqZeeEkaehZ0k-qli2EIioZif1R4mI1cfQuwxH7cqLXG2JmDGHcf4AiTma5MpwGnhyZ3FBWjMbLqlbvCjRk1AbK8_7oWxO0DZBRySBUh2XDWCtXY6SVRRl4gDq07_U3IC-IdASY5nzcVTgZ7-qoib3C8fhoU-6I1U7-e",
 			"q":            category,
