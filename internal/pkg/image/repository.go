@@ -6,5 +6,5 @@ import (
 )
 
 type Repository interface {
-	UploadImage(ctx context.Context, file *multipart.FileHeader, filename string) error
+	UploadImage(ctx context.Context, file *multipart.FileHeader) error
 }

@@ -17,10 +17,6 @@ func (r eventRepository) UploadImage(ctx context.Context, uid string, link strin
 	return r.events.UploadImage(ctx, uid, link)
 }
 
-func (r eventRepository) UploadPhotos(ctx context.Context, uid string, link []string) error {
-	return r.events.UploadPhotos(ctx, uid, link)
-}
-
 func (r eventRepository) GetAllCategories(ctx context.Context) ([]string, error) {
 	return r.events.GetAllCategories(ctx)
 }
@@ -55,8 +51,4 @@ func (r eventRepository) Subscribe(ctx context.Context, event string) error {
 
 func (r eventRepository) UnSubscribe(ctx context.Context, event string) error {
 	return r.events.UnSubscribe(ctx, event)
-}
-
-func (r eventRepository) DeletePhotos(ctx context.Context, links []string, uid string) error {
-	return r.events.DeletePhotos(ctx, links, uid)
 }

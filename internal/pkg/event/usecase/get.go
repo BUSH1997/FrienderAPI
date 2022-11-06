@@ -7,7 +7,6 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
 	"github.com/pkg/errors"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -48,19 +47,6 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 			}
 
 			return len(events[i].Members) < len(events[j].Members)
-		})
-	}
-
-	if params.SortPrice != "" {
-		sort.SliceStable(events, func(i, j int) bool {
-			first, _ := strconv.ParseFloat(events[i].Ticket.Cost, 32)
-			second, _ := strconv.ParseFloat(events[j].Ticket.Cost, 32)
-
-			if params.SortPrice == "asc" {
-				return first > second
-			}
-
-			return first < second
 		})
 	}
 

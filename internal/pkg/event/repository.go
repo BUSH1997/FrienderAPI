@@ -11,7 +11,6 @@ type Repository interface {
 	GetAll(ctx context.Context, params models.GetEventParams) ([]models.Event, error)
 	GetEventById(ctx context.Context, id string) (models.Event, error)
 	UploadImage(ctx context.Context, uid string, link string) error
-	UploadPhotos(ctx context.Context, uid string, link []string) error
 	UploadAvatar(ctx context.Context, uid string, link string, vkId string) error
 	GetAllCategories(ctx context.Context) ([]string, error)
 	GetSharings(ctx context.Context, params models.GetEventParams) ([]models.Event, error)
@@ -22,5 +21,4 @@ type Repository interface {
 	Subscribe(ctx context.Context, event string) error
 	UnSubscribe(ctx context.Context, event string) error
 	Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error
-	DeletePhotos(ctx context.Context, links []string, uid string) error
 }

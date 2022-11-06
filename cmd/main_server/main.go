@@ -70,11 +70,11 @@ func main() {
 	eventRepo = revindex.New(db, logger, eventRepo, configApp.SkipList)
 
 	searchRepo := searchPostgres.New(db, logger)
-	imageRepo := s3.New(logger)
 
-	eventUsecase := usecase.New(eventRepo, profileRepo, searchRepo, imageRepo, blackLister, configApp.SkipList, logger)
+	eventUsecase := usecase.New(eventRepo, profileRepo, searchRepo, blackLister, configApp.SkipList, logger)
 	eventHandler := http.NewEventHandler(eventUsecase, logger)
 
+	imageRepo := s3.New(logger)
 	imageUseCase := imageUseCase.New(imageRepo, eventRepo, logger, vk)
 	imageHandler := image.NewImageHandler(imageUseCase)
 

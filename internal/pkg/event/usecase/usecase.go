@@ -3,7 +3,6 @@ package usecase
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
-	"github.com/BUSH1997/FrienderAPI/internal/pkg/image"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/search"
 	"github.com/sirupsen/logrus"
@@ -13,7 +12,6 @@ type eventUsecase struct {
 	Events            event.Repository
 	ProfileRepository profile.Repository
 	SearchRepository  search.Repository
-	ImageRepository   image.Repository
 	BlackLister       blacklist.BlackLister
 	skipList          map[string]bool
 	logger            *logrus.Logger
@@ -23,7 +21,6 @@ func New(
 	repository event.Repository,
 	profileRepository profile.Repository,
 	searchRepository search.Repository,
-	imageRepository image.Repository,
 	blackLister blacklist.BlackLister,
 	skipList []string,
 	logger *logrus.Logger,
@@ -37,7 +34,6 @@ func New(
 		Events:            repository,
 		ProfileRepository: profileRepository,
 		SearchRepository:  searchRepository,
-		ImageRepository:   imageRepository,
 		BlackLister:       blackLister,
 		skipList:          skipMap,
 		logger:            logger,

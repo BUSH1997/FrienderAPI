@@ -2,11 +2,9 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	"mime/multipart"
 )
 
 func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.Event, error) {
@@ -34,28 +32,4 @@ func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.E
 	}
 
 	return event, nil
-}
-
-func (uc eventUsecase) UploadPhotos(ctx context.Context, files map[string][]*multipart.FileHeader, uid string) error {
-	var links []string
-	for i := 0; i < len(files); i++ {
-		currentFieldName := fmt.Sprintf("photo%d", i)
-		fileName, err := uuid.NewV4()
-		if err != nil {
-			return errors.Wrap(err, "failed to generate filename")
-		}
-
-		err = uc.ImageRepository.UploadImage(ctx, files[currentFieldName][0], fileName.String())
-		if err != nil {
-			return errors.Wrap(err, "failed to upload image")
-		}
-
-		links = append(links, "https://friender.hb.bizmrg.com/"+fileName.String())
-	}
-
-	if len(links) == 0 {
-		return nil
-	}
-
-	return uc.Events.UploadPhotos(ctx, uid, links)
 }

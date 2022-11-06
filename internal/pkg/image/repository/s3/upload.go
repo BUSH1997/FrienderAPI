@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func (r *ImageRepository) UploadImage(ctx context.Context, file *multipart.FileHeader, filename string) error {
+func (r *ImageRepository) UploadImage(ctx context.Context, file *multipart.FileHeader) error {
 	src, err := file.Open()
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (r *ImageRepository) UploadImage(ctx context.Context, file *multipart.FileH
 
 	_, err = svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
-		Key:    aws.String(filename),
+		Key:    aws.String(file.Filename),
 		Body:   bytes.NewReader(b),
 	})
 	if err, ok := err.(awserr.Error); ok && err.Code() == request.CanceledErrorCode {

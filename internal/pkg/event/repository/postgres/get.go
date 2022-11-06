@@ -49,7 +49,8 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 	}
 
 	var dbEventSharings []db_models.EventSharing
-	res = r.db.Model(&db_models.EventSharing{}).
+
+	res = r.db.
 		Joins("JOIN events on event_sharings.event_id = events.id").
 		Where("events.uid = ?", id).
 		Where("event_sharings.is_deleted = ?", false).
@@ -74,11 +75,6 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		members = append(members, dbMember.Uid)
 	}
 
-	var photos []string
-	for _, dbEventSharing := range dbEventSharings {
-		photos = append(photos, dbEventSharing.Photos...)
-	}
-
 	event := models.Event{
 		Uid:          dbEvent.Uid,
 		Title:        dbEvent.Title,
@@ -95,7 +91,6 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 			AvatarVkId: dbEvent.AvatarVkId,
 		},
 		Source: dbEvent.Source,
-		Photos: photos,
 	}
 
 	if strings.Contains(dbEvent.Ticket, ";;") {

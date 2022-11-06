@@ -3,7 +3,6 @@ package event
 import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
-	"mime/multipart"
 )
 
 type FilterGetAll struct {
@@ -26,6 +25,4 @@ type Usecase interface {
 	Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error
 	Change(ctx context.Context, event models.Event) error
 	GetAllCategories(ctx context.Context) ([]string, error)
-	UploadPhotos(ctx context.Context, files map[string][]*multipart.FileHeader, uid string) error
-	DeletePhotos(ctx context.Context, links []string, uid string) error
 }

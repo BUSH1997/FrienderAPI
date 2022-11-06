@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func (r *ImageRepository) UploadImage(ctx context.Context, file *multipart.FileHeader, filename string) error {
+func (r *ImageRepository) UploadImage(ctx context.Context, file *multipart.FileHeader) error {
 	src, err := file.Open()
 	if err != nil {
 		return err
