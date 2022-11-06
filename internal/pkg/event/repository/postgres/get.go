@@ -128,8 +128,12 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 
 	event.GeoData = geoData
 	event.IsActive = event.StartsAt > time.Now().Unix()
-	images := strings.Split(dbEvent.Images, ",")
-	event.Images = images
+	if dbEvent.Images != "" {
+		images := strings.Split(dbEvent.Images, ",")
+		event.Images = images
+	} else {
+		event.Images = []string{}
+	}
 
 	return event, nil
 }
