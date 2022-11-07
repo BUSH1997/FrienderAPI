@@ -49,6 +49,7 @@ func (gr *groupRepository) ApproveEvent(ctx context.Context, eventApproveInfo mo
 		if eventApproveInfo.Approve {
 			approveUpdate = map[string]interface{}{
 				"is_need_approve": false,
+				"is_admin":        true,
 			}
 		} else {
 			approveUpdate = map[string]interface{}{
