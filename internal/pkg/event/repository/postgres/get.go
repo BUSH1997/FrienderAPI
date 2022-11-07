@@ -380,7 +380,8 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEve
 		query := r.db.Model(&db_models.Event{}).
 			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
 			Where("groups_events_sharing.group_id = ?", dbGroup.ID).
-			Where("events.is_deleted = ?", false)
+			Where("events.is_deleted = ?", false).
+			Where("groups_events_sharing.is_deleted = ?", false)
 
 		if params.IsAdmin.IsDefinedTrue() {
 			query = query.Where("groups_events_sharing.is_admin = ?", params.IsAdmin.Value)

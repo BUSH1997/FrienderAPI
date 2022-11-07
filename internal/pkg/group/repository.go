@@ -11,4 +11,5 @@ type Repository interface {
 	GetAdministeredGroupByUserId(ctx context.Context, userId int) ([]models.Group, error)
 	CheckIfAdmin(ctx context.Context, userId int, groupId int64) (bool, error)
 	Get(ctx context.Context, groupID int64) (models.Group, error)
+	ApproveEvent(ctx context.Context, event models.ApproveEvent) error
 }

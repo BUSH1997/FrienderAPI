@@ -6,6 +6,7 @@ type GroupsEventsSharing struct {
 	GroupID       uint `gorm:"column:group_id"`
 	IsAdmin       bool `gorm:"is_admin"`
 	IsNeedApprove bool `gorm:"is_need_approve"`
+	IsDeleted     bool `gorm:"is_deleted"`
 }
 
 func (GroupsEventsSharing) TableName() string {

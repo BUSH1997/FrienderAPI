@@ -11,3 +11,9 @@ type Group struct {
 	UserId          int  `json:"user_id"`
 	AllowUserEvents bool `json:"allow_user_events"`
 }
+
+type ApproveEvent struct {
+	GroupId  int    `json:"group_id"`
+	Approve  bool   `json:"approve"`
+	EventUid string `json:"event_uid"`
+}

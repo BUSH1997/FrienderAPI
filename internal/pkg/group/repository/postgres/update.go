@@ -29,3 +29,46 @@ func (gr *groupRepository) Update(ctx context.Context, group models.GroupInput) 
 
 	return nil
 }
+
+func (gr *groupRepository) ApproveEvent(ctx context.Context, eventApproveInfo models.ApproveEvent) error {
+	err := gr.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvent db_models.Event
+		res := gr.db.Take(&dbEvent, "uid = ?", eventApproveInfo.EventUid)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to get event")
+		}
+
+		var dbGroup db_models.Group
+		res = gr.db.Take(&dbGroup, "group_id = ?", eventApproveInfo.GroupId)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to get group")
+		}
+
+		var approveUpdate map[string]interface{}
+
+		if eventApproveInfo.Approve {
+			approveUpdate = map[string]interface{}{
+				"is_need_approve": false,
+			}
+		} else {
+			approveUpdate = map[string]interface{}{
+				"is_deleted": true,
+			}
+		}
+
+		res = gr.db.Model(&db_models.GroupsEventsSharing{}).
+			Where("group_id = ?", dbGroup.ID).
+			Where("event_id = ?", dbEvent.ID).
+			Updates(approveUpdate)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update GroupsEventsSharing")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to make transaction")
+	}
+
+	return nil
+}

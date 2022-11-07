@@ -89,7 +89,8 @@ create table groups_events_sharing (
                                        group_id int references groups(id),
                                        event_id int references events(id),
                                        is_admin bool,
-                                       is_need_approve bool
+                                       is_need_approve bool,
+                                       is_deleted bool
 );
 
 create table subscribe_sharings(

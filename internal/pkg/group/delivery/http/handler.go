@@ -137,3 +137,18 @@ func (gh *GroupHandler) IsAdmin(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, isAdmin)
 }
+
+func (gh *GroupHandler) ApproveEvent(ctx echo.Context) error {
+	var approveEvent models.ApproveEvent
+	if err := ctx.Bind(&approveEvent); err != nil {
+		gh.logger.WithError(err).Errorf("failed to bind approve data")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	err := gh.useCase.ApproveEvent(ctx.Request().Context(), approveEvent)
+	if err != nil {
+		gh.logger.WithError(err).Errorf("failed to approve")
+		return ctx.JSON(http.StatusInternalServerError, err)
+	}
+	return ctx.JSON(http.StatusOK, approveEvent)
+}
