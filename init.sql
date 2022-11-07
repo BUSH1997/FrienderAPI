@@ -1,20 +1,20 @@
-drop table subscribe_profile_sharing;
-drop table revindex_words;
-drop table revindex_events;
-drop table unlocked_awards;
-drop table messages;
-drop table awards;
-drop table unlocked_statuses;
-drop table subscribe_sharings;
-drop table groups_events_sharing;
-drop table groups;
-drop table event_sharings;
-drop table events;
-drop table users;
-drop table statuses;
-drop table conditions;
-drop table categories;
-drop table syncer;
+drop table subscribe_profile_sharing cascade;
+drop table revindex_words cascade;
+drop table revindex_events cascade;
+drop table unlocked_awards cascade;
+drop table messages cascade;
+drop table awards cascade;
+drop table unlocked_statuses cascade;
+drop table subscribe_sharings cascade;
+drop table groups_events_sharing cascade;
+drop table groups cascade;
+drop table event_sharings cascade;
+drop table events cascade;
+drop table users cascade;
+drop table statuses cascade;
+drop table conditions cascade;
+drop table categories cascade;
+drop table syncer cascade;
 
 
 create table categories(
@@ -88,7 +88,8 @@ create table groups_events_sharing (
                                        id serial primary key,
                                        group_id int references groups(id),
                                        event_id int references events(id),
-                                       is_admin bool
+                                       is_admin bool,
+                                       is_need_approve bool
 );
 
 create table subscribe_sharings(

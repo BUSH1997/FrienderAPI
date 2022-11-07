@@ -89,11 +89,15 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 		} else {
 			var dbGroup db_models.Group
 			res = r.db.Find(&dbGroup, "group_id = ?", event.GroupInfo.GroupId)
-
+			isNeedApprove := true
+			if event.GroupInfo.IsAdmin {
+				isNeedApprove = false
+			}
 			dbGroupsEventsSharing := db_models.GroupsEventsSharing{
-				EventID: dbEvent.ID,
-				GroupID: dbGroup.ID,
-				IsAdmin: event.GroupInfo.IsAdmin,
+				EventID:       dbEvent.ID,
+				GroupID:       dbGroup.ID,
+				IsAdmin:       event.GroupInfo.IsAdmin,
+				IsNeedApprove: isNeedApprove,
 			}
 
 			res = r.db.Create(&dbGroupsEventsSharing)

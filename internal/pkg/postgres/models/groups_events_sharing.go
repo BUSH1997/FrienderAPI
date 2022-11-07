@@ -1,10 +1,11 @@
 package models
 
 type GroupsEventsSharing struct {
-	ID      uint `gorm:"column:id"`
-	EventID uint `gorm:"column:event_id"`
-	GroupID uint `gorm:"column:group_id"`
-	IsAdmin bool `gorm:"is_admin"`
+	ID            uint `gorm:"column:id"`
+	EventID       uint `gorm:"column:event_id"`
+	GroupID       uint `gorm:"column:group_id"`
+	IsAdmin       bool `gorm:"is_admin"`
+	IsNeedApprove bool `gorm:"is_need_approve"`
 }
 
 func (GroupsEventsSharing) TableName() string {

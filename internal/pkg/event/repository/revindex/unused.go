@@ -37,10 +37,6 @@ func (r eventRepository) GetSharings(ctx context.Context, params models.GetEvent
 	return r.events.GetSharings(ctx, params)
 }
 
-func (r eventRepository) GetGroupAdminEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
-	return r.events.GetGroupAdminEvent(ctx, params)
-}
-
 func (r eventRepository) UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error {
 	return r.events.UpdateEventPriority(ctx, eventPriority)
 }

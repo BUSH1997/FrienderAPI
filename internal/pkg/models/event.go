@@ -19,9 +19,10 @@ type PriorityEvent struct {
 }
 
 type GroupInfo struct {
-	IsAdmin    bool  `json:"is_admin, omitempty"`
-	GroupId    int64 `json:"group_id, omitempty"`
-	CheckExist bool  `json:"-"`
+	IsAdmin       bool  `json:"is_admin, omitempty"`
+	GroupId       int64 `json:"group_id, omitempty"`
+	IsNeedApprove bool  `json:"is_need_approve,omitempty"`
+	CheckExist    bool  `json:"-"`
 }
 
 type Event struct {
@@ -53,21 +54,22 @@ type Ticket struct {
 }
 
 type GetEventParams struct {
-	UserID       int64       `json:"id,omitempty"`
-	IsOwner      Bool        `json:"is_owner,omitempty"`
-	IsActive     Bool        `json:"is_active,omitempty"`
-	IsSubscriber Bool        `json:"is_subscriber,omitempty"`
-	GroupId      int64       `json:"group_id,omitempty"`
-	IsAdmin      Bool        `json:"is_admin,omitempty"`
-	Source       string      `json:"source,omitempty"`
-	City         string      `json:"city,omitempty"`
-	Category     Category    `json:"category,omitempty"`
-	SortMembers  string      `json:"sort_members,omitempty"`
-	Search       SearchInput `json:"search,omitempty"`
-	Limit        int         `json:"limit,omitempty"`
-	Page         int         `json:"page,omitempty"`
-	UIDs         []string    `json:"-"`
-	IsPublic     Bool        `json:"-"`
+	UserID        int64       `json:"id,omitempty"`
+	IsOwner       Bool        `json:"is_owner,omitempty"`
+	IsActive      Bool        `json:"is_active,omitempty"`
+	IsSubscriber  Bool        `json:"is_subscriber,omitempty"`
+	GroupId       int64       `json:"group_id,omitempty"`
+	IsNeedApprove Bool        `json:"is_need_approve,omitempty"`
+	IsAdmin       Bool        `json:"is_admin,omitempty"`
+	Source        string      `json:"source,omitempty"`
+	City          string      `json:"city,omitempty"`
+	Category      Category    `json:"category,omitempty"`
+	SortMembers   string      `json:"sort_members,omitempty"`
+	Search        SearchInput `json:"search,omitempty"`
+	Limit         int         `json:"limit,omitempty"`
+	Page          int         `json:"page,omitempty"`
+	UIDs          []string    `json:"-"`
+	IsPublic      Bool        `json:"-"`
 }
 
 type Category string

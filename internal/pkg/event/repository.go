@@ -16,7 +16,6 @@ type Repository interface {
 	GetSharings(ctx context.Context, params models.GetEventParams) ([]models.Event, error)
 	GetSubscriptionEvents(ctx context.Context, user int64) ([]models.Event, error)
 	GetGroupEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error)
-	GetGroupAdminEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error)
 	UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
 	Subscribe(ctx context.Context, event string) error
 	UnSubscribe(ctx context.Context, event string) error

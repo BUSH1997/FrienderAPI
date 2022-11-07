@@ -101,9 +101,6 @@ func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventPara
 	if params.IsSubscriber.IsDefinedTrue() {
 		return uc.Events.GetSubscriptionEvents(ctx, params.UserID)
 	}
-	if params.GroupId != 0 && (params.IsAdmin.IsDefinedTrue() || params.IsAdmin.IsDefinedFalse()) {
-		return uc.Events.GetGroupAdminEvent(ctx, params)
-	}
 	if params.GroupId != 0 {
 		return uc.Events.GetGroupEvent(ctx, params)
 	}

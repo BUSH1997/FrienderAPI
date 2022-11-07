@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/pkg/errors"
@@ -117,6 +118,7 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		}
 		event.GroupInfo.GroupId = int64(group.GroupId)
 		event.GroupInfo.IsAdmin = groupEventSharing.IsAdmin
+		event.GroupInfo.IsNeedApprove = groupEventSharing.IsNeedApprove
 	}
 
 	event.Members = members
@@ -380,6 +382,19 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEve
 			Where("groups_events_sharing.group_id = ?", dbGroup.ID).
 			Where("events.is_deleted = ?", false)
 
+		if params.IsAdmin.IsDefinedTrue() {
+			query = query.Where("groups_events_sharing.is_admin = ?", params.IsAdmin.Value)
+		}
+
+		if params.IsNeedApprove.IsDefinedTrue() {
+			userID := contextlib.GetUser(ctx)
+
+			if userID != int64(dbGroup.UserId) {
+				return errors.New("try get need approve user no admin")
+			}
+			query = query.Where("groups_events_sharing.is_need_approve = ?", params.IsNeedApprove.Value)
+		}
+
 		if params.Category != "" {
 			dbCategory, err := r.getCategory(string(params.Category))
 			if err != nil {
@@ -420,60 +435,6 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEve
 			event.GroupInfo.GroupId = params.GroupId
 			event.GroupInfo.IsAdmin = eventSharing.IsAdmin
 
-			if !params.IsActive.IsDefined() {
-				ret = append(ret, event)
-			} else if params.IsActive.IsDefinedTrue() && event.IsActive {
-				ret = append(ret, event)
-			} else if params.IsActive.IsDefinedFalse() && !event.IsActive {
-				ret = append(ret, event)
-			}
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to make transaction")
-	}
-
-	return ret, nil
-}
-
-func (r eventRepository) GetGroupAdminEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
-	var ret []models.Event
-	err := r.db.Transaction(func(tx *gorm.DB) error {
-		var dbGroup db_models.Group
-		res := r.db.Take(&dbGroup).Where("group_id = ?", params.GroupId)
-		if err := res.Error; err != nil {
-			return errors.Wrap(err, "failed to get groups events sharings")
-		}
-
-		var dbEvents []db_models.Event
-
-		query := r.db.Model(&db_models.Event{}).
-			Joins("JOIN groups_events_sharing on groups_events_sharing.event_id = events.id").
-			Where("groups_events_sharing.group_id = ? and groups_events_sharing.is_admin = ?", dbGroup.ID, params.IsAdmin.Value).
-			Where("events.is_deleted = ?", false)
-
-		query = query.Offset(params.Page * params.Limit)
-
-		if params.Limit != 0 {
-			query = query.Limit(params.Limit)
-		}
-
-		res = query.Find(&dbEvents)
-		if err := res.Error; err != nil {
-			return errors.Wrap(err, "failed to get events group")
-		}
-
-		ret = make([]models.Event, 0, len(dbEvents))
-		for _, dbEvent := range dbEvents {
-			event, err := r.GetEventById(ctx, dbEvent.Uid)
-			if err != nil {
-				return errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
-			}
-			event.GroupInfo.IsAdmin = params.IsAdmin.Value
-			event.GroupInfo.GroupId = params.GroupId
 			if !params.IsActive.IsDefined() {
 				ret = append(ret, event)
 			} else if params.IsActive.IsDefinedTrue() && event.IsActive {
