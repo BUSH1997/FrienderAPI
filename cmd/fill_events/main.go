@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	SERVER_ADDRESS    = "http://localhost:8090/"
+	SERVER_ADDRESS    = "https://vk-events.ru/"
 	EVENTS_CREATE_URI = "event/create"
 	UPLOAD_PHOTO_URI  = "image/upload"
 	USER_ID_EUGENIY   = "98278046"

@@ -16,6 +16,7 @@ func Auth(logger *logrus.Logger) echo.MiddlewareFunc {
 			var userIDString string
 
 			path := context.Path()
+			logger.Println(path)
 			if strings.Contains(path, "ws/") {
 				userIDString = context.QueryParam("user_id")
 			} else {
