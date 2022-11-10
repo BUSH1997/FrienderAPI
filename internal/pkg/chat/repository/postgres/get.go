@@ -56,8 +56,9 @@ func (r chatRepository) GetMessages(ctx context.Context, opts models.GetMessageO
 }
 
 func (r chatRepository) GetChats(ctx context.Context) ([]models.Chat, error) {
-	var chats []models.Chat
+	user := context2.GetUser(ctx)
 
+	var chats []models.Chat
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvents []db_models.Event
 		res := r.db.Model(&db_models.Event{}).
@@ -79,6 +80,23 @@ func (r chatRepository) GetChats(ctx context.Context) ([]models.Chat, error) {
 			chats = append(chats, chat)
 		}
 
+		for i := range chats {
+			lastCheckTime, err := r.getLastCheckTime(ctx, chats[i].EventUID)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get last check time for chat %s", chats[i].EventUID)
+			}
+
+			res = r.db.Model(&db_models.Message{}).
+				Where("event_uid = ?", chats[i].EventUID).
+				Where("time_created > ?", lastCheckTime).
+				Where("user_uid <> ?", user).
+				Count(&chats[i].UnreadMessagesNumber)
+
+			if err := res.Error; err != nil {
+				return errors.Wrap(err, "failed to get unread messages in repository")
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -86,4 +104,30 @@ func (r chatRepository) GetChats(ctx context.Context) ([]models.Chat, error) {
 	}
 
 	return chats, nil
+}
+
+func (r chatRepository) getLastCheckTime(ctx context.Context, event string) (int64, error) {
+	var dbEvent db_models.Event
+	res := r.db.Take(&dbEvent, "uid = ?", event)
+	if err := res.Error; err != nil {
+		return 0, errors.Wrap(err, "failed to get event by id")
+	}
+
+	var dbUser db_models.User
+	res = r.db.Take(&dbUser, "uid = ?", context2.GetUser(ctx))
+	if err := res.Error; err != nil {
+		return 0, errors.Wrap(err, "failed to get user by uid")
+	}
+
+	var dbEventSharing db_models.EventSharing
+	res = r.db.Model(&db_models.EventSharing{}).
+		Where("event_id = ?", dbEvent.ID).
+		Where("user_id = ?", dbUser.ID).
+		Take(&dbEventSharing)
+
+	if err := res.Error; err != nil {
+		return 0, errors.Wrap(err, "failed ro get event sharing")
+	}
+
+	return dbEventSharing.TimeLastCheck, nil
 }
