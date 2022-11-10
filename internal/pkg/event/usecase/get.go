@@ -125,6 +125,10 @@ func (uc eventUsecase) GetSearch(ctx context.Context, params models.GetEventPara
 		return nil, errors.Wrap(err, "failed to get event uids")
 	}
 
+	if len(eventUIDs) == 0 {
+		return make([]models.Event, 0), nil
+	}
+
 	params.UIDs = eventUIDs
 
 	events, err := uc.Events.GetAll(ctx, params)
