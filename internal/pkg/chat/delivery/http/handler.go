@@ -151,6 +151,12 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 				ch.logger.WithError(err).Errorf("failed to write message to %d", client.UserID)
 				return ctx.JSON(http.StatusInternalServerError, err.Error())
 			}
+
+			err = ch.useCase.UpdateLastCheckTime(ctx.Request().Context(), eventID, client.UserID, time.Now().Unix())
+			if err != nil {
+				ch.logger.WithError(err).Errorf("failed to update last check time for %d", client.UserID)
+				return ctx.JSON(http.StatusInternalServerError, err.Error())
+			}
 		}
 	}
 

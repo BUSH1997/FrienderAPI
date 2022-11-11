@@ -1,9 +1,10 @@
 package models
 
 type Chat struct {
-	EventUID    string `json:"event_uid,omitempty"`
-	EventTitle  string `json:"event_title,omitempty"`
-	EventAvatar string `json:"event_avatar,omitempty"`
+	EventUID             string `json:"event_uid,omitempty"`
+	EventTitle           string `json:"event_title,omitempty"`
+	EventAvatar          string `json:"event_avatar,omitempty"`
+	UnreadMessagesNumber int64  `json:"unread_messages_number,omitempty"`
 }
 
 type Message struct {
