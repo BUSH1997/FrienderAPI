@@ -75,6 +75,66 @@
     "is_private": false
   },
   {
+    "id" : "if26g.jpeg",
+    "title": "Концерт Басты в Курске",
+    "description": "Собираю банду для похода на концерт Басты, давайте оторвемся!",
+    "time_start": 1777038951,
+    "category": "Концерт",
+    "members_limit": 15,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "1-181.jpg",
+    "title": "Концерт Киркорова в Курске",
+    "description": "Собираю банду для похода на концерт Киркорова, давайте оторвемся!",
+    "time_start": 1777038951,
+    "category": "Концерт",
+    "members_limit": 15,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "LNiXO1YcccU-e1465393972564.jpg",
+    "title": "Концерт ТаймСквер в Курске",
+    "description": "Собираю банду для похода на концерт Киркорова, давайте оторвемся!",
+    "time_start": 1777038951,
+    "category": "Концерт",
+    "members_limit": 15,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "Dai--te-tank-5-1024x717.jpg",
+    "title": "Концерт ТаймСквер в Курске",
+    "description": "Собираю банду для похода на концерт Киркорова, давайте оторвемся!",
+    "time_start": 1777038951,
+    "category": "Концерт",
+    "members_limit": 15,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
     "id" : "5mMLm1gGbKE.jpg",
     "title": "Найти IT",
     "description": "«Найти IT» — это выставка вакансий и стажировок от ведущих компаний в области IT-технологий — Epic Skills, Epam, Selectel, EF, Return on Intelligence и других. В программу карьерного форума в креативном пространстве «Ткачи» входят мастер-классы от представителей организаций, презентации проектов работодателей, розыгрыши призов и многое другое.",
