@@ -208,3 +208,46 @@ func (r eventRepository) UnSubscribe(ctx context.Context, event string) error {
 
 	return nil
 }
+
+func (r eventRepository) AddAlbum(ctx context.Context, eventUid string, albumUid string) error {
+	var dbEvent db_models.Event
+
+	res := r.db.Take(&dbEvent, "uid = ?", eventUid)
+	if err := res.Error; err != nil {
+		return errors.Wrapf(err, "failed to get event by uid %s", eventUid)
+	}
+
+	dbEvent.Albums = append(dbEvent.Albums, albumUid)
+	res = r.db.Model(&db_models.Event{}).
+		Where("uid = ?", eventUid).
+		Update("albums", dbEvent.Albums)
+	if err := res.Error; err != nil {
+		return errors.Wrapf(err, "error update albums event")
+	}
+
+	return nil
+}
+
+func (r eventRepository) DeleteAlbum(ctx context.Context, eventUid string, albumUid string) error {
+	var dbEvent db_models.Event
+
+	res := r.db.Take(&dbEvent, "uid = ?", eventUid)
+	if err := res.Error; err != nil {
+		return errors.Wrapf(err, "failed to get event by uid %s", eventUid)
+	}
+
+	for i, v := range dbEvent.Albums {
+		if v == albumUid {
+			dbEvent.Albums = append(dbEvent.Albums[:i], dbEvent.Albums[i+1:]...)
+			break
+		}
+	}
+	res = r.db.Model(&db_models.Event{}).
+		Where("uid = ?", eventUid).
+		Update("albums", dbEvent.Albums)
+	if err := res.Error; err != nil {
+		return errors.Wrapf(err, "error update albums event")
+	}
+
+	return nil
+}

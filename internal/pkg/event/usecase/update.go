@@ -71,3 +71,20 @@ func (uc eventUsecase) validateEvent(event models.Event) error {
 
 	return nil
 }
+
+func (uc eventUsecase) UpdateAlbum(ctx context.Context, updateInfo models.UpdateAlbumInfo) error {
+	if updateInfo.Type == models.UPDATE_ALBUM_ADD {
+		err := uc.Events.AddAlbum(ctx, updateInfo.UidEvent, updateInfo.UidAlbum)
+		if err != nil {
+			uc.logger.WithError(err).Errorf("[UpdateAlbum] AddAlbum failed")
+			return err
+		}
+	} else if updateInfo.Type == models.UPDATE_ALBUM_DELETE {
+		err := uc.Events.DeleteAlbum(ctx, updateInfo.UidEvent, updateInfo.UidAlbum)
+		if err != nil {
+			uc.logger.WithError(err).Errorf("[UpdateAlbum] DelAlbum failed")
+			return err
+		}
+	}
+	return nil
+}

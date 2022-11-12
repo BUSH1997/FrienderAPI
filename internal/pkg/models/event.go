@@ -12,6 +12,17 @@ const (
 	SOURCE_EVENT_FORK_GROUP = "fork_group"
 )
 
+const (
+	UPDATE_ALBUM_DELETE = "delete"
+	UPDATE_ALBUM_ADD    = "add"
+)
+
+type UpdateAlbumInfo struct {
+	UidAlbum string `json:"uid_album"`
+	UidEvent string `json:"uid_event"`
+	Type     string `json:"type"`
+}
+
 type UidEventPriority struct {
 	UidUser  int    `json:"-"`
 	UidEvent string `json:"event_uid,omitempty"`

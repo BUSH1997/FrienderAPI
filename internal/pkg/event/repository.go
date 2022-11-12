@@ -20,4 +20,6 @@ type Repository interface {
 	Subscribe(ctx context.Context, event string) error
 	UnSubscribe(ctx context.Context, event string) error
 	Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error
+	AddAlbum(ctx context.Context, eventUid string, albumUid string) error
+	DeleteAlbum(ctx context.Context, eventUid string, albumUid string) error
 }

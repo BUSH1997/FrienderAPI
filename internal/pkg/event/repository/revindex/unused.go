@@ -48,3 +48,11 @@ func (r eventRepository) Subscribe(ctx context.Context, event string) error {
 func (r eventRepository) UnSubscribe(ctx context.Context, event string) error {
 	return r.events.UnSubscribe(ctx, event)
 }
+
+func (r eventRepository) AddAlbum(ctx context.Context, eventUid string, albumUid string) error {
+	return r.events.AddAlbum(ctx, eventUid, albumUid)
+}
+
+func (r eventRepository) DeleteAlbum(ctx context.Context, eventUid string, albumUid string) error {
+	return r.events.DeleteAlbum(ctx, eventUid, albumUid)
+}

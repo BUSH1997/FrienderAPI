@@ -66,7 +66,8 @@ create table events(
                        members_limit int,
                        source varchar(256),
                        ticket varchar(256),
-                       forks varchar(256)[]
+                       forks int[],
+                       albums varchar(64)[]
 );
 
 create table event_sharings(
@@ -74,7 +75,8 @@ create table event_sharings(
                                event_id int references events(id),
                                user_id int references  users(id),
                                priority int,
-                               is_deleted bool
+                               is_deleted bool,
+                               time_last_check bigint
 );
 
 create table groups(

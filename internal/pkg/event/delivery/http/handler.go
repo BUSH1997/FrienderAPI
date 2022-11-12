@@ -162,3 +162,18 @@ func (eh *EventHandler) GetAllCategory(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, categories)
 }
+
+func (eh *EventHandler) UpdateAlbum(ctx echo.Context) error {
+	var updateAlbumInfo models.UpdateAlbumInfo
+	if err := ctx.Bind(&updateAlbumInfo); err != nil {
+		eh.logger.WithError(err).Errorf("failed to bind UpdateAlbumInfo")
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	if err := eh.useCase.UpdateAlbum(ctx.Request().Context(), updateAlbumInfo); err != nil {
+		eh.logger.WithError(err).Errorf("failed to updateAlbum")
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, updateAlbumInfo)
+}

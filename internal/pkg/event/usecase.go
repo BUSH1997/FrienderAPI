@@ -25,4 +25,5 @@ type Usecase interface {
 	Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error
 	Change(ctx context.Context, event models.Event) error
 	GetAllCategories(ctx context.Context) ([]string, error)
+	UpdateAlbum(ctx context.Context, updateInfo models.UpdateAlbumInfo) error
 }

@@ -45,4 +45,5 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("messages", sc.ChatHandler.GetMessages)
 	router.GET("chats", sc.ChatHandler.GetChats)
 	router.GET("cities", sc.ProfileHandler.GetAllCities)
+	router.PUT("event/album", sc.EventHandler.UpdateAlbum)
 }
