@@ -15,15 +15,16 @@ import (
 func (r eventRepository) Update(ctx context.Context, event models.Event) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		res := r.db.Model(&db_models.Event{}).Where("uid = ?", event.Uid).Updates(map[string]interface{}{
-			"uid":          event.Uid,
-			"title":        event.Title,
-			"description":  event.Description,
-			"starts_at":    event.StartsAt,
-			"time_updated": time.Now().Unix(),
-			"geo":          fmt.Sprintf("%f;;%f;;%s", event.GeoData.Longitude, event.GeoData.Latitude, event.GeoData.Address),
-			"is_public":    event.IsPublic,
-			"is_private":   event.IsPrivate,
-			"ticket":       fmt.Sprintf("%s;;%s", event.Ticket.Link, event.Ticket.Cost),
+			"uid":           event.Uid,
+			"title":         event.Title,
+			"description":   event.Description,
+			"starts_at":     event.StartsAt,
+			"time_updated":  time.Now().Unix(),
+			"geo":           fmt.Sprintf("%f;;%f;;%s", event.GeoData.Longitude, event.GeoData.Latitude, event.GeoData.Address),
+			"is_public":     event.IsPublic,
+			"is_private":    event.IsPrivate,
+			"ticket":        fmt.Sprintf("%s;;%s", event.Ticket.Link, event.Ticket.Cost),
+			"members_limit": event.MembersLimit,
 		})
 		if err := res.Error; err != nil {
 			return errors.Wrapf(err, "failed to update event, uid %d", event.Uid)

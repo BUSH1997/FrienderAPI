@@ -16,18 +16,19 @@ import (
 func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		dbEvent := db_models.Event{
-			Uid:         event.Uid,
-			Title:       event.Title,
-			Description: event.Description,
-			StartsAt:    event.StartsAt,
-			TimeCreated: time.Now().Unix(),
-			TimeUpdated: time.Now().Unix(),
-			IsPublic:    event.IsPublic,
-			IsPrivate:   event.IsPrivate,
-			Source:      event.Source,
-			AvatarUrl:   event.Avatar.AvatarUrl,
-			AvatarVkId:  event.Avatar.AvatarVkId,
-			Ticket:      fmt.Sprintf("%s;;%s", event.Ticket.Link, event.Ticket.Cost),
+			Uid:          event.Uid,
+			Title:        event.Title,
+			Description:  event.Description,
+			StartsAt:     event.StartsAt,
+			TimeCreated:  time.Now().Unix(),
+			TimeUpdated:  time.Now().Unix(),
+			IsPublic:     event.IsPublic,
+			IsPrivate:    event.IsPrivate,
+			Source:       event.Source,
+			AvatarUrl:    event.Avatar.AvatarUrl,
+			AvatarVkId:   event.Avatar.AvatarVkId,
+			Ticket:       fmt.Sprintf("%s;;%s", event.Ticket.Link, event.Ticket.Cost),
+			MembersLimit: event.MembersLimit,
 		}
 
 		dbCategory := db_models.Category{}
