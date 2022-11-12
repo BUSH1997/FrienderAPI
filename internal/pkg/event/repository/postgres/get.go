@@ -30,6 +30,36 @@ func (r eventRepository) GetEventById(ctx context.Context, id string) (models.Ev
 	return event, nil
 }
 
+func (r eventRepository) findMembersByEventUid(ctx context.Context, uid string) ([]int, error) {
+	var dbEventSharings []db_models.EventSharing
+	res := r.db.
+		Joins("JOIN events on event_sharings.event_id = events.id").
+		Where("events.uid = ?", uid).
+		Where("event_sharings.is_deleted = ?", false).
+		Find(&dbEventSharings)
+	if err := res.Error; err != nil {
+		return []int{}, errors.Wrap(err, "failed to get event sharings")
+	}
+
+	memberDBIDs := make([]int, 0, len(dbEventSharings))
+	for _, eventSharing := range dbEventSharings {
+		memberDBIDs = append(memberDBIDs, eventSharing.UserID)
+	}
+
+	var dbMembers []db_models.User
+	res = r.db.Find(&dbMembers, memberDBIDs)
+	if err := res.Error; err != nil {
+		return []int{}, errors.Wrap(err, "failed to get members")
+	}
+
+	members := make([]int, 0, len(dbEventSharings))
+	for _, dbMember := range dbMembers {
+		members = append(members, dbMember.Uid)
+	}
+
+	return members, nil
+}
+
 func (r eventRepository) getEventById(ctx context.Context, id string) (models.Event, error) {
 	var dbEvent db_models.Event
 	res := r.db.Take(&dbEvent, "uid = ?", id)
@@ -49,31 +79,18 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		return models.Event{}, errors.Wrap(err, "failed to get category id")
 	}
 
-	var dbEventSharings []db_models.EventSharing
+	members, err := r.findMembersByEventUid(ctx, id)
+	for _, forkId := range dbEvent.Forks {
+		res := r.db.Take(&dbEvent, "id = ?", forkId)
+		if err := res.Error; err != nil {
+			return models.Event{}, errors.Wrap(err, "failed to get event by id")
+		}
 
-	res = r.db.
-		Joins("JOIN events on event_sharings.event_id = events.id").
-		Where("events.uid = ?", id).
-		Where("event_sharings.is_deleted = ?", false).
-		Find(&dbEventSharings)
-	if err := res.Error; err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to get event sharings")
-	}
-
-	memberDBIDs := make([]int, 0, len(dbEventSharings))
-	for _, eventSharing := range dbEventSharings {
-		memberDBIDs = append(memberDBIDs, eventSharing.UserID)
-	}
-
-	var dbMembers []db_models.User
-	res = r.db.Find(&dbMembers, memberDBIDs)
-	if err := res.Error; err != nil {
-		return models.Event{}, errors.Wrap(err, "failed to get members")
-	}
-
-	members := make([]int, 0, len(dbEventSharings))
-	for _, dbMember := range dbMembers {
-		members = append(members, dbMember.Uid)
+		membersFork, err := r.findMembersByEventUid(ctx, dbEvent.Uid)
+		if err != nil {
+			return models.Event{}, err
+		}
+		members = append(members, membersFork...)
 	}
 
 	event := models.Event{
