@@ -58,7 +58,7 @@ type Event struct {
 	IsActive     bool      `json:"is_active,omitempty"`
 	Category     Category  `json:"category,omitempty"`
 	Avatar       Avatar    `json:"avatar"`
-	MembersLimit int       `json:"members_limit,omitempty"`
+	MembersLimit int       `json:"members_limit"`
 	GroupInfo    GroupInfo `json:"group_info,omitempty"`
 	Source       string    `json:"source,omitempty"`
 	Ticket       Ticket    `json:"ticket,omitempty"`
