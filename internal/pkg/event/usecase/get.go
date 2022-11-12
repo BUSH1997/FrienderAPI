@@ -71,7 +71,7 @@ func (uc eventUsecase) GetSubscribeEvent(ctx context.Context, params models.GetE
 			params.IsActive = models.Bool{Defined: true, Value: true}
 			params.GroupId = subscribe.Id
 
-			profileEvents, err = uc.Events.GetGroupEvent(ctx, params)
+			profileEvents, err = uc.Events.GetGroupEvents(ctx, params)
 			if err != nil {
 				uc.logger.WithError(err).Errorf("[GetSubscribeEvent] faile getgroup event")
 				return []models.Event{}, err
@@ -102,7 +102,7 @@ func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventPara
 		return uc.Events.GetSubscriptionEvents(ctx, params.UserID)
 	}
 	if params.GroupId != 0 {
-		return uc.Events.GetGroupEvent(ctx, params)
+		return uc.Events.GetGroupEvents(ctx, params)
 	}
 	if params.Source == "subscribe" {
 		return uc.GetSubscribeEvent(ctx, params)

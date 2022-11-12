@@ -47,9 +47,11 @@ func (r eventRepository) findMembersByEventUid(ctx context.Context, uid string) 
 	}
 
 	var dbMembers []db_models.User
-	res = r.db.Find(&dbMembers, memberDBIDs)
-	if err := res.Error; err != nil {
-		return []int{}, errors.Wrap(err, "failed to get members")
+	if len(memberDBIDs) != 0 {
+		res = r.db.Find(&dbMembers, memberDBIDs)
+		if err := res.Error; err != nil {
+			return []int{}, errors.Wrap(err, "failed to get members")
+		}
 	}
 
 	members := make([]int, 0, len(dbEventSharings))
@@ -384,7 +386,7 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 	return ret, nil
 }
 
-func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+func (r eventRepository) GetGroupEvents(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	var ret []models.Event
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group

@@ -29,8 +29,8 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 	return r.events.GetSubscriptionEvents(ctx, user)
 }
 
-func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
-	return r.events.GetGroupEvent(ctx, params)
+func (r eventRepository) GetGroupEvents(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	return r.events.GetGroupEvents(ctx, params)
 }
 
 func (r eventRepository) GetSharings(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
