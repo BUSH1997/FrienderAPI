@@ -408,6 +408,7 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEve
 			userID := contextlib.GetUser(ctx)
 
 			if userID != int64(dbGroup.UserId) {
+				r.logger.Info("try get need approve user no admin %d, %d", userID, dbGroup.UserId)
 				return errors.New("try get need approve user no admin")
 			}
 			query = query.Where("groups_events_sharing.is_need_approve = ?", params.IsNeedApprove.Value)
