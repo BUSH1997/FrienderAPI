@@ -45,7 +45,7 @@ type Event struct {
 	Uid          string    `json:"id,omitempty"`
 	Title        string    `json:"title,omitempty"`
 	Description  string    `json:"description,omitempty"`
-	Members      []int     `json:"members,omitempty"`
+	Members      []int     `json:"members"`
 	Images       []string  `json:"images"`
 	TimeCreated  time.Time `json:"time_created,omitempty"`
 	TimeUpdated  time.Time `json:"time_update,omitempty"`
