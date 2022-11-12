@@ -226,7 +226,7 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 	if params.Limit != 0 {
 		query = query.Limit(params.Limit)
 	}
-
+	query = query.Order("starts_at asc")
 	res := query.Find(&dbEvents)
 	if err := res.Error; err != nil {
 		return nil, errors.Wrap(err, "failed to get all events")
@@ -388,7 +388,6 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEve
 	var ret []models.Event
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group
-		r.logger.Info("params group id %", params.GroupId)
 		res := r.db.Model(&dbGroup).Where("group_id = ?", params.GroupId).Take(&dbGroup)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get groups events sharings")
@@ -409,7 +408,6 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEve
 			userID := contextlib.GetUser(ctx)
 
 			if userID != int64(dbGroup.UserId) {
-				r.logger.Info("try get need approve user no admin %d, %d", userID, dbGroup.UserId)
 				return errors.New("try get need approve user no admin")
 			}
 			query = query.Where("groups_events_sharing.is_need_approve = ?", params.IsNeedApprove.Value)
