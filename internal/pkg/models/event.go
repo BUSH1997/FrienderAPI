@@ -7,6 +7,11 @@ import (
 	_ "time"
 )
 
+const (
+	SOURSE_EVENT_GROUP      = "group"
+	SOURCE_EVENT_FORK_GROUP = "fork_group"
+)
+
 type UidEventPriority struct {
 	UidUser  int    `json:"-"`
 	UidEvent string `json:"event_uid,omitempty"`
@@ -46,6 +51,7 @@ type Event struct {
 	GroupInfo    GroupInfo `json:"group_info,omitempty"`
 	Source       string    `json:"source,omitempty"`
 	Ticket       Ticket    `json:"ticket,omitempty"`
+	Parent       string    `json:"parent,omitempty"`
 }
 
 type Ticket struct {

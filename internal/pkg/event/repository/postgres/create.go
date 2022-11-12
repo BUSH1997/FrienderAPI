@@ -6,6 +6,7 @@ import (
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"strings"
@@ -70,7 +71,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			return errors.Wrapf(err, "failed to create event, uid %s", event.Uid)
 		}
 
-		if event.Source != "group" {
+		if event.Source != models.SOURSE_EVENT_GROUP {
 			var sharingsExist []db_models.EventSharing
 			res = r.db.Model(&db_models.EventSharing{}).Find(&sharingsExist, "user_id = ?", dbUser.ID)
 			if err := res.Error; err != nil {
@@ -103,6 +104,24 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			res = r.db.Create(&dbGroupsEventsSharing)
 			if err := res.Error; err != nil {
 				return errors.Wrapf(err, "failed to create group event sharing")
+			}
+		}
+
+		if event.Source == models.SOURCE_EVENT_FORK_GROUP {
+			var parentEvent db_models.Event
+			res := r.db.Model(&parentEvent).
+				Where("uid = ?", event.Parent).
+				Find(&parentEvent)
+			if err := res.Error; err != nil {
+				return errors.Wrapf(err, "parent with this uid not found")
+			}
+
+			parentEvent.Forks = append(parentEvent.Forks, int64(dbEvent.ID))
+			res = r.db.Model(&db_models.Event{}).
+				Where("uid = ?", parentEvent.Uid).
+				Update("forks", pq.Int64Array(parentEvent.Forks))
+			if err := res.Error; err != nil {
+				return errors.Wrapf(err, "error update forks events")
 			}
 		}
 

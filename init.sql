@@ -65,7 +65,8 @@ create table events(
                        photos text,
                        members_limit int,
                        source varchar(256),
-                       ticket varchar(256)
+                       ticket varchar(256),
+                       forks varchar(256)[]
 );
 
 create table event_sharings(
