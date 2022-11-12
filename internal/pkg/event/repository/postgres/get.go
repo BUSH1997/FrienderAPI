@@ -389,7 +389,7 @@ func (r eventRepository) GetGroupEvent(ctx context.Context, params models.GetEve
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group
 		r.logger.Info("params group id %", params.GroupId)
-		res := r.db.Find(&dbGroup).Where("group_id = ?", params.GroupId)
+		res := r.db.Model(&dbGroup).Where("group_id = ?", params.GroupId).Take(&dbGroup)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get groups events sharings")
 		}
