@@ -83,7 +83,8 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 
 	members, err := r.findMembersByEventUid(ctx, id)
 	for _, forkId := range dbEvent.Forks {
-		res := r.db.Take(&dbEvent, "id = ?", forkId)
+		var dbEventLocal db_models.Event
+		res := r.db.Take(&dbEventLocal, "id = ?", forkId)
 		if err := res.Error; err != nil {
 			return models.Event{}, errors.Wrap(err, "failed to get event by id")
 		}

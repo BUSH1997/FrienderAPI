@@ -6,6 +6,7 @@
     "time_start": 1777038951,
     "category": "Шоу",
     "members_limit": 100,
+    "source": "user",
     "geo": {
       "latitude": 57.22,
       "longitude": 48.06,
@@ -20,6 +21,7 @@
     "time_start": 1777038951,
     "category": "Спорт",
     "members_limit": 5,
+    "source": "user",
     "geo": {
       "latitude": 55.653375,
       "longitude": 36.144659,
@@ -34,6 +36,7 @@
     "time_start": 1777038951,
     "category": "Другое",
     "members_limit": 7,
+    "source": "user",
     "geo": {
       "latitude": 55.771641,
       "longitude": 37.683042,
@@ -48,6 +51,7 @@
     "time_start": 1777038951,
     "category": "Другое",
     "members_limit": 7,
+    "source": "user",
     "geo": {
       "latitude": 55.754544,
       "longitude": 37.621679,
@@ -62,6 +66,7 @@
     "time_start": 1777038951,
     "category": "Концерт",
     "members_limit": 15,
+    "source": "user",
     "geo": {
       "latitude": 51.761991,
       "longitude": 36.185114,
@@ -76,6 +81,7 @@
     "time_start": 1777038951,
     "category": "It",
     "members_limit": 1000,
+    "source": "user",
     "geo": {
       "latitude": 55.794421,
       "longitude": 37.586518,
@@ -90,6 +96,7 @@
     "time_start": 1777038951,
     "category": "Спорт",
     "members_limit": 3,
+    "source": "user",
     "geo": {
       "latitude": 55.797220,
       "longitude": 37.556442,
@@ -104,6 +111,7 @@
     "time_start": 1777038951,
     "category": "Флешмоб",
     "members_limit": 1000,
+    "source": "user",
     "geo": {
       "latitude": 55.159902,
       "longitude": 61.402554,
@@ -118,6 +126,7 @@
     "time_start": 1777038951,
     "category": "Другое",
     "members_limit": 4,
+    "source": "user",
     "geo": {
       "latitude": 55.159902,
       "longitude": 61.402554,
@@ -132,6 +141,7 @@
     "time_start": 1777038951,
     "category": "Выставка",
     "members_limit": 4,
+    "source": "user",
     "geo": {
       "latitude": 55.825706,
       "longitude": 37.638496,
@@ -146,6 +156,7 @@
     "time_start": 1777038951,
     "category": "Выставка",
     "members_limit": 4,
+    "source": "user",
     "geo": {
       "latitude": 55.766739,
       "longitude": 37.663297,
@@ -160,6 +171,7 @@
     "time_start": 1777038951,
     "category": "Экскурсия",
     "members_limit": 4,
+    "source": "user",
     "geo": {
       "latitude": 55.825706,
       "longitude": 37.638496,
@@ -174,6 +186,7 @@
     "time_start": 1777038951,
     "category": "Экскурсия",
     "members_limit": 4,
+    "source": "user",
     "geo": {
       "latitude": 55.825706,
       "longitude": 37.638496,
@@ -187,6 +200,7 @@
     "description": "Иду в воскресенье на Монте-Кристо - присоединяйтесь",
     "time_start": 1777038951,
     "category": "Театр",
+    "source": "user",
     "members_limit": 4,
     "geo": {
       "latitude": 55.760221,
@@ -201,6 +215,7 @@
     "description": "Любители фигурного катания - идем",
     "time_start": 1777038951,
     "category": "Шоу",
+    "source": "user",
     "members_limit": 4,
     "geo": {
       "latitude": 55.79145,
@@ -215,6 +230,7 @@
     "description": "Ищу инетересного человека для похода в театр",
     "time_start": 1777038951,
     "members_limit": 2,
+    "source": "user",
     "category": "Театр",
     "geo": {
       "latitude": 55.760221,
@@ -230,6 +246,7 @@
     "time_start": 1777038951,
     "category": "Театр",
     "members_limit": 3,
+    "source": "user",
     "geo": {
       "latitude": 55.760221,
       "longitude": 37.618561,
@@ -244,6 +261,7 @@
     "time_start": 1777038951,
     "category": "Бизнес",
     "members_limit": 3,
+    "source": "user",
     "geo": {
       "latitude": 55.753088,
       "longitude": 37.587614,
@@ -258,6 +276,7 @@
     "time_start": 1777038951,
     "category": "Бизнес",
     "members_limit": 100,
+    "source": "user",
     "geo": {
       "latitude": 55.749486,
       "longitude": 37.591485,
@@ -272,6 +291,7 @@
     "time_start": 1777038951,
     "category": "Бизнес",
     "members_limit": 100,
+    "source": "user",
     "geo": {
       "latitude": 55.749486,
       "longitude": 37.591485,
@@ -286,6 +306,7 @@
     "time_start": 1777038951,
     "category": "Воркшоп",
     "members_limit": 20,
+    "source": "user",
     "geo": {
       "latitude": 55.749486,
       "longitude": 37.591485,
@@ -300,6 +321,7 @@
     "time_start": 1777038951,
     "category": "Кино",
     "members_limit": 7,
+    "source": "user",
     "geo": {
       "latitude": 55.757384,
       "longitude": 37.658905,
