@@ -425,6 +425,10 @@ func (r eventRepository) GetGroupEvents(ctx context.Context, params models.GetEv
 			query = query.Where("events.category_id = ?", dbCategory.ID)
 		}
 
+		if params.Source == models.SOURCE_EVENT_FORK_GROUP {
+			query = query.Where("events.source = ?", models.SOURCE_EVENT_FORK_GROUP)
+		}
+
 		if params.City != "" {
 			query = query.Where("events.geo LIKE ?", "%"+params.City+"%")
 		}
