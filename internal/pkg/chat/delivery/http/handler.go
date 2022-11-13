@@ -80,6 +80,13 @@ func (ch *ChatHandler) GetMessages(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	user := context.GetUser(ctx.Request().Context())
+	err = ch.useCase.UpdateLastCheckTime(ctx.Request().Context(), opts.EventID, user, time.Now().Unix())
+	if err != nil {
+		ch.logger.WithError(err).Errorf("failed to update last check time for %d", user)
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
 	return ctx.JSON(http.StatusOK, messages)
 }
 
