@@ -26,8 +26,8 @@ func (uc eventUsecase) SubscribeEvent(ctx context.Context, event string) error {
 	return nil
 }
 
-func (uc eventUsecase) UnsubscribeEvent(ctx context.Context, event string) error {
-	err := uc.Events.UnSubscribe(ctx, event)
+func (uc eventUsecase) UnsubscribeEvent(ctx context.Context, event string, user int64) error {
+	err := uc.Events.UnSubscribe(ctx, event, user)
 	if err != nil {
 		return errors.Wrapf(err, "failed to unsubscribe event %s", event)
 	}
