@@ -148,7 +148,8 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 			err := client.Socket.WriteMessage(websocket.TextMessage, jsonMessage)
 			if err != nil {
 				ch.logger.WithError(err).Errorf("failed to write message to %d", client.UserID)
-				return ctx.JSON(http.StatusInternalServerError, err.Error())
+				ch.messenger.Chat.Clients = remove(ch.messenger.Chat.Clients, user)
+				continue
 			}
 
 			err = ch.useCase.UpdateLastCheckTime(ctx.Request().Context(), eventID, client.UserID, time.Now().Unix())
