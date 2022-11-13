@@ -121,11 +121,101 @@
   },
   {
     "id" : "Dai--te-tank-5-1024x717.jpg",
-    "title": "Концерт ТаймСквер в Курске",
-    "description": "Собираю банду для похода на концерт Киркорова, давайте оторвемся!",
+    "title": "Концерт ДайтеТанк в Курске",
+    "description": "Собираю банду для похода на концерт ДайтеТанк, давайте оторвемся!",
     "time_start": 1777038951,
     "category": "Концерт",
     "members_limit": 15,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "gb_30d4af7be2a27c72635aea9029f89754.jpg",
+    "title": "Поход в клуб Часы",
+    "description": "Собираю тусовочную компанию для похода в клуб",
+    "time_start": 1777038951,
+    "category": "Шоу",
+    "members_limit": 15,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "tri_bogatirya.jpg",
+    "title": "Ищу с кем посмотреть Три Богатыря в кино",
+    "description": "Пойдемте в кино!",
+    "time_start": 1777038951,
+    "category": "Кино",
+    "members_limit": 3,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "553110.jpeg",
+    "title": "Поход на Щелкунчика",
+    "description": "Есть лишний билет на щелкунчика - отдам в хорошие руки",
+    "time_start": 1777038951,
+    "category": "Театр",
+    "members_limit": 2,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "5348024598429563_884.jpg",
+    "title": "Прыжок с парашютом!!!",
+    "description": "Ищу безбашенных людей, которые отважутся составить мне компанию в прыжке с парашютом",
+    "time_start": 1777038951,
+    "category": "Спорт",
+    "members_limit": 2,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "10273836668371896_de24.jpg",
+    "title": "Ищу людей чтобы просто погулять",
+    "description": "Ищу человека с которым просто можно погулять",
+    "time_start": 1777038951,
+    "category": "Другое",
+    "members_limit": 2,
+    "source": "user",
+    "geo": {
+      "latitude": 51.761991,
+      "longitude": 36.185114,
+      "address": "Курск"
+    },
+    "is_private": false
+  },
+  {
+    "id" : "phytbol.jpg",
+    "title": "Ищу компанию для игры в футбол",
+    "description": "Давайте соберемся в футбольчик поиграть",
+    "time_start": 1777038951,
+    "category": "Спорт",
+    "members_limit": 22,
     "source": "user",
     "geo": {
       "latitude": 51.761991,

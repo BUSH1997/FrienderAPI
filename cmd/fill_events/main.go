@@ -36,7 +36,8 @@ func main() {
 	}
 
 	for _, value := range events {
-		time := time.Now().Unix() + int64(60*60*25*rand.Intn(15))
+		time.Sleep(2 * time.Second)
+		time := time.Now().Unix() + int64(60*60*25*rand.Intn(30))
 
 		value.StartsAt = time
 
