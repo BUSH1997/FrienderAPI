@@ -121,8 +121,7 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 		mt, msg, err := ws.ReadMessage()
 		if err != nil || mt == websocket.CloseMessage {
 			ch.logger.WithError(err).Error("failed to read message from socket")
-			break
-			// TODO: return
+			return ctx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to read message").Error())
 		}
 
 		message := models.Message{
@@ -159,8 +158,6 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 			}
 		}
 	}
-
-	return ctx.JSON(http.StatusOK, nil)
 }
 
 func remove(clients []*chat.Client, uid int64) []*chat.Client {
