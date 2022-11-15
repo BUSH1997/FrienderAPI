@@ -159,7 +159,7 @@ func (r eventRepository) Subscribe(ctx context.Context, event string) error {
 	return nil
 }
 
-func (r eventRepository) UnSubscribe(ctx context.Context, event string) error {
+func (r eventRepository) UnSubscribe(ctx context.Context, event string, user int64) error {
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := r.db.Take(&dbEvent, "uid = ?", event)
@@ -167,12 +167,10 @@ func (r eventRepository) UnSubscribe(ctx context.Context, event string) error {
 			return errors.Wrapf(err, "failed to get event by uid %s", event)
 		}
 
-		userID := contextlib.GetUser(ctx)
-
 		var dbUser db_models.User
-		res = r.db.Take(&dbUser, "uid = ?", userID)
+		res = r.db.Take(&dbUser, "uid = ?", user)
 		if err := res.Error; err != nil {
-			return errors.Wrapf(err, "failed to get user by uid %d", userID)
+			return errors.Wrapf(err, "failed to get user by uid %d", user)
 		}
 
 		dbEventSharing := db_models.EventSharing{}

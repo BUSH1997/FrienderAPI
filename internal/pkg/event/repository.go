@@ -18,7 +18,7 @@ type Repository interface {
 	GetGroupEvents(ctx context.Context, params models.GetEventParams) ([]models.Event, error)
 	UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error
 	Subscribe(ctx context.Context, event string) error
-	UnSubscribe(ctx context.Context, event string) error
+	UnSubscribe(ctx context.Context, event string, user int64) error
 	Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error
 	AddAlbum(ctx context.Context, eventUid string, albumUid string) error
 	DeleteAlbum(ctx context.Context, eventUid string, albumUid string) error

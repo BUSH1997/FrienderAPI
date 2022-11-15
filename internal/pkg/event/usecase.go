@@ -21,7 +21,7 @@ type Usecase interface {
 	GetAllPublic(ctx context.Context) ([]models.Event, error)
 	GetEventById(ctx context.Context, id string) (models.Event, error)
 	SubscribeEvent(ctx context.Context, event string) error
-	UnsubscribeEvent(ctx context.Context, event string) error
+	UnsubscribeEvent(ctx context.Context, event string, user int64) error
 	Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error
 	Change(ctx context.Context, event models.Event) error
 	GetAllCategories(ctx context.Context) ([]string, error)

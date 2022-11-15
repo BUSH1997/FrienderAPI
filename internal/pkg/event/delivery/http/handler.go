@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
@@ -106,7 +107,18 @@ func (eh *EventHandler) UnsubscribeEvent(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	err := eh.useCase.UnsubscribeEvent(ctx.Request().Context(), eventID)
+	input := models.UnsubscribeEventInput{}
+	if err := ctx.Bind(&input); err != nil {
+		eh.logger.WithError(err).Errorf("failed to bind unsubscribe event input")
+		return ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	user := context.GetUser(ctx.Request().Context())
+	if input.User != 0 {
+		user = input.User
+	}
+
+	err := eh.useCase.UnsubscribeEvent(ctx.Request().Context(), eventID, user)
 	if err != nil {
 		eh.logger.WithError(err).Errorf("failed to unsubscribe event")
 		return ctx.JSON(http.StatusInternalServerError, err.Error())

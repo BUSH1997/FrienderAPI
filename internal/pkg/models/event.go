@@ -120,3 +120,7 @@ func (e Event) GetEtag() string {
 
 	return hex.EncodeToString(hasher.Sum(nil))
 }
+
+type UnsubscribeEventInput struct {
+	User int64 `json:"user,omitempty"`
+}
