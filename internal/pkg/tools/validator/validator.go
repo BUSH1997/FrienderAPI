@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
@@ -29,6 +30,17 @@ func TitleEvent(fl validator.FieldLevel) bool {
 func DescriptionEvent(fl validator.FieldLevel) bool {
 	val := fl.Field().String()
 	if len(val) < 5 {
+		return false
+	}
+	return true
+}
+
+func SourceEvent(fl validator.FieldLevel) bool {
+	val := fl.Field().String()
+	if val != models.SOURCE_EVENT_USER ||
+		val != models.SOURSE_EVENT_GROUP ||
+		val != models.SOURCE_EVENT_FORK_GROUP ||
+		val != models.SOURCE_EVENT_VK {
 		return false
 	}
 	return true

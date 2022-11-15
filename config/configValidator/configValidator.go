@@ -10,5 +10,6 @@ func ConfigValidator(router *echo.Echo) {
 	val := validator.New()
 	val.RegisterValidation("custom_title", customValidator.TitleEvent)
 	val.RegisterValidation("custom_description", customValidator.DescriptionEvent)
+	val.RegisterValidation("source_event", customValidator.SourceEvent)
 	router.Validator = &customValidator.CustomValidator{Validator: val}
 }

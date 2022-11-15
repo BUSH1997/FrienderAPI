@@ -128,7 +128,7 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		event.Ticket.Cost = ticketData[1]
 	}
 
-	if dbEvent.Source == "group" {
+	if dbEvent.Source == models.SOURSE_EVENT_GROUP {
 		var groupEventSharing db_models.GroupsEventsSharing
 		res := r.db.Take(&groupEventSharing, "event_id = ?", dbEvent.ID)
 		if err := res.Error; err != nil {
@@ -193,9 +193,9 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 	}
 
 	if params.Source == "not_vk" {
-		query = query.Where("source <> ?", "vk_event")
+		query = query.Where("source <> ?", models.SOURCE_EVENT_VK)
 	}
-	if params.Source == "vk_event" {
+	if params.Source == models.SOURCE_EVENT_VK {
 		query = query.Where("source = ?", params.Source)
 	}
 	if params.IsActive.IsDefinedTrue() {

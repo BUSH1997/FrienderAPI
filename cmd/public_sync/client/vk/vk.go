@@ -78,7 +78,7 @@ func (c HTTPVKClient) UploadPublicEvents(ctx context.Context, data client.SyncDa
 	// fmt.Println(respEventsData.VKEventsData[0].Name)
 	eventsInfo := EventInfo{
 		Category: data.GetFormData()[0]["q"],
-		Source:   SourceTypeEventVK,
+		Source:   models.SOURCE_EVENT_VK,
 	}
 	return convertEventsToModel(respEventsData.VKEventsData.VKEventsData, eventsInfo), nil
 }

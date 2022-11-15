@@ -10,6 +10,8 @@ import (
 const (
 	SOURSE_EVENT_GROUP      = "group"
 	SOURCE_EVENT_FORK_GROUP = "fork_group"
+	SOURCE_EVENT_USER       = "user"
+	SOURCE_EVENT_VK         = "vk_event"
 )
 
 const (
@@ -60,7 +62,7 @@ type Event struct {
 	Avatar       Avatar    `json:"avatar"`
 	MembersLimit int       `json:"members_limit"`
 	GroupInfo    GroupInfo `json:"group_info,omitempty"`
-	Source       string    `json:"source,omitempty"`
+	Source       string    `json:"source,omitempty" validate:"source_event"`
 	Ticket       Ticket    `json:"ticket,omitempty"`
 	Parent       string    `json:"parent,omitempty"`
 	Albums       []string  `json:"albums"`

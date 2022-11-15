@@ -101,8 +101,6 @@ type Country struct {
 	Title string `json:"title"`
 }
 
-const SourceTypeEventVK = "vk_event"
-
 type EventInfo struct {
 	Category string
 	Source   string
