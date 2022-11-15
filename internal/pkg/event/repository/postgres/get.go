@@ -242,6 +242,10 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 			return nil, errors.Wrapf(err, "failed to get event by id %s", dbEvent.Uid)
 		}
 
+		if event.GroupInfo.IsNeedApprove {
+			continue
+		}
+
 		ret = append(ret, event)
 	}
 
