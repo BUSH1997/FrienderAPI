@@ -28,12 +28,10 @@ import (
 	searchPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/search/repository/postgres"
 	statusPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/status/repository/postgres"
 	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
-	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/vk_api"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"log"
-	"os"
 )
 
 var (
@@ -64,8 +62,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	logger := logger2.New(os.Stdout, &logrus.JSONFormatter{}, logrus.InfoLevel)
-	logger.Println(configApp.Vk.AccessToken)
+	// logger := logger2.New(os.Stdout, &logrus.JSONFormatter{}, logrus.InfoLevel)
+	logger, err := hardlogger.NewLogrusLogger(configApp.Logger)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	profileRepo := profilePostgres.New(db, logger)
 	eventRepo := postgres.New(db, logger)
 	eventRepo = revindex.New(db, logger, eventRepo, configApp.SkipList)
@@ -77,7 +79,7 @@ func main() {
 
 	imageRepo := s3.New(logger)
 	imageUseCase := imageUseCase.New(imageRepo, eventRepo, logger, vk)
-	imageHandler := image.NewImageHandler(imageUseCase)
+	imageHandler := image.NewImageHandler(imageUseCase, logger)
 
 	awardRepo := awardPostgres.New(db, logger)
 	statusRepo := statusPostgres.New(db, logger)
@@ -96,7 +98,7 @@ func main() {
 	messenger := chat.NewMessenger()
 
 	chatRepo := chatPostgres.New(db, logger)
-	chatUseCase := chatUsecase.New(chatRepo)
+	chatUseCase := chatUsecase.New(chatRepo, logger)
 	chatHandler := chatHandler.NewChatHandler(chatUseCase, messenger, logger)
 
 	serverRouting := configRouting.ServerConfigRouting{

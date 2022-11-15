@@ -6,6 +6,8 @@ import (
 )
 
 func (gu *groupUseCase) Create(ctx context.Context, group models.GroupInput) error {
+	ctx = gu.logger.WithCaller(ctx)
+
 	if err := gu.repository.Create(ctx, group); err != nil {
 		gu.logger.WithError(err).Errorf("[Create] use case")
 		return err

@@ -12,6 +12,8 @@ import (
 )
 
 func (uc eventUsecase) GetAllPublic(ctx context.Context) ([]models.Event, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
 	events, err := uc.Events.GetAll(ctx, models.GetEventParams{
 		IsPublic: models.DefinedBool(true),
 	})
@@ -23,14 +25,20 @@ func (uc eventUsecase) GetAllPublic(ctx context.Context) ([]models.Event, error)
 }
 
 func (uc eventUsecase) GetEventById(ctx context.Context, id string) (models.Event, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
 	return uc.Events.GetEventById(ctx, id)
 }
 
 func (uc eventUsecase) GetAllCategories(ctx context.Context) ([]string, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
 	return uc.Events.GetAllCategories(ctx)
 }
 
 func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
 	events, err := uc.routerGet(ctx, params)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get events in usecase")
@@ -58,6 +66,8 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 }
 
 func (uc eventUsecase) GetSubscribeEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
 	subscribes, err := uc.ProfileRepository.GetSubscribe(ctx, context2.GetUser(ctx))
 	if err != nil {
 		uc.logger.WithError(err).Errorf("[GetSubscribeEvent]")
@@ -115,6 +125,8 @@ func (uc eventUsecase) routerGet(ctx context.Context, params models.GetEventPara
 }
 
 func (uc eventUsecase) GetSearch(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
 	stammers, err := stammer.GetStammers(stammer.FilterSkipList(params.Search.SearchData.Words, uc.skipList))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get stammers")

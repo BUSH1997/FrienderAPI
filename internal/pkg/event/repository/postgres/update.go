@@ -13,6 +13,8 @@ import (
 )
 
 func (r eventRepository) Update(ctx context.Context, event models.Event) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		res := r.db.Model(&db_models.Event{}).Where("uid = ?", event.Uid).Updates(map[string]interface{}{
 			"uid":           event.Uid,
@@ -40,6 +42,8 @@ func (r eventRepository) Update(ctx context.Context, event models.Event) error {
 }
 
 func (r eventRepository) UpdateEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEventSharing db_models.EventSharing
 
@@ -95,6 +99,8 @@ func (r eventRepository) UpdateEventPriority(ctx context.Context, eventPriority 
 }
 
 func (r eventRepository) Subscribe(ctx context.Context, event string) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := r.db.Take(&dbEvent, "uid = ?", event)
@@ -160,6 +166,8 @@ func (r eventRepository) Subscribe(ctx context.Context, event string) error {
 }
 
 func (r eventRepository) UnSubscribe(ctx context.Context, event string, user int64) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := r.db.Take(&dbEvent, "uid = ?", event)
@@ -209,6 +217,8 @@ func (r eventRepository) UnSubscribe(ctx context.Context, event string, user int
 }
 
 func (r eventRepository) AddAlbum(ctx context.Context, eventUid string, albumUid string) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	var dbEvent db_models.Event
 
 	res := r.db.Take(&dbEvent, "uid = ?", eventUid)
@@ -228,6 +238,8 @@ func (r eventRepository) AddAlbum(ctx context.Context, eventUid string, albumUid
 }
 
 func (r eventRepository) DeleteAlbum(ctx context.Context, eventUid string, albumUid string) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	var dbEvent db_models.Event
 
 	res := r.db.Take(&dbEvent, "uid = ?", eventUid)

@@ -4,177 +4,175 @@ import (
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
 
 type ProfileHandler struct {
 	useCase profile.UseCase
-	logger  *logrus.Logger
+	logger  hardlogger.Logger
 }
 
-func NewProfileHandler(useCase profile.UseCase, logger *logrus.Logger) *ProfileHandler {
+func NewProfileHandler(useCase profile.UseCase, logger hardlogger.Logger) *ProfileHandler {
 	return &ProfileHandler{
 		useCase: useCase,
 		logger:  logger,
 	}
 }
 
-func (eh *ProfileHandler) GetOneProfile(ctx echo.Context) error {
-	idString := ctx.Param("id")
+func (eh *ProfileHandler) GetOneProfile(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
+
+	idString := echoCtx.Param("id")
 	if idString == "" {
-		eh.logger.Errorf("[GetOneProfile] failed get id")
-		return ctx.NoContent(http.StatusInternalServerError)
+		err := errors.New("empty profile id")
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed get user id param")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	id, err := strconv.ParseInt(idString, 10, 32)
 	if err != nil {
-		eh.logger.WithError(errors.Wrap(err, "failed to parse user id")).
-			Errorf("failed to get user events")
-
-		return ctx.NoContent(http.StatusInternalServerError)
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to parse user id %s", id)
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	profile, err := eh.useCase.GetOneProfile(ctx.Request().Context(), id)
+	profile, err := eh.useCase.GetOneProfile(ctx, id)
 	if err != nil {
-		eh.logger.WithError(err).Errorf("[GetOneProfile] failed get one profile")
-		return ctx.NoContent(http.StatusInternalServerError)
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed get profile %d", id)
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, profile)
+	return echoCtx.JSON(http.StatusOK, profile)
 }
 
-func (eh *ProfileHandler) GetAllStatusesUser(ctx echo.Context) error {
-	statuses, err := eh.useCase.GetAllProfileStatuses(ctx.Request().Context())
+func (eh *ProfileHandler) GetAllStatusesUser(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
+
+	statuses, err := eh.useCase.GetAllProfileStatuses(ctx)
 	if err != nil {
-		eh.logger.WithError(err).Errorf("[GetAllStatusesUser] failed get all statuses user")
-		return ctx.NoContent(http.StatusInternalServerError)
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to get all user statuses")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, statuses)
+	return echoCtx.JSON(http.StatusOK, statuses)
 }
 
-func (eh *ProfileHandler) ChangeProfile(ctx echo.Context) error {
+func (eh *ProfileHandler) ChangeProfile(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
+
 	var newProfileData models.ChangeProfile
-	if err := ctx.Bind(&newProfileData); err != nil {
-		eh.logger.WithError(err).Errorf("[ChangeProfile] failed bind change profile")
-		return ctx.NoContent(http.StatusInternalServerError)
+	if err := echoCtx.Bind(&newProfileData); err != nil {
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to bind change profile data")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	newProfileData.ProfileId = contextlib.GetUser(ctx.Request().Context())
+	newProfileData.ProfileId = contextlib.GetUser(ctx)
 
-	if err := eh.useCase.UpdateProfile(ctx.Request().Context(), newProfileData); err != nil {
-		eh.logger.WithError(err).Errorf("[ChangeProfile] failed change profile")
-		return ctx.NoContent(http.StatusInternalServerError)
+	if err := eh.useCase.UpdateProfile(ctx, newProfileData); err != nil {
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to change profile")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.NoContent(http.StatusOK)
+	return echoCtx.NoContent(http.StatusOK)
 }
 
-func (eh *ProfileHandler) ChangePriorityEvent(ctx echo.Context) error {
+func (eh *ProfileHandler) ChangePriorityEvent(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
+
 	var newPriorityEvent models.UidEventPriority
-	if err := ctx.Bind(&newPriorityEvent); err != nil {
-		eh.logger.WithError(err).Errorf("[ChangePriorityEvent] failed bind priority event")
-		return ctx.NoContent(http.StatusInternalServerError)
+	if err := echoCtx.Bind(&newPriorityEvent); err != nil {
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed bind priority event")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
-	newPriorityEvent.UidUser = int(contextlib.GetUser(ctx.Request().Context()))
+	newPriorityEvent.UidUser = int(contextlib.GetUser(ctx))
 
-	if err := eh.useCase.ChangeEventPriority(ctx.Request().Context(), newPriorityEvent); err != nil {
-		eh.logger.WithError(err).Errorf("[ChangePriorityEvent] failed change priority event")
-		return ctx.NoContent(http.StatusInternalServerError)
+	if err := eh.useCase.ChangeEventPriority(ctx, newPriorityEvent); err != nil {
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed change event priority")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.NoContent(http.StatusOK)
+	return echoCtx.NoContent(http.StatusOK)
 }
 
-func (eh *ProfileHandler) Subscribe(ctx echo.Context) error {
-	var profileForSubscribeId models.UserId
-	if err := ctx.Bind(&profileForSubscribeId); err != nil {
-		eh.logger.WithError(err).Errorf("[Subscribe] failed bind data")
-		return ctx.JSON(http.StatusBadRequest, err)
+func (eh *ProfileHandler) Subscribe(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
+
+	var profileForSubscribeID models.UserId
+	if err := echoCtx.Bind(&profileForSubscribeID); err != nil {
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed bind subscribe data")
+		return echoCtx.JSON(http.StatusBadRequest, err)
 	}
 
-	userIDString := ctx.Request().Header.Get("X-User-ID")
-	userIdInt, err := strconv.Atoi(userIDString)
+	userID := contextlib.GetUser(ctx)
+	err := eh.useCase.Subscribe(ctx, userID, int64(profileForSubscribeID.Id))
 	if err != nil {
-		eh.logger.WithError(err).Errorf("[Subscribe] failed get x-user-id")
-		return ctx.JSON(http.StatusBadRequest, err)
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to subscribe to %d", profileForSubscribeID.Id)
+		return echoCtx.JSON(http.StatusBadRequest, err)
 	}
 
-	err = eh.useCase.Subscribe(ctx.Request().Context(), int64(userIdInt), int64(profileForSubscribeId.Id))
-	if err != nil {
-		eh.logger.WithError(err).Errorf("[Subscrivbe] error in usecase")
-		return ctx.JSON(http.StatusBadRequest, err)
-	}
-
-	return ctx.JSON(http.StatusOK, profileForSubscribeId)
+	return echoCtx.JSON(http.StatusOK, profileForSubscribeID)
 }
 
-func (eh *ProfileHandler) UnSubscribe(ctx echo.Context) error {
-	var profileForSubscribeId models.UserId
-	if err := ctx.Bind(&profileForSubscribeId); err != nil {
-		eh.logger.WithError(err).Errorf("[UnSubscribe] failed bind data")
-		return ctx.JSON(http.StatusBadRequest, err)
+func (eh *ProfileHandler) UnSubscribe(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
+
+	var profileForUnsubscribeId models.UserId
+	if err := echoCtx.Bind(&profileForUnsubscribeId); err != nil {
+		eh.logger.WithCtx(ctx).WithError(err).Error("failed bind unsubscribe data")
+		return echoCtx.JSON(http.StatusBadRequest, err)
 	}
 
-	userIDString := ctx.Request().Header.Get("X-User-ID")
-	userIdInt, err := strconv.Atoi(userIDString)
+	userID := contextlib.GetUser(ctx)
+
+	err := eh.useCase.UnSubscribe(ctx, userID, int64(profileForUnsubscribeId.Id))
 	if err != nil {
-		eh.logger.WithError(err).Errorf("[UnSubscribe] failed get x-user-id")
-		return ctx.JSON(http.StatusBadRequest, err)
+		eh.logger.WithCtx(ctx).WithError(err).
+			Errorf("failed to unsubscribe from %d", profileForUnsubscribeId.Id)
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	err = eh.useCase.UnSubscribe(ctx.Request().Context(), int64(userIdInt), int64(profileForSubscribeId.Id))
-	if err != nil {
-		eh.logger.WithError(err).Errorf("[UnSubscrivbe] error in usecase")
-		return ctx.JSON(http.StatusBadRequest, err)
-	}
-
-	return ctx.JSON(http.StatusOK, profileForSubscribeId)
+	return echoCtx.JSON(http.StatusOK, profileForUnsubscribeId)
 }
 
-func (eh *ProfileHandler) GetSubscribe(ctx echo.Context) error {
-	userIDString := ctx.Request().Header.Get("X-User-ID")
-	userIdInt, err := strconv.Atoi(userIDString)
+func (eh *ProfileHandler) GetSubscribe(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
+
+	userID := contextlib.GetUser(ctx)
+
+	subscribe, err := eh.useCase.GetSubscribe(ctx, userID)
 	if err != nil {
-		eh.logger.WithError(err).Errorf("[GetSubscribe] failed get x-user-id")
-		return ctx.JSON(http.StatusBadRequest, err)
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to get subscriptions")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	subscribe, err := eh.useCase.GetSubscribe(ctx.Request().Context(), int64(userIdInt))
-	if err != nil {
-		eh.logger.WithError(err).Errorf("[GetSubscribe] failed getSubscribe")
-		return ctx.JSON(http.StatusInternalServerError, err)
-	}
-
-	return ctx.JSON(http.StatusOK, subscribe)
+	return echoCtx.JSON(http.StatusOK, subscribe)
 }
 
-func (eh *ProfileHandler) GetFriends(ctx echo.Context) error {
-	userIDString := ctx.Request().Header.Get("X-User-ID")
-	if userIDString == "" {
-		eh.logger.Errorf("[GetSubscribe] failed get x-user-id")
-		return ctx.JSON(http.StatusBadRequest, errors.New("failed get x-user-id"))
-	}
+func (eh *ProfileHandler) GetFriends(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
 
-	friends, err := eh.useCase.GetFriends(ctx.Request().Context(), userIDString)
+	userID := contextlib.GetUser(ctx)
+
+	friends, err := eh.useCase.GetFriends(ctx, userID)
 	if err != nil {
-		eh.logger.WithError(err).Errorf("[GetFriends] failed in usecase")
-		return ctx.JSON(http.StatusInternalServerError, err)
+		eh.logger.WithCtx(ctx).WithError(err).Error("failed to get friends")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, friends)
+	return echoCtx.JSON(http.StatusOK, friends)
 }
 
-func (eh *ProfileHandler) GetAllCities(ctx echo.Context) error {
-	cities, err := eh.useCase.GetCities(ctx.Request().Context())
+func (eh *ProfileHandler) GetAllCities(echoCtx echo.Context) error {
+	ctx := eh.logger.WithCaller(echoCtx.Request().Context())
+
+	cities, err := eh.useCase.GetCities(ctx)
 	if err != nil {
-		eh.logger.WithError(err).Errorf("[GetAllCities]")
-		return ctx.JSON(http.StatusInternalServerError, err)
+		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to get all cities")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, cities)
+	return echoCtx.JSON(http.StatusOK, cities)
 }

@@ -2,16 +2,16 @@ package postgres
 
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/syncer"
-	"github.com/sirupsen/logrus"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"gorm.io/gorm"
 )
 
 type syncerRepository struct {
 	db     *gorm.DB
-	logger *logrus.Logger
+	logger hardlogger.Logger
 }
 
-func New(db *gorm.DB, logger *logrus.Logger) syncer.Repository {
+func New(db *gorm.DB, logger hardlogger.Logger) syncer.Repository {
 	return syncerRepository{
 		db:     db,
 		logger: logger,

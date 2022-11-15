@@ -9,6 +9,8 @@ import (
 )
 
 func (r *eventRepository) UploadImage(ctx context.Context, uid string, link string) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 
@@ -44,6 +46,8 @@ func buildImageLink(dbImages string, link string) string {
 }
 
 func (r *eventRepository) UploadAvatar(ctx context.Context, uid string, link string, vkId string) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 

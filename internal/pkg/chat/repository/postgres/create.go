@@ -9,6 +9,8 @@ import (
 )
 
 func (r chatRepository) CreateMessage(ctx context.Context, message models.Message) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbUser db_models.User
 		res := r.db.Take(&dbUser, "uid = ?", message.UserID) //message.UserID)

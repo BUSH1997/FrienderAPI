@@ -16,6 +16,8 @@ import (
 )
 
 func (r *ImageRepository) UploadImage(ctx context.Context, file *multipart.FileHeader) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	src, err := file.Open()
 	if err != nil {
 		return err

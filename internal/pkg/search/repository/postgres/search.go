@@ -8,6 +8,8 @@ import (
 )
 
 func (r searchRepository) GetEventUIDs(ctx context.Context, terms []string) ([]string, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var eventIDsArray [][]int64
 	for _, term := range terms {
 		var dbRevindexWord db_models.RevindexWord

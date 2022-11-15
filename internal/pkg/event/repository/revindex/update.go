@@ -9,6 +9,8 @@ import (
 )
 
 func (r eventRepository) Update(ctx context.Context, event models.Event) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	existEvent, err := r.GetEventById(ctx, event.Uid)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get event by uid %s", event.Uid)

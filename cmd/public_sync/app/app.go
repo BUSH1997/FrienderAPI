@@ -12,10 +12,8 @@ import (
 	postgreslib "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
 	syncer_postgres "github.com/BUSH1997/FrienderAPI/internal/pkg/syncer/repository/postgres"
 	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
-	logger2 "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger"
-	"github.com/sirupsen/logrus"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"log"
-	"os"
 )
 
 func Run() {
@@ -26,7 +24,10 @@ func Run() {
 		panic(err)
 	}
 
-	logger := logger2.New(os.Stdout, &logrus.JSONFormatter{}, logrus.InfoLevel)
+	logger, err := hardlogger.NewLogrusLogger(configApp.Logger)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	HTTPClient, err := httplib.NewSimpleHTTPClient(configApp.Transport.HTTP)
 	if err != nil {

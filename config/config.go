@@ -6,6 +6,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/cmd/public_sync/syncer"
 	postgreslib "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
 	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/spf13/viper"
 )
 
@@ -29,6 +30,7 @@ type Config struct {
 	Vk        VKConfig             `mapstructure:"vk"`
 	BlackList []string             `mapstructure:"blacklist"`
 	SkipList  []string             `mapstructure:"skiplist"`
+	Logger    hardlogger.Config    `mapstructure:"logger"`
 }
 
 func LoadConfig(config *Config, path string) error {

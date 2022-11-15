@@ -10,6 +10,8 @@ import (
 )
 
 func (r chatRepository) GetMessages(ctx context.Context, opts models.GetMessageOpts) ([]models.Message, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var messages []models.Message
 
 	offset := opts.Page * opts.Limit
