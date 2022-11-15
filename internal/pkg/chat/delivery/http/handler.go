@@ -6,10 +6,10 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/chat"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"time"
@@ -18,10 +18,10 @@ import (
 type ChatHandler struct {
 	useCase   chat.Usecase
 	messenger *chat.Messenger
-	logger    *logrus.Logger
+	logger    hardlogger.Logger
 }
 
-func NewChatHandler(usecase chat.Usecase, messenger *chat.Messenger, logger *logrus.Logger) *ChatHandler {
+func NewChatHandler(usecase chat.Usecase, messenger *chat.Messenger, logger hardlogger.Logger) *ChatHandler {
 	return &ChatHandler{
 		useCase:   usecase,
 		messenger: messenger,
@@ -37,74 +37,80 @@ var (
 	}
 )
 
-func (ch *ChatHandler) GetChats(ctx echo.Context) error {
-	chats, err := ch.useCase.GetChats(ctx.Request().Context())
+func (ch *ChatHandler) GetChats(echoCtx echo.Context) error {
+	ctx := ch.logger.WithCaller(echoCtx.Request().Context())
+
+	chats, err := ch.useCase.GetChats(ctx)
 	if err != nil {
-		ch.logger.WithError(err).Errorf("failed to get chats")
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to get chats")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, chats)
+	return echoCtx.JSON(http.StatusOK, chats)
 }
 
-func (ch *ChatHandler) GetMessages(ctx echo.Context) error {
+func (ch *ChatHandler) GetMessages(echoCtx echo.Context) error {
+	ctx := ch.logger.WithCaller(echoCtx.Request().Context())
+
 	opts := models.GetMessageOpts{}
 
-	pageString := ctx.QueryParam("page")
+	pageString := echoCtx.QueryParam("page")
 	if pageString != "" {
 		page, err := strconv.ParseInt(pageString, 10, 32)
 		if err != nil {
-			ch.logger.WithError(err).Errorf("failed to parse page param")
-			return ctx.JSON(http.StatusBadRequest, err.Error())
+			ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to parse page param")
+			return echoCtx.JSON(http.StatusBadRequest, err.Error())
 		}
 
 		opts.Page = int(page)
 	}
 
-	limitString := ctx.QueryParam("limit")
+	limitString := echoCtx.QueryParam("limit")
 	if limitString != "" {
 		limit, err := strconv.ParseInt(limitString, 10, 32)
 		if err != nil {
-			ch.logger.WithError(err).Errorf("failed to parse limit param")
-			return ctx.JSON(http.StatusBadRequest, err.Error())
+			ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to parse limit param")
+			return echoCtx.JSON(http.StatusBadRequest, err.Error())
 		}
 
 		opts.Limit = int(limit)
 	}
 
-	opts.EventID = ctx.QueryParam("event")
+	opts.EventID = echoCtx.QueryParam("event")
 
-	messages, err := ch.useCase.GetMessages(ctx.Request().Context(), opts)
+	messages, err := ch.useCase.GetMessages(ctx, opts)
 	if err != nil {
-		ch.logger.WithError(err).Errorf("failed to get messages")
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to get messages")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := context.GetUser(ctx.Request().Context())
-	err = ch.useCase.UpdateLastCheckTime(ctx.Request().Context(), opts.EventID, user, time.Now().Unix())
+	user := context.GetUser(ctx)
+	err = ch.useCase.UpdateLastCheckTime(ctx, opts.EventID, user, time.Now().Unix())
 	if err != nil {
-		ch.logger.WithError(err).Errorf("failed to update last check time for %d", user)
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to update last check time for %d", user)
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, messages)
+	return echoCtx.JSON(http.StatusOK, messages)
 }
 
-func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
-	eventID := ctx.Param("id")
+func (ch *ChatHandler) ProcessMessage(echoCtx echo.Context) error {
+	ctx := ch.logger.WithCaller(echoCtx.Request().Context())
+
+	eventID := echoCtx.Param("id")
 	if eventID == "" {
 		err := errors.New("event id is empty")
-		ch.logger.WithError(err).Errorf("failed to get event id")
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to get event id")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	ws, err := upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
+	ws, err := upgrader.Upgrade(echoCtx.Response(), echoCtx.Request(), nil)
 	if err != nil {
-		ch.logger.WithError(err).Errorf("failed to upgrade http request")
-		return ctx.JSON(http.StatusInternalServerError, err.Error())
+		ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to upgrade http request")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := context.GetUser(ctx.Request().Context())
+	user := context.GetUser(ctx)
 
 	ch.messenger.Chat.Mx.Lock()
 
@@ -127,8 +133,8 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 	for {
 		mt, msg, err := ws.ReadMessage()
 		if err != nil || mt == websocket.CloseMessage {
-			ch.logger.WithError(err).Error("failed to read message from socket")
-			return ctx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to read message").Error())
+			ch.logger.WithCtx(ctx).WithError(err).Error("failed to read message from socket")
+			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to read message").Error())
 		}
 
 		message := models.Message{
@@ -138,15 +144,15 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 			TimeCreated: time.Now().Unix(),
 		}
 
-		err = ch.useCase.CreateMessage(ctx.Request().Context(), message)
+		err = ch.useCase.CreateMessage(ctx, message)
 		if err != nil {
-			ch.logger.WithError(err).Error("failed to create message")
-			return ctx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to create message").Error())
+			ch.logger.WithCtx(ctx).WithError(err).Error("failed to create message")
+			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to create message").Error())
 		}
 
 		jsonMessage, err := json.Marshal(&message)
 		if err != nil {
-			return ctx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to unmarshal json message").Error())
+			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to unmarshal json message").Error())
 		}
 
 		for _, client := range ch.messenger.Chat.Clients {
@@ -154,15 +160,15 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 
 			err := client.Socket.WriteMessage(websocket.TextMessage, jsonMessage)
 			if err != nil {
-				ch.logger.WithError(err).Errorf("failed to write message to %d", client.UserID)
+				ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to write message to %d", client.UserID)
 				ch.messenger.Chat.Clients = remove(ch.messenger.Chat.Clients, user)
 				continue
 			}
 
-			err = ch.useCase.UpdateLastCheckTime(ctx.Request().Context(), eventID, client.UserID, time.Now().Unix())
+			err = ch.useCase.UpdateLastCheckTime(ctx, eventID, client.UserID, time.Now().Unix())
 			if err != nil {
-				ch.logger.WithError(err).Errorf("failed to update last check time for %d", client.UserID)
-				return ctx.JSON(http.StatusInternalServerError, err.Error())
+				ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to update last check time for %d", client.UserID)
+				return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 			}
 		}
 	}

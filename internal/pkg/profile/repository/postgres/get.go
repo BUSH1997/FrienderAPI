@@ -10,6 +10,8 @@ import (
 )
 
 func (r profileRepository) CheckUserExists(ctx context.Context, user int64) (bool, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	userExists := true
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbUser db_models.User

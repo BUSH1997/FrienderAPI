@@ -13,6 +13,8 @@ import (
 )
 
 func (r eventRepository) GetEventById(ctx context.Context, id string) (models.Event, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var event models.Event
 
 	err := r.db.Transaction(func(tx *gorm.DB) (err error) {
@@ -184,6 +186,8 @@ func getGeoData(geo string) (models.Geo, error) {
 }
 
 func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var dbEvents []db_models.Event
 	query := r.db.Model(&db_models.Event{})
 
@@ -257,6 +261,8 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 }
 
 func (r eventRepository) GetSharings(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var dbEventSharings []db_models.EventSharing
 
 	query := r.db.Model(&db_models.EventSharing{})
@@ -327,6 +333,8 @@ func (r eventRepository) getCategory(name string) (db_models.Category, error) {
 }
 
 func (r eventRepository) GetAllCategories(ctx context.Context) ([]string, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var ret []string
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbCategories []db_models.Category
@@ -352,6 +360,8 @@ func (r eventRepository) GetAllCategories(ctx context.Context) ([]string, error)
 }
 
 func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) ([]models.Event, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var ret []models.Event
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -396,6 +406,8 @@ func (r eventRepository) GetSubscriptionEvents(ctx context.Context, user int64) 
 }
 
 func (r eventRepository) GetGroupEvents(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var ret []models.Event
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbGroup db_models.Group

@@ -9,6 +9,8 @@ import (
 )
 
 func (gr *groupRepository) Update(ctx context.Context, group models.GroupInput) error {
+	ctx = gr.logger.WithCaller(ctx)
+
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
 		res := gr.db.Model(&db_models.Group{}).
 			Where("group_id = ?", group.GroupId).
@@ -31,6 +33,8 @@ func (gr *groupRepository) Update(ctx context.Context, group models.GroupInput) 
 }
 
 func (gr *groupRepository) ApproveEvent(ctx context.Context, eventApproveInfo models.ApproveEvent) error {
+	ctx = gr.logger.WithCaller(ctx)
+
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := gr.db.Take(&dbEvent, "uid = ?", eventApproveInfo.EventUid)

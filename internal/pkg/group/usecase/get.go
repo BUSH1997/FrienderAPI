@@ -8,6 +8,8 @@ import (
 )
 
 func (gu *groupUseCase) GetAdministeredGroupByUserId(ctx context.Context, userId string) ([]models.Group, error) {
+	ctx = gu.logger.WithCaller(ctx)
+
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		gu.logger.WithError(err).Error("[GetAdministeredGroupByUserId] bad user id")
@@ -27,6 +29,8 @@ func (gu *groupUseCase) GetAdministeredGroupByUserId(ctx context.Context, userId
 }
 
 func (gu *groupUseCase) Get(ctx context.Context, userID int64) (models.Group, error) {
+	ctx = gu.logger.WithCaller(ctx)
+
 	group, err := gu.repository.Get(ctx, userID)
 	if err != nil {
 		gu.logger.WithError(err).Error("failed to get group")
@@ -36,12 +40,13 @@ func (gu *groupUseCase) Get(ctx context.Context, userID int64) (models.Group, er
 	return group, err
 }
 
-func (gu *groupUseCase) CheckIfAdmin(ctx context.Context, userId string, groupId int64) (bool, error) {
-	userIdInt, err := strconv.Atoi(userId)
+func (gu *groupUseCase) CheckIfAdmin(ctx context.Context, userId int64, groupId int64) (bool, error) {
+	ctx = gu.logger.WithCaller(ctx)
+
+	isAdmin, err := gu.repository.CheckIfAdmin(ctx, userId, groupId)
 	if err != nil {
-		gu.logger.WithError(err).Error("[GetAdministeredGroupByUserId] bad user id")
-		return false, err
+		return false, errors.Wrap(err, "failed to check if admin in usecase")
 	}
 
-	return gu.repository.CheckIfAdmin(ctx, userIdInt, groupId)
+	return isAdmin, nil
 }

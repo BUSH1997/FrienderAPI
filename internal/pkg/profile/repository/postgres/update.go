@@ -9,6 +9,8 @@ import (
 )
 
 func (r profileRepository) UpdateProfile(ctx context.Context, profile models.ChangeProfile) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		res := r.db.Model(&db_models.User{}).Where("uid = ?", profile.ProfileId).
 			Updates(map[string]interface{}{
@@ -28,6 +30,8 @@ func (r profileRepository) UpdateProfile(ctx context.Context, profile models.Cha
 }
 
 func (r profileRepository) Subscribe(ctx context.Context, userId int64, groupId int64) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbUser db_models.User
 		res := r.db.Take(&dbUser, "uid = ?", userId)
@@ -60,6 +64,8 @@ func (r profileRepository) Subscribe(ctx context.Context, userId int64, groupId 
 }
 
 func (r profileRepository) UnSubscribe(ctx context.Context, userId int64, groupId int64) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbUser db_models.User
 		res := r.db.Take(&dbUser, "uid = ?", userId)

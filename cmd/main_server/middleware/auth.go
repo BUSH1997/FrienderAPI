@@ -2,21 +2,21 @@ package middleware
 
 import (
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
-func Auth(logger *logrus.Logger) echo.MiddlewareFunc {
+func Auth(logger hardlogger.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(context echo.Context) error {
 			var userIDString string
 
 			path := context.Path()
-			logger.Println(path)
+			// logger.Println(path)
 			if strings.Contains(path, "ws/") {
 				userIDString = context.QueryParam("user_id")
 			} else {
@@ -34,8 +34,13 @@ func Auth(logger *logrus.Logger) echo.MiddlewareFunc {
 				return context.NoContent(http.StatusBadRequest)
 			}
 
+			ctx := context.Request().Context()
+			ctx = hardlogger.AddCtxFields(ctx, hardlogger.Fields{
+				"user": userID,
+			})
+
 			context.SetRequest(
-				context.Request().WithContext(contextlib.SetUser(context.Request().Context(), userID)),
+				context.Request().WithContext(contextlib.SetUser(ctx, userID)),
 			)
 
 			return next(context)

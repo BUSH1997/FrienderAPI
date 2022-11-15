@@ -8,6 +8,8 @@ import (
 )
 
 func (r profileRepository) Create(ctx context.Context, user int64, isGroup bool) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		dbUser := db_models.User{
 			Uid:           int(user),

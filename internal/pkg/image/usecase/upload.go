@@ -8,22 +8,24 @@ import (
 	"strings"
 )
 
-func (us *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*multipart.FileHeader, uid string) error {
+func (uc *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*multipart.FileHeader, uid string) error {
+	ctx = uc.logger.WithCaller(ctx)
+
 	for i := 0; i < len(files); i++ {
 		currentFieldName := fmt.Sprintf("photo%d", i)
-		err := us.imageRepository.UploadImage(ctx, files[currentFieldName][0])
+		err := uc.imageRepository.UploadImage(ctx, files[currentFieldName][0])
 		if err != nil {
 			log.Error(err)
 			return err
 		}
 	}
 
-	stringVkId, err := us.vk.UploadPhoto(files["photo0"][0])
+	stringVkId, err := uc.vk.UploadPhoto(files["photo0"][0])
 	if err != nil {
 		log.Error(err)
 	}
 	linkAvatar := "https://friender.hb.bizmrg.com/" + files["photo0"][0].Filename
-	err = us.eventRepository.UploadAvatar(ctx, uid, linkAvatar, stringVkId)
+	err = uc.eventRepository.UploadAvatar(ctx, uid, linkAvatar, stringVkId)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -39,5 +41,5 @@ func (us *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*mul
 		return nil
 	}
 	links = strings.TrimSuffix(links, ",")
-	return us.eventRepository.UploadImage(ctx, uid, links)
+	return uc.eventRepository.UploadImage(ctx, uid, links)
 }

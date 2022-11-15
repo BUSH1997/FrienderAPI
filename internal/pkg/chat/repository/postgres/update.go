@@ -7,6 +7,8 @@ import (
 )
 
 func (r chatRepository) UpdateLastCheckTime(ctx context.Context, event string, user int64, time int64) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	var dbEvent db_models.Event
 	res := r.db.Take(&dbEvent, "uid = ?", event)
 	if err := res.Error; err != nil {

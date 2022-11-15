@@ -10,6 +10,8 @@ import (
 )
 
 func (r eventRepository) Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var dbEvent db_models.Event
 		res := r.db.Take(&dbEvent, "uid = ?", event)

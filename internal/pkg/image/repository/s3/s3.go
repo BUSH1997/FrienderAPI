@@ -2,14 +2,14 @@ package s3
 
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/image"
-	"github.com/sirupsen/logrus"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 )
 
 type ImageRepository struct {
-	logger *logrus.Logger
+	logger hardlogger.Logger
 }
 
-func New(logger *logrus.Logger) image.Repository {
+func New(logger hardlogger.Logger) image.Repository {
 	return &ImageRepository{
 		logger: logger,
 	}

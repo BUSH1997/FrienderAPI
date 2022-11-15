@@ -62,3 +62,7 @@ blacklist: ['(вы|ты)?бл(е|и)?я.*?',
             'morons?',
             'assholes?']
 skiplist: ['в', 'на', 'где', 'для', 'а', 'по', 'у', 'за', 'над', 'под']
+logger:
+  level: debug
+  app: main_server
+

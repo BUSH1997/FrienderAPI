@@ -9,6 +9,8 @@ import (
 )
 
 func (gr *groupRepository) Create(ctx context.Context, group models.GroupInput) error {
+	ctx = gr.logger.WithCaller(ctx)
+
 	err := gr.db.Transaction(func(tx *gorm.DB) error {
 		dbGroup := db_models.Group{
 			UserId:          group.UserId,

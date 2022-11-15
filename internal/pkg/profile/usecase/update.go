@@ -7,6 +7,8 @@ import (
 )
 
 func (uc *UseCase) UpdateProfile(ctx context.Context, profile models.ChangeProfile) error {
+	ctx = uc.Logger.WithCaller(ctx)
+
 	err := uc.profileRepository.UpdateProfile(ctx, profile)
 	if err != nil {
 		return errors.Wrap(err, "failed to update profile")
@@ -16,6 +18,8 @@ func (uc *UseCase) UpdateProfile(ctx context.Context, profile models.ChangeProfi
 }
 
 func (uc *UseCase) ChangeEventPriority(ctx context.Context, eventPriority models.UidEventPriority) error {
+	ctx = uc.Logger.WithCaller(ctx)
+
 	err := uc.eventRepository.UpdateEventPriority(ctx, eventPriority)
 	if err != nil {
 		return errors.Wrap(err, "failed to update event priority")
@@ -25,6 +29,8 @@ func (uc *UseCase) ChangeEventPriority(ctx context.Context, eventPriority models
 }
 
 func (uc *UseCase) Subscribe(ctx context.Context, userId int64, groupId int64) error {
+	ctx = uc.Logger.WithCaller(ctx)
+
 	err := uc.profileRepository.Subscribe(ctx, userId, groupId)
 	if err != nil {
 		return errors.Wrap(err, "failed subscribe")
@@ -34,6 +40,8 @@ func (uc *UseCase) Subscribe(ctx context.Context, userId int64, groupId int64) e
 }
 
 func (uc *UseCase) UnSubscribe(ctx context.Context, userId int64, groupId int64) error {
+	ctx = uc.Logger.WithCaller(ctx)
+
 	err := uc.profileRepository.UnSubscribe(ctx, userId, groupId)
 	if err != nil {
 		return errors.Wrap(err, "failed subscribe")
