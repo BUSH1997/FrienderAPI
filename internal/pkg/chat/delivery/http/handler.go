@@ -80,6 +80,13 @@ func (ch *ChatHandler) GetMessages(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	user := context.GetUser(ctx.Request().Context())
+	err = ch.useCase.UpdateLastCheckTime(ctx.Request().Context(), opts.EventID, user, time.Now().Unix())
+	if err != nil {
+		ch.logger.WithError(err).Errorf("failed to update last check time for %d", user)
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
 	return ctx.JSON(http.StatusOK, messages)
 }
 
@@ -121,8 +128,7 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 		mt, msg, err := ws.ReadMessage()
 		if err != nil || mt == websocket.CloseMessage {
 			ch.logger.WithError(err).Error("failed to read message from socket")
-			break
-			// TODO: return
+			return ctx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to read message").Error())
 		}
 
 		message := models.Message{
@@ -149,7 +155,8 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 			err := client.Socket.WriteMessage(websocket.TextMessage, jsonMessage)
 			if err != nil {
 				ch.logger.WithError(err).Errorf("failed to write message to %d", client.UserID)
-				return ctx.JSON(http.StatusInternalServerError, err.Error())
+				ch.messenger.Chat.Clients = remove(ch.messenger.Chat.Clients, user)
+				continue
 			}
 
 			err = ch.useCase.UpdateLastCheckTime(ctx.Request().Context(), eventID, client.UserID, time.Now().Unix())
@@ -159,8 +166,6 @@ func (ch *ChatHandler) ProcessMessage(ctx echo.Context) error {
 			}
 		}
 	}
-
-	return ctx.JSON(http.StatusOK, nil)
 }
 
 func remove(clients []*chat.Client, uid int64) []*chat.Client {
