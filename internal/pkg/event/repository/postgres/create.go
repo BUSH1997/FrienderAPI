@@ -124,6 +124,16 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 			if err := res.Error; err != nil {
 				return errors.Wrapf(err, "error update forks events")
 			}
+
+			dbEventSharing = db_models.EventSharing{}
+			dbEventSharing.EventID = int(parentEvent.ID)
+			dbEventSharing.UserID = int(dbUser.ID)
+			dbEventSharing.Priority = len(sharingsExist) + 1
+
+			res = r.db.Create(&dbEventSharing)
+			if err := res.Error; err != nil {
+				return errors.Wrapf(err, "failed to create event sharing in parent event")
+			}
 		}
 
 		return nil
