@@ -63,6 +63,7 @@ type Event struct {
 	Source       string    `json:"source,omitempty"`
 	Ticket       Ticket    `json:"ticket,omitempty"`
 	Parent       string    `json:"parent,omitempty"`
+	Albums       []string  `json:"albums"`
 }
 
 type Ticket struct {

@@ -112,6 +112,10 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 			AvatarVkId: dbEvent.AvatarVkId,
 		},
 		Source: dbEvent.Source,
+		Albums: dbEvent.Albums,
+	}
+	if len(event.Albums) == 0 {
+		event.Albums = make([]string, 0)
 	}
 
 	if strings.Contains(dbEvent.Ticket, ";;") {
