@@ -43,8 +43,8 @@ type GroupInfo struct {
 
 type Event struct {
 	Uid          string    `json:"id,omitempty"`
-	Title        string    `json:"title,omitempty"`
-	Description  string    `json:"description,omitempty"`
+	Title        string    `json:"title,omitempty" validate:"custom_title"`
+	Description  string    `json:"description,omitempty" validate:"custom_description"`
 	Members      []int     `json:"members"`
 	Images       []string  `json:"images"`
 	TimeCreated  time.Time `json:"time_created,omitempty"`

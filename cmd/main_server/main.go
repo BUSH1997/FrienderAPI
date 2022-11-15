@@ -4,6 +4,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/config"
 	"github.com/BUSH1997/FrienderAPI/config/configMiddleware"
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
+	"github.com/BUSH1997/FrienderAPI/config/configValidator"
 	awardPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/award/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist/text_blacklist"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/chat"
@@ -106,6 +107,7 @@ func main() {
 		ChatHandler:    chatHandler,
 	}
 
+	configValidator.ConfigValidator(router)
 	configMiddleware.ConfigMiddleware(router, profileRepo, logger)
 	serverRouting.ConfigRouting(router)
 

@@ -29,6 +29,11 @@ func (eh *EventHandler) Create(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err)
 	}
 
+	if err := ctx.Validate(&newEvent); err != nil {
+		eh.logger.WithError(err).Errorf("failed validate event")
+		return ctx.JSON(http.StatusBadRequest, errors.New("Failed validate data").Error())
+	}
+
 	event, err := eh.useCase.Create(ctx.Request().Context(), newEvent)
 	if errors.Is(err, usecase.ErrBlacklistedEvent) {
 		eh.logger.WithError(err).Errorf("failed to create event")
