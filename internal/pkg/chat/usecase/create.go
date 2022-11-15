@@ -6,5 +6,7 @@ import (
 )
 
 func (uc ChatUsecase) CreateMessage(ctx context.Context, message models.Message) error {
+	ctx = uc.logger.WithCaller(ctx)
+
 	return uc.chatRepository.CreateMessage(ctx, message)
 }

@@ -14,6 +14,8 @@ import (
 )
 
 func (r eventRepository) Create(ctx context.Context, event models.Event) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		dbEvent := db_models.Event{
 			Uid:          event.Uid,

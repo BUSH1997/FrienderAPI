@@ -12,6 +12,8 @@ import (
 )
 
 func (r eventRepository) Create(ctx context.Context, event models.Event) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	terms, err := stammer.GetStammers(stammer.FilterSkipList(strings.Split(event.Title, " "), r.skipList))
 	if err != nil {
 		return errors.Wrap(err, "failed to get stammers from title")

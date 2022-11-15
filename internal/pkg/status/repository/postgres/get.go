@@ -9,6 +9,8 @@ import (
 )
 
 func (r statusRepository) GetUserCurrentStatus(ctx context.Context, id int64) (models.Status, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var status models.Status
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
@@ -38,6 +40,8 @@ func (r statusRepository) GetUserCurrentStatus(ctx context.Context, id int64) (m
 }
 
 func (r statusRepository) GetAllUserStatuses(ctx context.Context, id int64) ([]models.Status, error) {
+	ctx = r.logger.WithCaller(ctx)
+
 	var statuses []models.Status
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {

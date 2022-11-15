@@ -13,6 +13,6 @@ type UseCase interface {
 	Subscribe(ctx context.Context, userId int64, groupId int64) error
 	UnSubscribe(ctx context.Context, userId int64, groupId int64) error
 	GetSubscribe(cxt context.Context, userId int64) (models.Subscriptions, error)
-	GetFriends(ctx context.Context, userId string) ([]int64, error)
+	GetFriends(ctx context.Context, userId int64) ([]int64, error)
 	GetCities(ctx context.Context) ([]string, error)
 }

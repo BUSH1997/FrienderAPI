@@ -8,6 +8,8 @@ import (
 )
 
 func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.Event, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
 	uid, err := uuid.NewV4()
 	if err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to  generate uuid")

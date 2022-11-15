@@ -11,6 +11,8 @@ import (
 )
 
 func (r eventRepository) Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error {
+	ctx = r.logger.WithCaller(ctx)
+
 	existEvent, err := r.GetEventById(ctx, event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get event by uid %s", event)

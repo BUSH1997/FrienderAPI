@@ -7,6 +7,8 @@ import (
 )
 
 func (uc ChatUsecase) GetChats(ctx context.Context) ([]models.Chat, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
 	chats, err := uc.chatRepository.GetChats(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get chats in usecase")

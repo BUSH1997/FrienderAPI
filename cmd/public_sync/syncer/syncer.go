@@ -7,8 +7,8 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/syncer"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 	"time"
@@ -38,7 +38,7 @@ type Syncer interface {
 
 type SyncManager struct {
 	Config     SyncerConfig
-	Logger     *logrus.Logger
+	Logger     hardlogger.Logger
 	Syncers    []Syncer
 	Events     event.Usecase
 	Repository syncer.Repository
@@ -46,7 +46,7 @@ type SyncManager struct {
 
 func New(
 	config SyncerConfig,
-	logger *logrus.Logger,
+	logger hardlogger.Logger,
 	syncers []Syncer,
 	usecase event.Usecase,
 	repository syncer.Repository,
@@ -68,7 +68,7 @@ func (s SyncManager) RunPublicSync() {
 
 		updatedAt, err := s.Repository.GetUpdatedTime(ctx)
 		if err != nil {
-			s.Logger.Warnf("failed to get updated_at with error: %s", err.Error())
+			s.Logger.Errorf("failed to get updated_at with error: %s", err.Error())
 			continue
 		}
 
@@ -78,11 +78,11 @@ func (s SyncManager) RunPublicSync() {
 
 		err = s.syncPublicEvents(ctx)
 		if err != nil {
-			s.Logger.Warnf("failed to process sync with error: %s", err.Error())
+			s.Logger.Errorf("failed to process sync with error: %s", err.Error())
 
 			err = s.Repository.Update(ctx, time.Now().Add(-s.Config.ResyncDelayAfterFail))
 			if err != nil {
-				s.Logger.Warnf("failed to update sync after fail with error: %s", err.Error())
+				s.Logger.Errorf("failed to update sync after fail with error: %s", err.Error())
 			}
 
 			continue
@@ -90,7 +90,7 @@ func (s SyncManager) RunPublicSync() {
 
 		err = s.Repository.Update(ctx, time.Now())
 		if err != nil {
-			s.Logger.Warnf("failed to update sync after success with error: %s", err.Error())
+			s.Logger.Errorf("failed to update sync after success with error: %s", err.Error())
 		}
 	}
 }

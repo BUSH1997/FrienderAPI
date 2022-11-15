@@ -1,154 +1,158 @@
 package http
 
 import (
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/group"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
 
 type GroupHandler struct {
-	logger  *logrus.Logger
+	logger  hardlogger.Logger
 	useCase group.UseCase
 }
 
-func New(logger *logrus.Logger, useCase group.UseCase) *GroupHandler {
+func New(logger hardlogger.Logger, useCase group.UseCase) *GroupHandler {
 	return &GroupHandler{
 		logger:  logger,
 		useCase: useCase,
 	}
 }
 
-func (gh *GroupHandler) CreateGroup(ctx echo.Context) error {
+func (gh *GroupHandler) CreateGroup(echoCtx echo.Context) error {
+	ctx := gh.logger.WithCaller(echoCtx.Request().Context())
+
 	var newGroup models.GroupInput
-	userId := ctx.Request().Header.Get("X-User-ID")
-	if userId == "" {
-		gh.logger.Error("[GetAdministeredGroup], bad x-user-id")
-		return ctx.JSON(http.StatusBadRequest, errors.New("bad x-user-id"))
+	if err := echoCtx.Bind(&newGroup); err != nil {
+		gh.logger.WithCtx(ctx).WithError(err).Errorf("[Create group], error json")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	if err := ctx.Bind(&newGroup); err != nil {
-		gh.logger.WithError(err).Errorf("[Create group], error json")
-		return ctx.JSON(http.StatusBadRequest, err)
+	userID := context.GetUser(ctx)
+	if int(userID) != newGroup.UserId {
+		err := errors.New("attempt to create group with alien id")
+		gh.logger.WithCtx(ctx).WithError(err).Error("failed to try to create group not with your id")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	userIdInt, err := strconv.Atoi(userId)
+	err := gh.useCase.Create(ctx, newGroup)
 	if err != nil {
-		gh.logger.WithError(err).Error("[CreateGroup] bad user id")
-		return ctx.JSON(http.StatusBadRequest, err)
+		gh.logger.WithCtx(ctx).WithError(err).Errorf("failed to create group")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	if userIdInt != newGroup.UserId {
-		gh.logger.Error("[CreateGroup] try to create group not with your id")
-		return ctx.JSON(http.StatusBadRequest, errors.New("try to create group not with your id"))
-	}
-
-	err = gh.useCase.Create(ctx.Request().Context(), newGroup)
-	if err != nil {
-		gh.logger.WithError(err).Errorf("[Create group], error in useCase")
-		return ctx.JSON(http.StatusInternalServerError, err)
-	}
-
-	return ctx.JSON(http.StatusOK, newGroup)
+	return echoCtx.JSON(http.StatusOK, newGroup)
 }
 
-func (gh *GroupHandler) Update(ctx echo.Context) error {
+func (gh *GroupHandler) Update(echoCtx echo.Context) error {
+	ctx := gh.logger.WithCaller(echoCtx.Request().Context())
+
 	var newGroupData models.GroupInput
-	if err := ctx.Bind(&newGroupData); err != nil {
-		gh.logger.WithError(err).Errorf("failed to bind group data")
-		return ctx.JSON(http.StatusBadRequest, err)
+	if err := echoCtx.Bind(&newGroupData); err != nil {
+		gh.logger.WithCtx(ctx).WithError(err).Errorf("failed to bind group data")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	err := gh.useCase.Update(ctx.Request().Context(), newGroupData)
+	err := gh.useCase.Update(ctx, newGroupData)
 	if err != nil {
-		gh.logger.WithError(err).Errorf("failed to update group data")
-		return ctx.JSON(http.StatusInternalServerError, err)
+		gh.logger.WithCtx(ctx).WithError(err).Errorf("failed to update group data")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, newGroupData)
+	return echoCtx.JSON(http.StatusOK, newGroupData)
 }
 
-func (gh *GroupHandler) GetAdministeredGroup(ctx echo.Context) error {
-	userId := ctx.QueryParam("user_id")
+func (gh *GroupHandler) GetAdministeredGroup(echoCtx echo.Context) error {
+	ctx := gh.logger.WithCaller(echoCtx.Request().Context())
+
+	userId := echoCtx.QueryParam("user_id")
 	if userId == "" {
-		gh.logger.Error("[GetAdministeredGroup], bad x-user-id")
-		return ctx.JSON(http.StatusBadRequest, errors.New("bad x-user-id"))
+		err := errors.New("empty user id")
+		gh.logger.WithCtx(ctx).WithError(err).Error("failed to parse user id param")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	groups, err := gh.useCase.GetAdministeredGroupByUserId(ctx.Request().Context(), userId)
+	groups, err := gh.useCase.GetAdministeredGroupByUserId(ctx, userId)
 	if err != nil {
-		gh.logger.WithError(err).Errorf("[GetAdministeredGroup], error in useCase")
-		return ctx.JSON(http.StatusInternalServerError, err)
+		gh.logger.WithCtx(ctx).WithError(err).
+			Errorf("failed to get administrated group by user id %d", userId)
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, groups)
+	return echoCtx.JSON(http.StatusOK, groups)
 }
 
-func (gh *GroupHandler) Get(ctx echo.Context) error {
-	groupIdString := ctx.QueryParam("group_id")
+func (gh *GroupHandler) Get(echoCtx echo.Context) error {
+	ctx := gh.logger.WithCaller(echoCtx.Request().Context())
+
+	groupIdString := echoCtx.QueryParam("group_id")
 	if groupIdString == "" {
-		gh.logger.Error("[Get], bad group_id")
-		return ctx.JSON(http.StatusBadRequest, errors.New(" bad group_id").Error())
+		err := errors.New("empty user id")
+		gh.logger.WithCtx(ctx).WithError(err).Error("failed to parse group id param")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	groupId, err := strconv.Atoi(groupIdString)
 	if err != nil {
-		gh.logger.WithError(err).Error("failed to parse user id from string")
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		gh.logger.WithCtx(ctx).WithError(err).Error("failed to parse group id %d from string", groupIdString)
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	group, err := gh.useCase.Get(ctx.Request().Context(), int64(groupId))
+	group, err := gh.useCase.Get(ctx, int64(groupId))
 	if err != nil {
-		gh.logger.WithError(err).Errorf("failed to get group by id %d", groupId)
-		return ctx.JSON(http.StatusInternalServerError, err)
+		gh.logger.WithCtx(ctx).WithError(err).Errorf("failed to get group by id %d", groupId)
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, group)
+	return echoCtx.JSON(http.StatusOK, group)
 }
 
-func (gh *GroupHandler) IsAdmin(ctx echo.Context) error {
-	userId := ctx.Request().Header.Get("X-User-ID")
-	if userId == "" {
-		gh.logger.Error("[IsAdmin], bad x-user-id")
-		return ctx.JSON(http.StatusBadRequest, errors.New("bad x-user-id"))
-	}
+func (gh *GroupHandler) IsAdmin(echoCtx echo.Context) error {
+	ctx := gh.logger.WithCaller(echoCtx.Request().Context())
 
-	groupIdString := ctx.QueryParam("group_id")
+	userId := context.GetUser(ctx)
+
+	groupIdString := echoCtx.QueryParam("group_id")
 	if groupIdString == "" {
-		gh.logger.Error("[IsAdmin], bad group_id")
-		return ctx.JSON(http.StatusBadRequest, errors.New("bad group_id"))
+		err := errors.New("empty group id")
+		gh.logger.WithCtx(ctx).WithError(err).Error("failed to parse group id param")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	groupId, err := strconv.ParseInt(groupIdString, 10, 32)
 	if err != nil {
-		gh.logger.WithError(errors.Wrap(err, "failed to parse owner param")).
+		gh.logger.WithCtx(ctx).WithError(errors.Wrap(err, "failed to parse owner param")).
 			Errorf("failed to get group id")
-		return ctx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	isAdmin, err := gh.useCase.CheckIfAdmin(ctx.Request().Context(), userId, groupId)
+	isAdmin, err := gh.useCase.CheckIfAdmin(ctx, userId, groupId)
 	if err != nil {
-		gh.logger.WithError(err).Errorf("[IsAdmin], error in useCase")
-		return ctx.JSON(http.StatusInternalServerError, err)
+		gh.logger.WithCtx(ctx).WithError(err).Errorf("failed to check if admin")
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusOK, isAdmin)
+	return echoCtx.JSON(http.StatusOK, isAdmin)
 }
 
-func (gh *GroupHandler) ApproveEvent(ctx echo.Context) error {
+func (gh *GroupHandler) ApproveEvent(echoCtx echo.Context) error {
+	ctx := gh.logger.WithCaller(echoCtx.Request().Context())
+
 	var approveEvent models.ApproveEvent
-	if err := ctx.Bind(&approveEvent); err != nil {
-		gh.logger.WithError(err).Errorf("failed to bind approve data")
-		return ctx.JSON(http.StatusBadRequest, err)
+	if err := echoCtx.Bind(&approveEvent); err != nil {
+		gh.logger.WithCtx(ctx).WithError(err).Errorf("failed to bind approve event data")
+		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	err := gh.useCase.ApproveEvent(ctx.Request().Context(), approveEvent)
+	err := gh.useCase.ApproveEvent(ctx, approveEvent)
 	if err != nil {
-		gh.logger.WithError(err).Errorf("failed to approve")
-		return ctx.JSON(http.StatusInternalServerError, err)
+		gh.logger.WithCtx(ctx).WithError(err).Errorf("failed to approve event %d", approveEvent.EventUid)
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(http.StatusOK, approveEvent)
+
+	return echoCtx.JSON(http.StatusOK, approveEvent)
 }

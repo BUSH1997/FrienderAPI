@@ -2,16 +2,16 @@ package postgres
 
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/status"
-	"github.com/sirupsen/logrus"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"gorm.io/gorm"
 )
 
 type statusRepository struct {
 	db     *gorm.DB
-	logger *logrus.Logger
+	logger hardlogger.Logger
 }
 
-func New(db *gorm.DB, logger *logrus.Logger) status.Repository {
+func New(db *gorm.DB, logger hardlogger.Logger) status.Repository {
 	return &statusRepository{
 		db:     db,
 		logger: logger,

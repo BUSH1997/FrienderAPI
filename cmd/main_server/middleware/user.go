@@ -3,12 +3,12 @@ package middleware
 import (
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-func CreateUser(profileRepository profile.Repository, logger *logrus.Logger) echo.MiddlewareFunc {
+func CreateUser(profileRepository profile.Repository, logger hardlogger.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(context echo.Context) error {
 			ctx := context.Request().Context()

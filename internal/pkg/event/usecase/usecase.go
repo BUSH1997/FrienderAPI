@@ -5,7 +5,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/search"
-	"github.com/sirupsen/logrus"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 )
 
 type eventUsecase struct {
@@ -14,7 +14,7 @@ type eventUsecase struct {
 	SearchRepository  search.Repository
 	BlackLister       blacklist.BlackLister
 	skipList          map[string]bool
-	logger            *logrus.Logger
+	logger            hardlogger.Logger
 }
 
 func New(
@@ -23,7 +23,7 @@ func New(
 	searchRepository search.Repository,
 	blackLister blacklist.BlackLister,
 	skipList []string,
-	logger *logrus.Logger,
+	logger hardlogger.Logger,
 ) event.Usecase {
 	skipMap := make(map[string]bool)
 	for _, skip := range skipList {
