@@ -45,8 +45,8 @@ type GroupInfo struct {
 
 type Event struct {
 	Uid          string    `json:"id,omitempty"`
-	Title        string    `json:"title,omitempty" validate:"custom_title"`
-	Description  string    `json:"description,omitempty" validate:"custom_description"`
+	Title        string    `json:"title,omitempty"`
+	Description  string    `json:"description,omitempty"`
 	Members      []int     `json:"members"`
 	Images       []string  `json:"images"`
 	TimeCreated  time.Time `json:"time_created,omitempty"`
@@ -62,7 +62,7 @@ type Event struct {
 	Avatar       Avatar    `json:"avatar"`
 	MembersLimit int       `json:"members_limit"`
 	GroupInfo    GroupInfo `json:"group_info,omitempty"`
-	Source       string    `json:"source,omitempty" validate:"source_event"`
+	Source       string    `json:"source,omitempty"`
 	Ticket       Ticket    `json:"ticket,omitempty"`
 	Parent       string    `json:"parent,omitempty"`
 	Albums       []string  `json:"albums"`
