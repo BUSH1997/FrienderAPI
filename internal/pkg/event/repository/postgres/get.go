@@ -5,7 +5,7 @@ import (
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
 	"strconv"
 	"strings"
@@ -431,7 +431,7 @@ func (r eventRepository) GetGroupEvents(ctx context.Context, params models.GetEv
 			userID := contextlib.GetUser(ctx)
 
 			if userID != int64(dbGroup.UserId) {
-				return errors.New("try get need approve user no admin")
+				return errors.New("try get need approve user no admin") // TODO
 			}
 			query = query.Where("groups_events_sharing.is_need_approve = ?", params.IsNeedApprove.Value)
 		}
@@ -473,7 +473,7 @@ func (r eventRepository) GetGroupEvents(ctx context.Context, params models.GetEv
 			var eventSharing db_models.GroupsEventsSharing
 
 			q := r.db.Model(&eventSharing).Where("group_id = ?", dbGroup.ID).Find(&eventSharing)
-			if err := q.Error; err != nil {
+			if err = q.Error; err != nil {
 				return errors.Wrap(err, "failed to get eventSharing")
 			}
 

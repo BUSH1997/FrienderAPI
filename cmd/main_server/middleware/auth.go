@@ -2,9 +2,9 @@ package middleware
 
 import (
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"net/http"
 	"strconv"
 	"strings"

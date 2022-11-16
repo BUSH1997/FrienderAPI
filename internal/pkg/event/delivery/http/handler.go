@@ -1,13 +1,14 @@
 package http
 
 import (
+	"github.com/BUSH1997/FrienderAPI/internal/api/errors/convert"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/usecase"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"net/http"
 )
 
@@ -29,7 +30,7 @@ func (eh *EventHandler) Create(echoCtx echo.Context) error {
 	var newEvent models.Event
 	if err := echoCtx.Bind(&newEvent); err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to bind new event data")
-		return echoCtx.JSON(http.StatusBadRequest, err)
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	if err := echoCtx.Validate(&newEvent); err != nil {
@@ -41,11 +42,11 @@ func (eh *EventHandler) Create(echoCtx echo.Context) error {
 
 	if errors.Is(err, usecase.ErrBlacklistedEvent) {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to create event")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 	if err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to create event")
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, event)
@@ -58,7 +59,7 @@ func (eh *EventHandler) GetOneEvent(echoCtx echo.Context) error {
 	if idString == "" {
 		err := errors.New("event id is empty")
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to get one event")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	event, err := eh.useCase.GetEventById(ctx, idString)
@@ -66,7 +67,7 @@ func (eh *EventHandler) GetOneEvent(echoCtx echo.Context) error {
 		eh.logger.WithCtx(ctx).WithFields(hardlogger.Fields{
 			"event": idString,
 		}).WithError(err).Errorf("failed to get one event")
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, event)
@@ -84,7 +85,7 @@ func (eh *EventHandler) Get(echoCtx echo.Context) error {
 	events, err := eh.useCase.Get(ctx, eventParams)
 	if err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to get events")
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, events)
@@ -97,7 +98,7 @@ func (eh *EventHandler) SubscribeEvent(echoCtx echo.Context) error {
 	if eventID == "" {
 		err := errors.New("event id is empty")
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to subscribe event")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	err := eh.useCase.SubscribeEvent(echoCtx.Request().Context(), eventID)
@@ -105,7 +106,7 @@ func (eh *EventHandler) SubscribeEvent(echoCtx echo.Context) error {
 		eh.logger.WithCtx(ctx).WithFields(hardlogger.Fields{
 			"event": eventID,
 		}).WithError(err).Errorf("failed to subscribe event")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, "successfully subscribed event")
@@ -118,7 +119,7 @@ func (eh *EventHandler) UnsubscribeEvent(echoCtx echo.Context) error {
 	if eventID == "" {
 		err := errors.New("event id is empty")
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to unsubscribe event")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	input := models.UnsubscribeEventInput{}
@@ -137,7 +138,7 @@ func (eh *EventHandler) UnsubscribeEvent(echoCtx echo.Context) error {
 		eh.logger.WithCtx(ctx).WithFields(hardlogger.Fields{
 			"event": eventID,
 		}).WithError(err).Errorf("failed to unsubscribe event")
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, "successfully unsubscribed event")
@@ -151,7 +152,7 @@ func (eh *EventHandler) DeleteEvent(echoCtx echo.Context) error {
 		err := errors.New("event id is empty")
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to get event id param")
 
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	var groupInfo models.GroupInfo
@@ -166,7 +167,7 @@ func (eh *EventHandler) DeleteEvent(echoCtx echo.Context) error {
 			"event": eventID,
 		}).WithError(err).Errorf("failed to delete event")
 
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, "successfully deleted event")
@@ -178,17 +179,17 @@ func (eh *EventHandler) ChangeEvent(echoCtx echo.Context) error {
 	var event models.Event
 	if err := echoCtx.Bind(&event); err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to bind event")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	err := eh.useCase.Change(ctx, event)
 	if errors.Is(err, usecase.ErrBlacklistedEvent) {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to create event")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 	if err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to change event")
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, event)
@@ -200,7 +201,7 @@ func (eh *EventHandler) GetAllCategory(echoCtx echo.Context) error {
 	categories, err := eh.useCase.GetAllCategories(ctx)
 	if err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to get all categories")
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, categories)
@@ -212,12 +213,12 @@ func (eh *EventHandler) UpdateAlbum(echoCtx echo.Context) error {
 	var updateAlbumInfo models.UpdateAlbumInfo
 	if err := echoCtx.Bind(&updateAlbumInfo); err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to bind album info")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	if err := eh.useCase.UpdateAlbum(ctx, updateAlbumInfo); err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to update album")
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, updateAlbumInfo)

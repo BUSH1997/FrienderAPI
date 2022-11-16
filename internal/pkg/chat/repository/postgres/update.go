@@ -3,7 +3,7 @@ package postgres
 import (
 	"context"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 )
 
 func (r chatRepository) UpdateLastCheckTime(ctx context.Context, event string, user int64, time int64) error {

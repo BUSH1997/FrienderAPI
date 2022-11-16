@@ -4,7 +4,7 @@ import (
 	"context"
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 )
 
 func (gu *groupUseCase) Update(ctx context.Context, group models.GroupInput) error {

@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 )
 
 func (uc ChatUsecase) UpdateLastCheckTime(ctx context.Context, event string, user int64, time int64) error {

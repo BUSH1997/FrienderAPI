@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
+	event_pkg "github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
 	"math"
 	"time"
@@ -132,6 +134,10 @@ func (r eventRepository) Subscribe(ctx context.Context, event string) error {
 			dbEventSharing.UserID = int(dbUser.ID)
 			res = r.db.Create(&dbEventSharing)
 			if err := res.Error; err != nil {
+				if postgres.ProcessError(err) == postgres.UniqueViolationError {
+					err = errors.Transform(err, event_pkg.ErrAlreadyExists)
+				}
+
 				return errors.Wrapf(err, "failed to create event sharing")
 			}
 		}

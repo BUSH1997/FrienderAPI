@@ -2,7 +2,7 @@ package text_blacklist
 
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"strings"
 )
 

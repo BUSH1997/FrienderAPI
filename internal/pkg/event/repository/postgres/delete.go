@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
+	event_pkg "github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
 )
 
@@ -35,7 +36,7 @@ func (r eventRepository) Delete(ctx context.Context, event string, groupInfo mod
 
 		if groupInfo.GroupId == 0 {
 			if dbEvent.Owner != int(dbUser.ID) {
-				return errors.New("user is not events owner, cannot delete")
+				return event_pkg.ErrNoDeleteAccess.WithMessage("user is not events owner, cannot delete")
 			}
 		} else {
 			//надо проверить является ли юзер админом
@@ -53,12 +54,15 @@ func (r eventRepository) Delete(ctx context.Context, event string, groupInfo mod
 			}
 
 			if !checkAdmin {
-				return errors.New("user is not admin, cannot delete")
+				return event_pkg.ErrNoDeleteAccess.WithMessage("user is not admin, cannot delete")
 			}
 		}
 
 		dbEventSharing := db_models.EventSharing{}
 		res = r.db.Take(&dbEventSharing, "event_id = ? AND user_id = ?", dbEvent.ID, dbUser.ID)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to get event sharing")
+		}
 
 		currentPriority := dbEventSharing.Priority
 
