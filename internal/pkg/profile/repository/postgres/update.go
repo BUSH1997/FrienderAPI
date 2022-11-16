@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
 )
 
@@ -51,7 +51,7 @@ func (r profileRepository) Subscribe(ctx context.Context, userId int64, groupId 
 		}
 		res = r.db.Create(&dbSubscribe)
 		if err := res.Error; err != nil {
-			return errors.Wrapf(err, "failed to create user")
+			return errors.Wrapf(err, "failed to create subscribe")
 		}
 
 		return nil
@@ -85,7 +85,7 @@ func (r profileRepository) UnSubscribe(ctx context.Context, userId int64, groupI
 		}
 		res = r.db.Delete(&dbSubscribe, "profile_id = ? and user_id = ?", dbSubscribe.ProfileId, dbSubscribe.UserId)
 		if err := res.Error; err != nil {
-			return errors.Wrapf(err, "failed to create user")
+			return errors.Wrapf(err, "failed to delete subscribe")
 		}
 
 		return nil

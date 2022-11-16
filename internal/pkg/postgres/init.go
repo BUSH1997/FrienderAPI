@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

@@ -1,8 +1,8 @@
 package stammer
 
 import (
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/goodsign/snowball"
-	"github.com/pkg/errors"
 	"strings"
 )
 

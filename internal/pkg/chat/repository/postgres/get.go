@@ -5,7 +5,7 @@ import (
 	context2 "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
 )
 

@@ -3,7 +3,7 @@ package vk
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"

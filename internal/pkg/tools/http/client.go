@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/rs/xid"
 	"io"
 	"io/ioutil"

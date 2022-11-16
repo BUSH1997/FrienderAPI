@@ -1,10 +1,11 @@
 package http
 
 import (
+	"github.com/BUSH1997/FrienderAPI/internal/api/errors/convert"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/image"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"net/http"
 )
 
@@ -27,19 +28,19 @@ func (h *ImageHandler) UploadImage(echoCtx echo.Context) error {
 	if uid == "" {
 		err := errors.New("empty event id")
 		h.logger.WithCtx(ctx).WithError(err).Errorf("failed to upload image for event %s", uid)
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	mf, err := echoCtx.MultipartForm()
 	if err != nil {
 		h.logger.WithCtx(ctx).WithError(err).Errorf("failed to get multipart form")
-		return echoCtx.JSON(http.StatusBadRequest, err.Error())
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
 	err = h.useCase.UploadImage(ctx, mf.File, uid)
 	if err != nil {
 		h.logger.WithCtx(ctx).WithError(err).Errorf("failed to upload image for event %s", uid)
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
 	return echoCtx.NoContent(http.StatusOK)

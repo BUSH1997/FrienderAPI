@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"context"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +20,10 @@ func (r profileRepository) Create(ctx context.Context, user int64, isGroup bool)
 		}
 		res := r.db.Create(&dbUser)
 		if err := res.Error; err != nil {
+			if postgres.ProcessError(err) == postgres.UniqueViolationError {
+				err = errors.Transform(err, profile.ErrAlreadyExists)
+			}
+
 			return errors.Wrapf(err, "failed to create user")
 		}
 

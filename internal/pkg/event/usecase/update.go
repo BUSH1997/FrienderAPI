@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
-	"github.com/pkg/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 )
 
 var ErrBlacklistedEvent = errors.New("event data is blacklisted")

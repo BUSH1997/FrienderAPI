@@ -2,9 +2,9 @@ package validator
 
 import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"net/http"
 )
 

@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
+	event_pkg "github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/lib/pq"
-	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"strings"
 	"time"
@@ -71,6 +73,10 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 
 		res = r.db.Create(&dbEvent)
 		if err := res.Error; err != nil {
+			if postgres.ProcessError(err) == postgres.UniqueViolationError {
+				err = errors.Transform(err, event_pkg.ErrAlreadyExists)
+			}
+
 			return errors.Wrapf(err, "failed to create event, uid %s", event.Uid)
 		}
 
@@ -87,6 +93,10 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 
 		res = r.db.Create(&dbEventSharing)
 		if err := res.Error; err != nil {
+			if postgres.ProcessError(err) == postgres.UniqueViolationError {
+				err = errors.Transform(err, event_pkg.ErrAlreadyExists)
+			}
+
 			return errors.Wrapf(err, "failed to create event sharing")
 		}
 
@@ -106,6 +116,10 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 
 			res = r.db.Create(&dbGroupsEventsSharing)
 			if err := res.Error; err != nil {
+				if postgres.ProcessError(err) == postgres.UniqueViolationError {
+					err = errors.Transform(err, event_pkg.ErrAlreadyExists)
+				}
+
 				return errors.Wrapf(err, "failed to create group event sharing")
 			}
 		}
@@ -134,6 +148,10 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 
 			res = r.db.Create(&dbEventSharing)
 			if err := res.Error; err != nil {
+				if postgres.ProcessError(err) == postgres.UniqueViolationError {
+					err = errors.Transform(err, event_pkg.ErrAlreadyExists)
+				}
+
 				return errors.Wrapf(err, "failed to create event sharing in parent event")
 			}
 		}

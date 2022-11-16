@@ -3,8 +3,8 @@ package revindex
 import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
-	"github.com/pkg/errors"
 	"strings"
 )
 

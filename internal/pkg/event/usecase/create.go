@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 )
 
 func (uc eventUsecase) Create(ctx context.Context, event models.Event) (models.Event, error) {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
 	"github.com/lib/pq"
-	"github.com/pkg/errors"
 	"sort"
 	"strings"
 )
