@@ -66,3 +66,5 @@ logger:
   level: debug
   app: main_server
 
+clients:
+  - fdr.front1

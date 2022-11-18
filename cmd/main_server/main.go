@@ -111,7 +111,7 @@ func main() {
 	}
 
 	configValidator.ConfigValidator(router)
-	configMiddleware.ConfigMiddleware(router, profileRepo, logger)
+	configMiddleware.ConfigMiddleware(router, profileRepo, logger, configApp.Clients)
 	api_errors.ConfigErrorHandler(router, logger)
 	serverRouting.ConfigRouting(router)
 

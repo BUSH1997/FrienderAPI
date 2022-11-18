@@ -31,6 +31,7 @@ type Config struct {
 	BlackList []string             `mapstructure:"blacklist"`
 	SkipList  []string             `mapstructure:"skiplist"`
 	Logger    hardlogger.Config    `mapstructure:"logger"`
+	Clients   []string             `mapstructure:"clients"`
 }
 
 func LoadConfig(config *Config, path string) error {
