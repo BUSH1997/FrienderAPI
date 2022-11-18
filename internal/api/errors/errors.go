@@ -73,6 +73,7 @@ func (e InternalError) Error() string {
 type ForbiddenReason string
 
 const (
+	CSRFTokenEmpty   ForbiddenReason = "csrf_empty"
 	CSRFTokenInvalid ForbiddenReason = "csrf_invalid"
 	EventIsSpam      ForbiddenReason = "event_is_spam"
 	NoAccess         ForbiddenReason = "no_access"

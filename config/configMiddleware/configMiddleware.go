@@ -28,9 +28,14 @@ func GetCORSConfigStruct() middleware.CORSConfig {
 
 func ConfigMiddleware(router *echo.Echo, profileRepository profile.Repository, logger hardlogger.Logger) {
 	router.Use(
-		middleware.CORSWithConfig(GetCORSConfigStruct()),
+		custommiddleware.RequestID(),
 		custommiddleware.Auth(logger),
 		custommiddleware.CreateUser(profileRepository, logger),
-		custommiddleware.RequestID(),
+		middleware.Secure(),
+		middleware.CSRFWithConfig(middleware.CSRFConfig{
+			TokenLookup: "header:X-CSRF-Token",
+			CookieName:  "persik",
+		}),
+		middleware.CORSWithConfig(GetCORSConfigStruct()),
 	)
 }
