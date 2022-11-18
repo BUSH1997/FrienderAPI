@@ -5,6 +5,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/config/configMiddleware"
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
 	"github.com/BUSH1997/FrienderAPI/config/configValidator"
+	api_errors "github.com/BUSH1997/FrienderAPI/internal/api/errors"
 	awardPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/award/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist/text_blacklist"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/chat"
@@ -110,7 +111,8 @@ func main() {
 	}
 
 	configValidator.ConfigValidator(router)
-	configMiddleware.ConfigMiddleware(router, profileRepo, logger)
+	configMiddleware.ConfigMiddleware(router, profileRepo, logger, configApp.Clients)
+	api_errors.ConfigErrorHandler(router, logger)
 	serverRouting.ConfigRouting(router)
 
 	router.Logger.Fatal(router.Start("localhost:8090"))

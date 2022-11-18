@@ -26,11 +26,27 @@ func GetCORSConfigStruct() middleware.CORSConfig {
 	}
 }
 
-func ConfigMiddleware(router *echo.Echo, profileRepository profile.Repository, logger hardlogger.Logger) {
+func ConfigMiddleware(
+	router *echo.Echo,
+	profileRepository profile.Repository,
+	logger hardlogger.Logger,
+	clients []string,
+) {
+	clientsMap := make(map[string]bool)
+	for _, client := range clients {
+		clientsMap[client] = true
+	}
+
 	router.Use(
-		middleware.CORSWithConfig(GetCORSConfigStruct()),
-		custommiddleware.Auth(logger),
-		custommiddleware.CreateUser(profileRepository, logger),
 		custommiddleware.RequestID(),
+		custommiddleware.Auth(logger),
+		custommiddleware.ClientID(clientsMap, logger),
+		custommiddleware.CreateUser(profileRepository, logger),
+		middleware.Secure(),
+		middleware.CSRFWithConfig(middleware.CSRFConfig{
+			TokenLookup: "header:X-CSRF-Token",
+			CookieName:  "persik",
+		}),
+		middleware.CORSWithConfig(GetCORSConfigStruct()),
 	)
 }
