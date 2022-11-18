@@ -63,7 +63,7 @@ func (e InternalError) Unwrap() error {
 }
 
 func (e InternalError) ErrorExplain() string {
-	return ""
+	return "internal server error"
 }
 
 func (e InternalError) Error() string {
@@ -211,12 +211,6 @@ func (e UnimplementedMethodError) OriginalError() error {
 
 func (e UnimplementedMethodError) Error() string {
 	return errorString(e)
-}
-
-func (e UnimplementedMethodError) GRPCExtensions() map[string]string {
-	return map[string]string{
-		"type": e.ErrorType(),
-	}
 }
 
 func (e UnimplementedMethodError) Unwrap() error {

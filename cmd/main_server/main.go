@@ -5,12 +5,14 @@ import (
 	"github.com/BUSH1997/FrienderAPI/config/configMiddleware"
 	"github.com/BUSH1997/FrienderAPI/config/configRouting"
 	"github.com/BUSH1997/FrienderAPI/config/configValidator"
-	awardPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/award/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/blacklist/text_blacklist"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/chat"
 	chatHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/delivery/http"
 	chatPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/repository/postgres"
 	chatUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/usecase"
+	complaintHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/complaint/delivery/http"
+	complaintPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/complaint/repository/postgres"
+	complaintUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/complaint/usecase"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/postgres"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/repository/revindex"
@@ -26,7 +28,6 @@ import (
 	profilePostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/repository/postgres"
 	profileUseCase "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/usecase"
 	searchPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/search/repository/postgres"
-	statusPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/status/repository/postgres"
 	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/vk_api"
@@ -81,14 +82,11 @@ func main() {
 	imageUseCase := imageUseCase.New(imageRepo, eventRepo, logger, vk)
 	imageHandler := image.NewImageHandler(imageUseCase, logger)
 
-	awardRepo := awardPostgres.New(db, logger)
-	statusRepo := statusPostgres.New(db, logger)
-
 	HTTPClient, err := httplib.NewSimpleHTTPClient(configApp.Transport.HTTP)
 	if err != nil {
 		panic(err)
 	}
-	profileUseCase := profileUseCase.New(profileRepo, eventRepo, awardRepo, statusRepo, logger, HTTPClient)
+	profileUseCase := profileUseCase.New(profileRepo, eventRepo, logger, HTTPClient)
 	profileHandler := profileHandler.NewProfileHandler(profileUseCase, logger)
 
 	groupRepo := groupPostgres.New(db, logger)
@@ -101,12 +99,17 @@ func main() {
 	chatUseCase := chatUsecase.New(chatRepo, logger)
 	chatHandler := chatHandler.NewChatHandler(chatUseCase, messenger, logger)
 
+	complaintRepo := complaintPostgres.New(db, logger)
+	complaintUseCase := complaintUsecase.New(complaintRepo, logger)
+	complaintHandler := complaintHandler.NewComplaintHandler(complaintUseCase, logger)
+
 	serverRouting := configRouting.ServerConfigRouting{
-		EventHandler:   eventHandler,
-		ImageHandler:   imageHandler,
-		ProfileHandler: profileHandler,
-		GroupHandler:   groupHandler,
-		ChatHandler:    chatHandler,
+		EventHandler:     eventHandler,
+		ImageHandler:     imageHandler,
+		ProfileHandler:   profileHandler,
+		GroupHandler:     groupHandler,
+		ChatHandler:      chatHandler,
+		ComplaintHandler: complaintHandler,
 	}
 
 	configValidator.ConfigValidator(router)

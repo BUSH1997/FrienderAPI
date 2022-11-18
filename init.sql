@@ -2,6 +2,8 @@ drop table subscribe_profile_sharing cascade;
 drop table revindex_words cascade;
 drop table revindex_events cascade;
 drop table unlocked_awards cascade;
+drop table complaints cascade;
+drop type item;
 drop table messages cascade;
 drop table awards cascade;
 drop table unlocked_statuses cascade;
@@ -153,6 +155,16 @@ create table subscribe_profile_sharing (
                                            profile_id int references users(id),
                                            user_id int references users(id)
 
+);
+
+create type item as enum('event', 'user');
+create table complaints(
+                           id serial primary key,
+                           initiator int references users(id),
+                           item item,
+                           item_uid varchar(256),
+                           time_created bigint,
+                           is_processed bool
 );
 
 insert into categories(name) values ('Концерт'), ('Выставка'), ('Кино'), ('Экскурсия'), ('Спорт'), ('Театр'), ('Шоу'),

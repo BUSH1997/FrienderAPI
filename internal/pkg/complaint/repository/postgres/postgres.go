@@ -1,18 +1,18 @@
 package postgres
 
 import (
-	"github.com/BUSH1997/FrienderAPI/internal/pkg/award"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/complaint"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"gorm.io/gorm"
 )
 
-type awardRepository struct {
+type complaintRepository struct {
 	db     *gorm.DB
 	logger hardlogger.Logger
 }
 
-func New(db *gorm.DB, logger hardlogger.Logger) award.Repository {
-	return &awardRepository{
+func New(db *gorm.DB, logger hardlogger.Logger) complaint.Repository {
+	return &complaintRepository{
 		db:     db,
 		logger: logger,
 	}

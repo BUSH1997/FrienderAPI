@@ -2,6 +2,7 @@ package configRouting
 
 import (
 	chat "github.com/BUSH1997/FrienderAPI/internal/pkg/chat/delivery/http"
+	complaint "github.com/BUSH1997/FrienderAPI/internal/pkg/complaint/delivery/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event/delivery/http"
 	group "github.com/BUSH1997/FrienderAPI/internal/pkg/group/delivery/http"
 	image "github.com/BUSH1997/FrienderAPI/internal/pkg/image/delivery/http"
@@ -10,11 +11,12 @@ import (
 )
 
 type ServerConfigRouting struct {
-	EventHandler   *http.EventHandler
-	ImageHandler   *image.ImageHandler
-	ProfileHandler *profileHandler.ProfileHandler
-	GroupHandler   *group.GroupHandler
-	ChatHandler    *chat.ChatHandler
+	EventHandler     *http.EventHandler
+	ImageHandler     *image.ImageHandler
+	ProfileHandler   *profileHandler.ProfileHandler
+	GroupHandler     *group.GroupHandler
+	ChatHandler      *chat.ChatHandler
+	ComplaintHandler *complaint.ComplaintHandler
 }
 
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -47,4 +49,5 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("cities", sc.ProfileHandler.GetAllCities)
 	router.PUT("event/album", sc.EventHandler.UpdateAlbum)
 	router.POST("event/album/upload", sc.ImageHandler.UploadImageAlbum)
+	router.PUT("complaint", sc.ComplaintHandler.Create)
 }

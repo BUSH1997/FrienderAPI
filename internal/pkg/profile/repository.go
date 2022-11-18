@@ -13,4 +13,6 @@ type Repository interface {
 	UnSubscribe(ctx context.Context, userId int64, groupId int64) error
 	GetSubscribe(cxt context.Context, userId int64) ([]models.SubscribeType, error)
 	GetCities(ctx context.Context) ([]string, error)
+	GetOneProfile(ctx context.Context, userID int64) (models.Profile, error)
+	GetAllUserStatuses(ctx context.Context, id int64) ([]models.Status, error)
 }
