@@ -66,6 +66,7 @@ func (r chatRepository) GetChats(ctx context.Context) ([]models.Chat, error) {
 		res := r.db.Model(&db_models.Event{}).
 			Joins("JOIN event_sharings on event_sharings.event_id = events.id").
 			Joins("JOIN users on event_sharings.user_id = users.id").
+			Order("last_message_created_at desc").
 			Find(&dbEvents, "users.uid = ? AND event_sharings.is_deleted = ?", context2.GetUser(ctx), false)
 		if err := res.Error; err != nil {
 			return errors.Wrap(err, "failed to get user events")
