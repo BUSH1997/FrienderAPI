@@ -48,7 +48,7 @@ func (uc eventUsecase) GetAllCategories(ctx context.Context) ([]string, error) {
 	}
 
 	sort.Strings(categories)
-	return uc.Events.GetAllCategories(ctx)
+	return categories, nil
 }
 
 func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
