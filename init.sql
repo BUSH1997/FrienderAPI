@@ -70,7 +70,8 @@ create table events(
                        ticket varchar(256),
                        forks int[],
                        albums varchar(64)[],
-                       last_message_created_at bigserial
+                       last_message_created_at bigserial,
+                       blacklist int[]
 );
 
 create table event_sharings(
@@ -96,7 +97,10 @@ create table groups_events_sharing (
                                        event_id int references events(id),
                                        is_admin bool,
                                        is_need_approve bool,
-                                       is_deleted bool
+                                       is_deleted bool,
+                                       user_uid bigserial,
+                                       is_fork bool,
+                                       UNIQUE(group_id, event_id, user_uid)
 );
 
 create table subscribe_sharings(
