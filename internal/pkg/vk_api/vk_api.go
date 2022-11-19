@@ -103,14 +103,8 @@ func (vk *VKApi) UploadPhoto(file *multipart.FileHeader, param UploadPhotoParam)
 }
 
 func (vk VKApi) GetUploadServer(param UploadPhotoParam) (string, error) {
-	uri := ""
-	if param.Type == Default {
-		uri = fmt.Sprintf("%s/%s?access_token=%s&album_id=%s&group_id=%s&v=%s", vk_api_url,
-			"photos.getUploadServer", vk.AccessToken, vk.AlbumId, vk.GroupId, vk.Version)
-	} else if param.Type == Album {
-		uri = fmt.Sprintf("%s/%s?access_token=%s&album_id=%s&v=%s", vk_api_url,
-			"photos.getUploadServer", param.Token, param.AlbumId, vk.Version)
-	}
+	uri := fmt.Sprintf("%s/%s?access_token=%s&album_id=%s&group_id=%s&v=%s", vk_api_url,
+		"photos.getUploadServer", vk.AccessToken, vk.AlbumId, vk.GroupId, vk.Version)
 
 	resp, err := http.Get(uri)
 	if err != nil {
