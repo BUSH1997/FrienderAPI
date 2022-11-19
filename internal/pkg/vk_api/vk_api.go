@@ -19,13 +19,27 @@ type VKApi struct {
 	Version     string
 }
 
+type UploadPhotoParamType string
+
+const (
+	Default UploadPhotoParamType = "default"
+	Album   UploadPhotoParamType = "album"
+)
+
+type UploadPhotoParam struct {
+	Type    UploadPhotoParamType
+	Token   string
+	AlbumId string
+	GroupId string
+}
+
 const (
 	file_for_upload = "C:\\Users\\ruduk\\Desktop\\События\\FrienderAPI\\123211.png"
 	vk_api_url      = "https://api.vk.com/method"
 )
 
-func (vk *VKApi) UploadPhoto(file *multipart.FileHeader) (string, error) {
-	uriServerUpload, err := vk.GetUploadServer()
+func (vk *VKApi) UploadPhoto(file *multipart.FileHeader, param UploadPhotoParam) (string, error) {
+	uriServerUpload, err := vk.GetUploadServer(param)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
@@ -81,9 +95,15 @@ func (vk *VKApi) UploadPhoto(file *multipart.FileHeader) (string, error) {
 	return idPhoto, nil
 }
 
-func (vk VKApi) GetUploadServer() (string, error) {
-	uri := fmt.Sprintf("%s/%s?access_token=%s&album_id=%s&group_id=%s&v=%s", vk_api_url,
-		"photos.getUploadServer", vk.AccessToken, vk.AlbumId, vk.GroupId, vk.Version)
+func (vk VKApi) GetUploadServer(param UploadPhotoParam) (string, error) {
+	uri := ""
+	if param.Type == Default {
+		uri = fmt.Sprintf("%s/%s?access_token=%s&album_id=%s&group_id=%s&v=%s", vk_api_url,
+			"photos.getUploadServer", vk.AccessToken, vk.AlbumId, vk.GroupId, vk.Version)
+	} else if param.Type == Album {
+		uri = fmt.Sprintf("%s/%s?access_token=%s&album_id=%s&v=%s", vk_api_url,
+			"photos.getUploadServer", vk.AccessToken, vk.AlbumId, vk.Version)
+	}
 
 	resp, err := http.Get(uri)
 	if err != nil {

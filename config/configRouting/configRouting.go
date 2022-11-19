@@ -46,4 +46,5 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.GET("chats", sc.ChatHandler.GetChats)
 	router.GET("cities", sc.ProfileHandler.GetAllCities)
 	router.PUT("event/album", sc.EventHandler.UpdateAlbum)
+	router.POST("event/album/upload", sc.ImageHandler.UploadImageAlbum)
 }

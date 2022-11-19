@@ -7,4 +7,5 @@ import (
 
 type UseCase interface {
 	UploadImage(ctx context.Context, file map[string][]*multipart.FileHeader, uid string) error
+	UploadImageAlbum(ctx context.Context, form *multipart.Form) ([]string, error)
 }

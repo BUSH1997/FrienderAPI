@@ -45,3 +45,21 @@ func (h *ImageHandler) UploadImage(echoCtx echo.Context) error {
 
 	return echoCtx.NoContent(http.StatusOK)
 }
+
+func (h *ImageHandler) UploadImageAlbum(echoCtx echo.Context) error {
+	ctx := h.logger.WithCaller(echoCtx.Request().Context())
+
+	form, err := echoCtx.MultipartForm()
+	if err != nil {
+		h.logger.WithCtx(ctx).WithError(err).Errorf("failed to get multipart form")
+		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
+	}
+
+	idsPhotoVk, err := h.useCase.UploadImageAlbum(ctx, form)
+	if err != nil {
+		h.logger.WithCtx(ctx).WithError(err).Errorf("error upload images")
+		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
+	}
+
+	return echoCtx.JSON(http.StatusOK, idsPhotoVk)
+}
