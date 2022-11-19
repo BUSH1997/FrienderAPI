@@ -27,6 +27,7 @@ type Event struct {
 	Forks                pq.Int64Array  `gorm:"column:forks;type:integer[]"`
 	Albums               pq.StringArray `gorm:"column:albums; type:varchar(64)[]"`
 	LastMessageCreatedAt int64          `gorm:"column:last_message_created_at"`
+	BlackList            pq.Int64Array  `gorm:"column:blacklist;type:integer[]"`
 }
 
 func (Event) TableName() string {

@@ -111,6 +111,11 @@ func (r eventRepository) Subscribe(ctx context.Context, event string) error {
 		}
 
 		userID := contextlib.GetUser(ctx)
+		for _, banned := range dbEvent.BlackList {
+			if banned == userID {
+				return event_pkg.ErrNoAccessForBanned
+			}
+		}
 
 		var dbUser db_models.User
 		res = r.db.Take(&dbUser, "uid = ?", userID)

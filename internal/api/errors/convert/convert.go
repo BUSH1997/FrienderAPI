@@ -21,6 +21,13 @@ func DeliveryError(err error) api_errors.ApiError {
 		}
 	}
 
+	if errors.Is(err, event.ErrNoAccessForBanned) {
+		return api_errors.ForbiddenError{
+			Cause:  err,
+			Reason: api_errors.UserIsBanned,
+		}
+	}
+
 	if errors.Is(err, event.ErrEventIsSpam) {
 		return api_errors.ForbiddenError{
 			Cause:  err,
