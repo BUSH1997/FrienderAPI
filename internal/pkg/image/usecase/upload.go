@@ -54,7 +54,7 @@ func (uc *ImageUseCase) UploadImageAlbum(ctx context.Context, form *multipart.Fo
 		uc.logger.WithCtx(ctx).Errorf("Empty upload_server")
 		return []string{}, errors.New("Empty upload_server")
 	}
-
+	fmt.Println(form)
 	photos := form.File
 
 	if photos["photos"] == nil {
