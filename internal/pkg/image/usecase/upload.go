@@ -50,13 +50,13 @@ func (uc *ImageUseCase) UploadImageAlbum(ctx context.Context, form *multipart.Fo
 	ctx = uc.logger.WithCaller(ctx)
 
 	token := form.Value["token"]
-	if token[0] == "" {
+	if token == nil {
 		uc.logger.WithCtx(ctx).Errorf("Empty user key")
 		return []string{}, errors.New("Empty user key")
 	}
 
 	albumId := form.Value["album_id"]
-	if albumId[0] == "" {
+	if albumId == nil {
 		uc.logger.WithCtx(ctx).Errorf("Empty album_id")
 		return []string{}, errors.New("Empty album_id")
 	}
