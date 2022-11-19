@@ -22,15 +22,16 @@ type VKApi struct {
 type UploadPhotoParamType string
 
 const (
-	Default UploadPhotoParamType = "default"
-	Album   UploadPhotoParamType = "album"
+	Default          UploadPhotoParamType = "default"
+	WithUploadServer UploadPhotoParamType = "with_upload_server"
 )
 
 type UploadPhotoParam struct {
-	Type    UploadPhotoParamType
-	Token   string
-	AlbumId string
-	GroupId string
+	Type         UploadPhotoParamType
+	Token        string
+	AlbumId      string
+	GroupId      string
+	UploadServer string
 }
 
 const (
@@ -39,10 +40,17 @@ const (
 )
 
 func (vk *VKApi) UploadPhoto(file *multipart.FileHeader, param UploadPhotoParam) (string, error) {
-	uriServerUpload, err := vk.GetUploadServer(param)
-	if err != nil {
-		fmt.Println(err)
-		return "", err
+	var err error
+	uriServerUpload := ""
+
+	if param.Type == WithUploadServer {
+		uriServerUpload = param.UploadServer
+	} else {
+		uriServerUpload, err = vk.GetUploadServer(param)
+		if err != nil {
+			fmt.Println(err)
+			return "", err
+		}
 	}
 
 	b := new(bytes.Buffer)
