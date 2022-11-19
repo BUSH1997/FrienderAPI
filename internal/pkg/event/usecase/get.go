@@ -43,6 +43,7 @@ func (uc eventUsecase) GetAllCategories(ctx context.Context) ([]string, error) {
 			categories[i] = categories[len(categories)-1]
 			categories[len(categories)-1] = ""
 			categories = categories[:len(categories)-1]
+			break
 		}
 	}
 
