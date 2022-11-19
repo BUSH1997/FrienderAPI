@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 	complaint_pkg "github.com/BUSH1997/FrienderAPI/internal/pkg/complaint"
 	context2 "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
@@ -40,7 +39,6 @@ func (r complaintRepository) Create(ctx context.Context, complaint models.Compla
 	res = r.db.Create(&dbComplaint)
 	if err := res.Error; err != nil {
 		if postgres.ProcessError(err) == postgres.UniqueViolationError {
-			fmt.Println("PIPEC")
 			return errors.Transform(err, complaint_pkg.ErrAlreadyExists)
 		}
 

@@ -84,7 +84,6 @@ func (vk *VKApi) UploadPhoto(file *multipart.FileHeader, param UploadPhotoParam)
 	jsonMap := jsonResp.(map[string]interface{})
 	photos_list := jsonMap["photos_list"].(string)
 	server := jsonMap["server"].(float64)
-	fmt.Println(photos_list)
 	stringFlaot := fmt.Sprintf("%v", server)
 	hash := jsonMap["hash"].(string)
 	idPhoto, err := vk.SaveFile(photos_list, stringFlaot, hash)
@@ -161,7 +160,6 @@ func (vk VKApi) SaveFile(photosList string, server string, hash string) (string,
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 
@@ -177,6 +175,6 @@ func (vk VKApi) SaveFile(photosList string, server string, hash string) (string,
 	id := fieldResponse1["id"].(float64)
 	ownerId := fieldResponse1["owner_id"].(float64)
 	stringId := fmt.Sprintf("%.0f_%.0f", ownerId, id)
-	fmt.Println(stringId)
+
 	return stringId, nil
 }

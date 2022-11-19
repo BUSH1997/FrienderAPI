@@ -2,7 +2,6 @@ package vk
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"io/ioutil"
 	"net/http"
@@ -39,8 +38,6 @@ func (r *GetFriendsResponse) ReadFrom(resp *http.Response) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to read data from reader")
 	}
-
-	fmt.Println(string(data))
 
 	err = json.Unmarshal(data, &r.VkFriendsData)
 	if err != nil {
