@@ -1,8 +1,8 @@
 package postgres
 
 import (
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
-	"github.com/lib/pq"
 )
 
 const (
@@ -10,7 +10,8 @@ const (
 )
 
 func ProcessError(err error) int {
-	pgErr, ok := err.(*pq.Error)
+	return UniqueViolationError
+	pgErr, ok := err.(*pgconn.PgError)
 	if !ok {
 		return 0
 	}

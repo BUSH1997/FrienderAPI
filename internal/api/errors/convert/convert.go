@@ -2,23 +2,13 @@ package convert
 
 import (
 	api_errors "github.com/BUSH1997/FrienderAPI/internal/api/errors"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/complaint"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 )
 
-func DeliveryError(err error) error {
-	if err == nil {
-		return nil
-	}
-
-	err = DeliveryEventError(err)
-	err = DeliveryUserError(err)
-
-	return err
-}
-
-func DeliveryEventError(err error) error {
+func DeliveryError(err error) api_errors.ApiError {
 	if err == nil {
 		return nil
 	}
@@ -66,14 +56,6 @@ func DeliveryEventError(err error) error {
 		}
 	}
 
-	return api_errors.InternalError{Cause: errors.New("internal server error")}
-}
-
-func DeliveryUserError(err error) error {
-	if err == nil {
-		return nil
-	}
-
 	if errors.Is(err, profile.ErrNotFound) {
 		return api_errors.NotFoundError{
 			Cause: err,
@@ -95,6 +77,13 @@ func DeliveryUserError(err error) error {
 			ValidationErrorFields: api_errors.ValidationErrorFields{
 				"user_update_input": api_errors.FieldInvalid,
 			},
+		}
+	}
+
+	if errors.Is(err, complaint.ErrAlreadyExists) {
+		return api_errors.AlreadyExistsError{
+			Cause:  err,
+			Entity: "complaint",
 		}
 	}
 

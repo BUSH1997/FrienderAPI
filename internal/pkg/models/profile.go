@@ -5,6 +5,7 @@ type Profile struct {
 	Awards        []Award `json:"awards,omitempty"`
 	ActiveEvents  []Event `json:"active_events,omitempty"`
 	VisitedEvents []Event `json:"visited_events,omitempty"`
+	CanBeReported bool    `json:"can_be_reported,omitempty"`
 }
 
 type ChangeProfile struct {

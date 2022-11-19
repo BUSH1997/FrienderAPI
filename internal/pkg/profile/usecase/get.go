@@ -12,9 +12,9 @@ import (
 func (uc *UseCase) GetOneProfile(ctx context.Context, userID int64) (models.Profile, error) {
 	ctx = uc.Logger.WithCaller(ctx)
 
-	currentStatus, err := uc.statusRepository.GetUserCurrentStatus(ctx, userID)
+	profile, err := uc.profileRepository.GetOneProfile(ctx, userID)
 	if err != nil {
-		return models.Profile{}, errors.Wrap(err, "failed to get profile status")
+		return models.Profile{}, errors.Wrap(err, "failed to get user profile")
 	}
 
 	activeEvents, err := uc.eventRepository.GetSharings(ctx, models.GetEventParams{
@@ -25,6 +25,8 @@ func (uc *UseCase) GetOneProfile(ctx context.Context, userID int64) (models.Prof
 		return models.Profile{}, errors.Wrap(err, "failed to get user active events")
 	}
 
+	profile.ActiveEvents = activeEvents
+
 	visitedEvents, err := uc.eventRepository.GetSharings(ctx, models.GetEventParams{
 		UserID:   userID,
 		IsActive: models.DefinedBool(false),
@@ -33,17 +35,7 @@ func (uc *UseCase) GetOneProfile(ctx context.Context, userID int64) (models.Prof
 		return models.Profile{}, errors.Wrap(err, "failed to get user visited events")
 	}
 
-	awards, err := uc.awardRepository.GetUserAwards(ctx, userID)
-	if err != nil {
-		return models.Profile{}, errors.Wrap(err, "failed to get user awards")
-	}
-
-	profile := models.Profile{
-		ProfileStatus: currentStatus,
-		Awards:        awards,
-		ActiveEvents:  activeEvents,
-		VisitedEvents: visitedEvents,
-	}
+	profile.VisitedEvents = visitedEvents
 
 	return profile, nil
 }
@@ -53,7 +45,7 @@ func (uc *UseCase) GetAllProfileStatuses(ctx context.Context) ([]models.Status, 
 
 	userID := contextlib.GetUser(ctx)
 
-	statuses, err := uc.statusRepository.GetAllUserStatuses(ctx, userID)
+	statuses, err := uc.profileRepository.GetAllUserStatuses(ctx, userID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get all profile statuses")
 	}

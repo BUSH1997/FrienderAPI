@@ -1,4 +1,4 @@
-package award
+package complaint
 
 import (
 	"context"
@@ -6,5 +6,5 @@ import (
 )
 
 type Repository interface {
-	GetUserAwards(ctx context.Context, id int64) ([]models.Award, error)
+	Create(ctx context.Context, event models.Complaint) error
 }

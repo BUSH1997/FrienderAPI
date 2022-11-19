@@ -44,28 +44,29 @@ type GroupInfo struct {
 }
 
 type Event struct {
-	Uid          string    `json:"id,omitempty"`
-	Title        string    `json:"title,omitempty"`
-	Description  string    `json:"description,omitempty"`
-	Members      []int     `json:"members"`
-	Images       []string  `json:"images"`
-	TimeCreated  time.Time `json:"time_created,omitempty"`
-	TimeUpdated  time.Time `json:"time_update,omitempty"`
-	GeoData      Geo       `json:"geo,omitempty"`
-	Author       int       `json:"author,omitempty"`
-	StartsAt     int64     `json:"time_start,omitempty"`
-	IsGroup      bool      `json:"is_group,omitempty"`
-	IsPublic     bool      `json:"is_public,omitempty"`
-	IsPrivate    bool      `json:"is_private,omitempty"`
-	IsActive     bool      `json:"is_active,omitempty"`
-	Category     Category  `json:"category,omitempty"`
-	Avatar       Avatar    `json:"avatar"`
-	MembersLimit int       `json:"members_limit"`
-	GroupInfo    GroupInfo `json:"group_info,omitempty"`
-	Source       string    `json:"source,omitempty"`
-	Ticket       Ticket    `json:"ticket,omitempty"`
-	Parent       string    `json:"parent,omitempty"`
-	Albums       []string  `json:"albums"`
+	Uid           string    `json:"id,omitempty"`
+	Title         string    `json:"title,omitempty"`
+	Description   string    `json:"description,omitempty"`
+	Members       []int     `json:"members"`
+	Images        []string  `json:"images"`
+	TimeCreated   time.Time `json:"time_created,omitempty"`
+	TimeUpdated   time.Time `json:"time_update,omitempty"`
+	GeoData       Geo       `json:"geo,omitempty"`
+	Author        int       `json:"author,omitempty"`
+	StartsAt      int64     `json:"time_start,omitempty"`
+	IsGroup       bool      `json:"is_group,omitempty"`
+	IsPublic      bool      `json:"is_public,omitempty"`
+	IsPrivate     bool      `json:"is_private,omitempty"`
+	IsActive      bool      `json:"is_active,omitempty"`
+	Category      Category  `json:"category,omitempty"`
+	Avatar        Avatar    `json:"avatar"`
+	MembersLimit  int       `json:"members_limit"`
+	GroupInfo     GroupInfo `json:"group_info,omitempty"`
+	Source        string    `json:"source,omitempty"`
+	Ticket        Ticket    `json:"ticket,omitempty"`
+	Parent        string    `json:"parent,omitempty"`
+	Albums        []string  `json:"albums"`
+	CanBeReported bool      `json:"can_be_reported,omitempty"`
 }
 
 type Ticket struct {

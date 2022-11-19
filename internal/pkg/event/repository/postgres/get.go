@@ -71,8 +71,8 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		return models.Event{}, errors.Wrap(err, "failed to get event by id")
 	}
 
-	var dbUser db_models.User
-	res = r.db.Take(&dbUser, "id = ?", dbEvent.Owner)
+	var dbOwner db_models.User
+	res = r.db.Take(&dbOwner, "id = ?", dbEvent.Owner)
 	if err := res.Error; err != nil {
 		return models.Event{}, errors.Wrap(err, "failed to get owner id")
 	}
@@ -104,7 +104,7 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		Description:  dbEvent.Description,
 		TimeCreated:  time.Unix(dbEvent.TimeCreated, 0),
 		TimeUpdated:  time.Unix(dbEvent.TimeUpdated, 0),
-		Author:       dbUser.Uid,
+		Author:       dbOwner.Uid,
 		StartsAt:     dbEvent.StartsAt,
 		IsPublic:     dbEvent.IsPublic,
 		Category:     models.Category(dbCategory.Name),
@@ -113,8 +113,9 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 			AvatarUrl:  dbEvent.AvatarUrl,
 			AvatarVkId: dbEvent.AvatarVkId,
 		},
-		Source: dbEvent.Source,
-		Albums: dbEvent.Albums,
+		Source:        dbEvent.Source,
+		Albums:        dbEvent.Albums,
+		CanBeReported: true,
 	}
 	if len(event.Albums) == 0 {
 		event.Albums = make([]string, 0)
@@ -161,6 +162,26 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		event.Images = images
 	} else {
 		event.Images = make([]string, 0)
+	}
+
+	user := contextlib.GetUser(ctx)
+	var dbUser db_models.User
+	res = r.db.Take(&dbUser, "uid = ?", user)
+	if err := res.Error; err != nil {
+		return models.Event{}, errors.Wrap(err, "failed to get user id")
+	}
+
+	var dbComplaint db_models.Complaint
+	res = r.db.Model(&db_models.Complaint{}).
+		Where("item = ?", "event").
+		Where("item_id = ?", dbEvent.ID).
+		Where("initiator = ?", dbUser.ID).
+		Take(&dbComplaint)
+	if err := res.Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return models.Event{}, errors.Wrap(err, "failed to get complaint")
+	}
+	if int64(event.Author) == user || !errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		event.CanBeReported = false
 	}
 
 	return event, nil
