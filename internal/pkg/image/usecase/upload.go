@@ -64,7 +64,7 @@ func (uc *ImageUseCase) UploadImageAlbum(ctx context.Context, form *multipart.Fo
 	idPhotos := make([]string, 0)
 	photos := form.File
 	for _, v := range photos["photos"] {
-		stringVkId, err := uc.vk.UploadPhoto(v, vk_api.UploadPhotoParam{Type: vk_api.Album})
+		stringVkId, err := uc.vk.UploadPhoto(v, vk_api.UploadPhotoParam{Type: vk_api.Album, AlbumId: albumId[0], Token: token[0]})
 		if err != nil {
 			uc.logger.WithCtx(ctx).Errorf("Error upload photo album")
 			return []string{}, errors.New("Error Upload photo album")
