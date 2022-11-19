@@ -33,6 +33,20 @@ func (uc eventUsecase) GetEventById(ctx context.Context, id string) (models.Even
 func (uc eventUsecase) GetAllCategories(ctx context.Context) ([]string, error) {
 	ctx = uc.logger.WithCaller(ctx)
 
+	categories, err := uc.Events.GetAllCategories(ctx)
+	if err != nil {
+		return []string{}, err
+	}
+
+	for i, v := range categories {
+		if v == "" {
+			categories[i] = categories[len(categories)-1]
+			categories[len(categories)-1] = ""
+			categories = categories[:len(categories)-1]
+		}
+	}
+
+	sort.Strings(categories)
 	return uc.Events.GetAllCategories(ctx)
 }
 
