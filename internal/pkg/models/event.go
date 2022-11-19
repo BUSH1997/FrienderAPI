@@ -67,6 +67,7 @@ type Event struct {
 	Parent        string    `json:"parent,omitempty"`
 	Albums        []string  `json:"albums"`
 	CanBeReported bool      `json:"can_be_reported,omitempty"`
+	BlackList     []int64   `json:"blacklist,omitempty"`
 }
 
 type Ticket struct {

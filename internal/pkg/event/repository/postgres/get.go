@@ -116,6 +116,7 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 		Source:        dbEvent.Source,
 		Albums:        dbEvent.Albums,
 		CanBeReported: true,
+		BlackList:     dbEvent.BlackList,
 	}
 	if len(event.Albums) == 0 {
 		event.Albums = make([]string, 0)
