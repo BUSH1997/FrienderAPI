@@ -112,6 +112,8 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 				GroupID:       dbGroup.ID,
 				IsAdmin:       event.GroupInfo.IsAdmin,
 				IsNeedApprove: isNeedApprove,
+				UserUID:       userID,
+				IsFork:        true,
 			}
 
 			res = r.db.Create(&dbGroupsEventsSharing)
