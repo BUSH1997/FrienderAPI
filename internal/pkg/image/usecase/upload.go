@@ -57,6 +57,11 @@ func (uc *ImageUseCase) UploadImageAlbum(ctx context.Context, form *multipart.Fo
 
 	photos := form.File
 
+	if photos["photos"] == nil {
+		uc.logger.WithCtx(ctx).Errorf("Empty photos")
+		return []string{}, errors.New("Empty photos")
+	}
+
 	respServer, err := uc.vk.UploadPhotoOnUriServer(photos["photos"][0], uploadServer[0])
 	if err != nil {
 		uc.logger.WithCtx(ctx).Errorf("Error upload photo album")
