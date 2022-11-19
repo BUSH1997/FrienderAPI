@@ -53,6 +53,25 @@ func (vk *VKApi) UploadPhoto(file *multipart.FileHeader, param UploadPhotoParam)
 		}
 	}
 
+	jsonResp, err := vk.UploadPhotoOnUriServer(file, uriServerUpload)
+	if err != nil {
+		return "", err
+	}
+
+	jsonMap := jsonResp.(map[string]interface{})
+	photos_list := jsonMap["photos_list"].(string)
+	server := jsonMap["server"].(float64)
+	stringFlaot := fmt.Sprintf("%v", server)
+	hash := jsonMap["hash"].(string)
+	idPhoto, err := vk.SaveFile(photos_list, stringFlaot, hash)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	return idPhoto, nil
+}
+
+func (vk VKApi) UploadPhotoOnUriServer(file *multipart.FileHeader, uriServerUpload string) (interface{}, error) {
 	b := new(bytes.Buffer)
 	w := multipart.NewWriter(b)
 	field, err := w.CreateFormFile("file1", file_for_upload)
@@ -89,17 +108,7 @@ func (vk *VKApi) UploadPhoto(file *multipart.FileHeader, param UploadPhotoParam)
 		return "", err
 	}
 
-	jsonMap := jsonResp.(map[string]interface{})
-	photos_list := jsonMap["photos_list"].(string)
-	server := jsonMap["server"].(float64)
-	stringFlaot := fmt.Sprintf("%v", server)
-	hash := jsonMap["hash"].(string)
-	idPhoto, err := vk.SaveFile(photos_list, stringFlaot, hash)
-	if err != nil {
-		fmt.Println(err)
-		return "", err
-	}
-	return idPhoto, nil
+	return jsonResp, nil
 }
 
 func (vk VKApi) GetUploadServer(param UploadPhotoParam) (string, error) {

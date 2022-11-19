@@ -46,7 +46,7 @@ func (uc *ImageUseCase) UploadImage(ctx context.Context, files map[string][]*mul
 	return uc.eventRepository.UploadImage(ctx, uid, links)
 }
 
-func (uc *ImageUseCase) UploadImageAlbum(ctx context.Context, form *multipart.Form) ([]string, error) {
+func (uc *ImageUseCase) UploadImageAlbum(ctx context.Context, form *multipart.Form) (interface{}, error) {
 	ctx = uc.logger.WithCaller(ctx)
 
 	uploadServer := form.Value["upload_server"]
@@ -55,16 +55,13 @@ func (uc *ImageUseCase) UploadImageAlbum(ctx context.Context, form *multipart.Fo
 		return []string{}, errors.New("Empty upload_server")
 	}
 
-	idPhotos := make([]string, 0)
 	photos := form.File
-	for _, v := range photos["photos"] {
-		stringVkId, err := uc.vk.UploadPhoto(v, vk_api.UploadPhotoParam{Type: vk_api.WithUploadServer, UploadServer: uploadServer[0]})
-		if err != nil {
-			uc.logger.WithCtx(ctx).Errorf("Error upload photo album")
-			return []string{}, errors.New("Error Upload photo album")
-		}
-		idPhotos = append(idPhotos, stringVkId)
+
+	respServer, err := uc.vk.UploadPhotoOnUriServer(photos["photos"][0], uploadServer[0])
+	if err != nil {
+		uc.logger.WithCtx(ctx).Errorf("Error upload photo album")
+		return []string{}, errors.New("Error Upload photo album")
 	}
 
-	return idPhotos, nil
+	return respServer, nil
 }
