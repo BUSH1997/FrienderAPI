@@ -69,7 +69,8 @@ create table events(
                        source varchar(256),
                        ticket varchar(256),
                        forks int[],
-                       albums varchar(64)[]
+                       albums varchar(64)[],
+                       last_message_created_at bigserial
 );
 
 create table event_sharings(

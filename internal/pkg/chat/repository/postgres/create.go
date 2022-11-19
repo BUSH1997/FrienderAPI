@@ -38,6 +38,13 @@ func (r chatRepository) CreateMessage(ctx context.Context, message models.Messag
 			return errors.Wrapf(err, "failed to create message")
 		}
 
+		res = r.db.Model(&db_models.Event{}).
+			Where("id = ?", dbEvent.ID).
+			Update("last_message_created_at", message.TimeCreated)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to update last message time")
+		}
+
 		return nil
 	})
 	if err != nil {
