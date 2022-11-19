@@ -76,6 +76,7 @@ const (
 	CSRFTokenInvalid ForbiddenReason = "csrf_invalid"
 	EventIsSpam      ForbiddenReason = "event_is_spam"
 	NoAccess         ForbiddenReason = "no_access"
+	UserIsBanned     ForbiddenReason = "user_is_banned"
 )
 
 type ForbiddenError struct {
