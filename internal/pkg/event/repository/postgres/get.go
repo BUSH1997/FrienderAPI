@@ -174,7 +174,7 @@ func (r eventRepository) getEventById(ctx context.Context, id string) (models.Ev
 	var dbComplaint db_models.Complaint
 	res = r.db.Model(&db_models.Complaint{}).
 		Where("item = ?", "event").
-		Where("item_uid = ?", dbEvent.ID).
+		Where("item_uid = ?", id).
 		Where("initiator = ?", dbUser.ID).
 		Take(&dbComplaint)
 	if err := res.Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
