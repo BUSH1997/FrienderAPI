@@ -115,7 +115,7 @@ func (vk VKApi) UploadPhotoOnUriServer(file *multipart.FileHeader, uriServerUplo
 func (vk VKApi) UploadPhotosOnUriServer(files []*multipart.FileHeader, uriUploadServer string) ([]interface{}, error) {
 	b := new(bytes.Buffer)
 	w := multipart.NewWriter(b)
-
+	fmt.Println(files)
 	var res []interface{}
 
 	for i := 0; i < len(files); i++ {
@@ -158,6 +158,11 @@ func (vk VKApi) UploadPhotosOnUriServer(files []*multipart.FileHeader, uriUpload
 			}
 
 			res = append(res, jsonResp)
+
+			if i != len(files)-1 {
+				b = new(bytes.Buffer)
+				w = multipart.NewWriter(b)
+			}
 		}
 	}
 	fmt.Println(res)
