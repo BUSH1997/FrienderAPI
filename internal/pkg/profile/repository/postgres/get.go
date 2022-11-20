@@ -7,6 +7,7 @@ import (
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
+	"sort"
 	"strings"
 )
 
@@ -131,6 +132,9 @@ func (r profileRepository) GetCities(ctx context.Context) ([]string, error) {
 		for _, v := range dbEvents {
 			geoArray := strings.Split(v.Geo, ";;")
 			city := strings.Split(geoArray[2], ",")
+			if city[0] == "Москва" || city[0] == "Санкт-Петербург" {
+				continue
+			}
 			mapCities[city[0]] = true
 		}
 
@@ -143,6 +147,8 @@ func (r profileRepository) GetCities(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to make transaction GetAllCategories")
 	}
+
+	sort.Strings(cities)
 
 	return cities, nil
 }

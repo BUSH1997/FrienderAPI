@@ -128,5 +128,8 @@ func (uc *UseCase) GetCities(ctx context.Context) ([]string, error) {
 		return cities, err
 	}
 
+	moscowPiter := []string{"Москва", "Санкт-Петербург"}
+	cities = append(moscowPiter, cities...)
+
 	return cities, nil
 }
