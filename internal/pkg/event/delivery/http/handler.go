@@ -10,6 +10,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 type EventHandler struct {
@@ -215,6 +216,9 @@ func (eh *EventHandler) UpdateAlbum(echoCtx echo.Context) error {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to bind album info")
 		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
+
+	userId := context.GetUser(ctx)
+	updateAlbumInfo.UidAlbum = strconv.FormatInt(userId, 10) + "_" + updateAlbumInfo.UidAlbum
 
 	if err := eh.useCase.UpdateAlbum(ctx, updateAlbumInfo); err != nil {
 		eh.logger.WithCtx(ctx).WithError(err).Errorf("failed to update album")
