@@ -42,5 +42,5 @@ func (ch *ComplaintHandler) Create(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).ErrorExplain())
 	}
 
-	return echoCtx.NoContent(http.StatusOK)
+	return echoCtx.JSON(http.StatusOK, "successfully created complaint")
 }
