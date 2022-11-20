@@ -59,6 +59,16 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 		return nil, errors.Wrap(err, "failed to get events in usecase")
 	}
 
+	if params.UserID == 0 && params.GroupId == 0 {
+		events = models.EventList(events).Filter(func(event models.Event) bool {
+			if len(event.Members) < event.MembersLimit {
+				return true
+			}
+
+			return false
+		})
+	}
+
 	sort.SliceStable(events, func(i, j int) bool {
 		return events[i].StartsAt < events[j].StartsAt
 	})
@@ -79,7 +89,7 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 
 	return events, nil
 }
-
+q
 func (uc eventUsecase) GetSubscribeEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	ctx = uc.logger.WithCaller(ctx)
 
