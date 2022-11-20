@@ -89,7 +89,7 @@ func (uc eventUsecase) Get(ctx context.Context, params models.GetEventParams) ([
 
 	return events, nil
 }
-q
+
 func (uc eventUsecase) GetSubscribeEvent(ctx context.Context, params models.GetEventParams) ([]models.Event, error) {
 	ctx = uc.logger.WithCaller(ctx)
 
