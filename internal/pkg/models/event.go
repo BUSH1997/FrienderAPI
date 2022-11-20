@@ -128,3 +128,25 @@ func (e Event) GetEtag() string {
 type UnsubscribeEventInput struct {
 	User int64 `json:"user,omitempty"`
 }
+
+type EventList []Event
+type EventFilterFunc func(Event) bool
+
+func (l EventList) Filter(filters ...EventFilterFunc) EventList {
+	if len(filters) == 0 {
+		return l
+	}
+
+	filtered := make([]Event, 0, len(l))
+	for _, e := range l {
+		for _, filter := range filters {
+			if !filter(e) {
+				continue
+			}
+		}
+
+		filtered = append(filtered, e)
+	}
+
+	return filtered
+}
