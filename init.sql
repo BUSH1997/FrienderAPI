@@ -169,7 +169,8 @@ create table complaints(
                            item item,
                            item_uid varchar(256),
                            time_created bigint,
-                           is_processed bool
+                           is_processed bool,
+                           reason text
 );
 
 insert into categories(name) values ('Концерт'), ('Выставка'), ('Кино'), ('Экскурсия'), ('Спорт'), ('Театр'), ('Шоу'),

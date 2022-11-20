@@ -7,6 +7,7 @@ type Complaint struct {
 	ItemUID     string `gorm:"column:item_uid"`
 	TimeCreated int64  `gorm:"column:time_created"`
 	IsProcessed bool   `gorm:"column:is_processed"`
+	Reason      string `gorm:"column:reason"`
 }
 
 func (Complaint) TableName() string {
