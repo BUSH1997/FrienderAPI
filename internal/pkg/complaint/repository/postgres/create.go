@@ -16,6 +16,7 @@ func (r complaintRepository) Create(ctx context.Context, complaint models.Compla
 	dbComplaint := db_models.Complaint{
 		TimeCreated: time.Now().Unix(),
 		IsProcessed: false,
+		Reason:      complaint.Reason,
 	}
 
 	var dbInitiator db_models.User
