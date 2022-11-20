@@ -138,6 +138,9 @@ func (vk VKApi) UploadPhotosOnUriServer(files []*multipart.FileHeader, uriUpload
 		}
 
 		if i != 0 && (i%10 == 4 || i%10 == 9) || i == len(files)-1 {
+			fmt.Println(w)
+			w.Close()
+
 			resp, err := http.Post(uriUploadServer, w.FormDataContentType(), b)
 			if err != nil {
 				fmt.Println(err)
@@ -158,7 +161,6 @@ func (vk VKApi) UploadPhotosOnUriServer(files []*multipart.FileHeader, uriUpload
 		}
 	}
 	fmt.Println(res)
-	w.Close()
 
 	return res, nil
 }
