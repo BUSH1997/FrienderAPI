@@ -55,11 +55,11 @@ func (h *ImageHandler) UploadImageAlbum(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusBadRequest, convert.DeliveryError(err).Error())
 	}
 
-	idsPhotoVk, err := h.useCase.UploadImageAlbum(ctx, form)
+	respFromVk, err := h.useCase.UploadImageAlbum(ctx, form)
 	if err != nil {
 		h.logger.WithCtx(ctx).WithError(err).Errorf("error upload images")
 		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
-	return echoCtx.JSON(http.StatusOK, idsPhotoVk)
+	return echoCtx.JSON(http.StatusOK, respFromVk)
 }

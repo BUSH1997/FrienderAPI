@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type VKApi struct {
@@ -109,6 +110,57 @@ func (vk VKApi) UploadPhotoOnUriServer(file *multipart.FileHeader, uriServerUplo
 	}
 
 	return jsonResp, nil
+}
+
+func (vk VKApi) UploadPhotosOnUriServer(files []*multipart.FileHeader, uriUploadServer string) ([]interface{}, error) {
+	b := new(bytes.Buffer)
+	w := multipart.NewWriter(b)
+
+	var res []interface{}
+
+	for i := 0; i < len(files); i++ {
+		field, err := w.CreateFormFile("file"+strconv.Itoa(i+1), file_for_upload)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fileOpend, err := files[i].Open()
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(fileOpend)
+
+		field.Write(buf.Bytes())
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		if i != 0 && (i%10 == 4 || i%10 == 9) || i == len(files)-1 {
+			resp, err := http.Post(uriUploadServer, w.FormDataContentType(), b)
+			if err != nil {
+				fmt.Println(err)
+			}
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Println(err)
+				return res, err
+			}
+
+			var jsonResp interface{}
+			err = json.Unmarshal(body, &jsonResp)
+			if err != nil {
+				return res, err
+			}
+
+			res = append(res, jsonResp)
+		}
+	}
+
+	w.Close()
+
+	return res, nil
 }
 
 func (vk VKApi) GetUploadServer(param UploadPhotoParam) (string, error) {
