@@ -157,7 +157,7 @@ func (vk VKApi) UploadPhotosOnUriServer(files []*multipart.FileHeader, uriUpload
 			res = append(res, jsonResp)
 		}
 	}
-
+	fmt.Println(res)
 	w.Close()
 
 	return res, nil
