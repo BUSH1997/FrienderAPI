@@ -119,7 +119,7 @@ func (vk VKApi) UploadPhotosOnUriServer(files []*multipart.FileHeader, uriUpload
 	var res []interface{}
 
 	for i := 0; i < len(files); i++ {
-		field, err := w.CreateFormFile("file"+strconv.Itoa(i+1), file_for_upload)
+		field, err := w.CreateFormFile("file"+strconv.Itoa(i+1), files[i].Filename)
 		if err != nil {
 			fmt.Println(err)
 		}
