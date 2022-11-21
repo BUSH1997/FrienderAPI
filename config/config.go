@@ -7,6 +7,7 @@ import (
 	postgreslib "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres"
 	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
+	userUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/user/usecase"
 	"github.com/spf13/viper"
 )
 
@@ -31,6 +32,7 @@ type Config struct {
 	BlackList []string             `mapstructure:"blacklist"`
 	SkipList  []string             `mapstructure:"skiplist"`
 	Logger    hardlogger.Config    `mapstructure:"logger"`
+	Auth      userUsecase.Config   `mapstructure:"auth"`
 }
 
 func LoadConfig(config *Config, path string) error {

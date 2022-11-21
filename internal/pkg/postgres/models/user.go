@@ -12,3 +12,14 @@ type User struct {
 func (User) TableName() string {
 	return "users"
 }
+
+type AuthUser struct {
+	ID           uint   `gorm:"column:id"`
+	UID          int64  `gorm:"column:uid"`
+	RefreshToken string `gorm:"column:refresh_token"`
+	FingerPrint  string `gorm:"column:fingerprint"`
+}
+
+func (AuthUser) TableName() string {
+	return "auth"
+}

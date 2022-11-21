@@ -174,6 +174,13 @@ create table complaints(
                            constraint initiator_item_uid unique (initiator, item, item_uid)
 );
 
+create table auth(
+                     id serial primary key,
+                     uid int,
+                     refresh_token varchar(256),
+                     fingerprint varchar(256)
+);
+
 insert into categories(name) values ('Концерт'), ('Выставка'), ('Кино'), ('Экскурсия'), ('Спорт'), ('Театр'), ('Шоу'),
                                     ('Мастер-класс'), ('Бизнес'), ('It'), ('Воркшоп'), ('Флешмоб'), ('Другое');
 insert into conditions(created_events, visited_events) values (0, 0);

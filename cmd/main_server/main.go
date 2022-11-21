@@ -30,6 +30,9 @@ import (
 	searchPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/search/repository/postgres"
 	httplib "github.com/BUSH1997/FrienderAPI/internal/pkg/tools/http"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
+	userHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/user/delivery/http"
+	userPostgres "github.com/BUSH1997/FrienderAPI/internal/pkg/user/repository/postgres"
+	userUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/user/usecase"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/vk_api"
 	"github.com/labstack/echo/v4"
 	"log"
@@ -103,6 +106,10 @@ func main() {
 	complaintUseCase := complaintUsecase.New(complaintRepo, logger)
 	complaintHandler := complaintHandler.NewComplaintHandler(complaintUseCase, logger)
 
+	userRepo := userPostgres.New(db, logger)
+	userUseCase := userUsecase.New(userRepo, configApp.Auth, logger)
+	userHandler := userHandler.NewUserHandler(userUseCase, configApp.Auth.AuthSignSecret, logger)
+
 	serverRouting := configRouting.ServerConfigRouting{
 		EventHandler:     eventHandler,
 		ImageHandler:     imageHandler,
@@ -110,10 +117,11 @@ func main() {
 		GroupHandler:     groupHandler,
 		ChatHandler:      chatHandler,
 		ComplaintHandler: complaintHandler,
+		AuthHandler:      userHandler,
 	}
 
 	configValidator.ConfigValidator(router)
-	configMiddleware.ConfigMiddleware(router, profileRepo, logger)
+	configMiddleware.ConfigMiddleware(router, profileRepo, userUseCase, configApp.Auth, logger)
 	serverRouting.ConfigRouting(router)
 
 	router.Logger.Fatal(router.Start("localhost:8090"))

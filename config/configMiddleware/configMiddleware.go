@@ -4,6 +4,8 @@ import (
 	custommiddleware "github.com/BUSH1997/FrienderAPI/cmd/main_server/middleware"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/profile"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
+	"github.com/BUSH1997/FrienderAPI/internal/pkg/user"
+	userUsecase "github.com/BUSH1997/FrienderAPI/internal/pkg/user/usecase"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
@@ -26,11 +28,12 @@ func GetCORSConfigStruct() middleware.CORSConfig {
 	}
 }
 
-func ConfigMiddleware(router *echo.Echo, profileRepository profile.Repository, logger hardlogger.Logger) {
+func ConfigMiddleware(router *echo.Echo, profileRepository profile.Repository, userUseCase user.UseCase, authConfig userUsecase.Config, logger hardlogger.Logger) {
 	router.Use(
 		middleware.CORSWithConfig(GetCORSConfigStruct()),
-		custommiddleware.Auth(logger),
+		custommiddleware.UserID(logger),
 		custommiddleware.CreateUser(profileRepository, logger),
 		custommiddleware.RequestID(),
+		custommiddleware.CheckSession(logger, userUseCase, authConfig),
 	)
 }

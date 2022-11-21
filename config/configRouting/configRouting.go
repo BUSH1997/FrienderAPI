@@ -7,6 +7,7 @@ import (
 	group "github.com/BUSH1997/FrienderAPI/internal/pkg/group/delivery/http"
 	image "github.com/BUSH1997/FrienderAPI/internal/pkg/image/delivery/http"
 	profileHandler "github.com/BUSH1997/FrienderAPI/internal/pkg/profile/delivery/http"
+	user "github.com/BUSH1997/FrienderAPI/internal/pkg/user/delivery/http"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,6 +18,7 @@ type ServerConfigRouting struct {
 	GroupHandler     *group.GroupHandler
 	ChatHandler      *chat.ChatHandler
 	ComplaintHandler *complaint.ComplaintHandler
+	AuthHandler      *user.UserHandler
 }
 
 func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
@@ -50,4 +52,5 @@ func (sc *ServerConfigRouting) ConfigRouting(router *echo.Echo) {
 	router.PUT("event/album", sc.EventHandler.UpdateAlbum)
 	router.POST("event/album/upload", sc.ImageHandler.UploadImageAlbum)
 	router.PUT("complaint", sc.ComplaintHandler.Create)
+	router.POST("auth", sc.AuthHandler.Auth)
 }

@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func Auth(logger hardlogger.Logger) echo.MiddlewareFunc {
+func UserID(logger hardlogger.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(context echo.Context) error {
 			for k, v := range context.Request().Header {
@@ -20,7 +20,6 @@ func Auth(logger hardlogger.Logger) echo.MiddlewareFunc {
 			var userIDString string
 
 			path := context.Path()
-			// logger.Println(path)
 			if strings.Contains(path, "ws/") {
 				userIDString = context.QueryParam("user_id")
 			} else {
