@@ -9,6 +9,14 @@ func (r eventRepository) GetAll(ctx context.Context, params models.GetEventParam
 	return r.events.GetAll(ctx, params)
 }
 
+func (r eventRepository) CheckIfExists(ctx context.Context, event models.Event) (bool, error) {
+	return r.events.CheckIfExists(ctx, event)
+}
+
+func (r eventRepository) GetCountEvents(ctx context.Context, typeEvents string) (int64, error) {
+	return r.events.GetCountEvents(ctx, typeEvents)
+}
+
 func (r eventRepository) GetEventById(ctx context.Context, id string) (models.Event, error) {
 	return r.events.GetEventById(ctx, id)
 }

@@ -22,4 +22,6 @@ type Repository interface {
 	Delete(ctx context.Context, event string, groupInfo models.GroupInfo) error
 	AddAlbum(ctx context.Context, eventUid string, albumUid string) error
 	DeleteAlbum(ctx context.Context, eventUid string, albumUid string) error
+	CheckIfExists(ctx context.Context, event models.Event) (bool, error)
+	GetCountEvents(ctx context.Context, typeEvents string) (int64, error)
 }

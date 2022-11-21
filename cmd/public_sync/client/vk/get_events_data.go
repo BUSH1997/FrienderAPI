@@ -50,6 +50,21 @@ type VKEventsData struct {
 	downloadLimitBytes int64
 }
 
+type PhotoSize struct {
+	Height int    `json:"height"`
+	Type   string `json:"type"`
+	Width  int    `json:"width"`
+	Url    string `json:"url"`
+}
+
+type Photo struct {
+	Sizes []PhotoSize `json:"sizes"`
+}
+
+type CropPhoto struct {
+	Photo Photo `json:"photo"`
+}
+
 type VKEventData struct {
 	ID           int64     `json:"id,omitempty"`
 	Name         string    `json:"name,omitempty"`
@@ -57,6 +72,7 @@ type VKEventData struct {
 	Description  string    `json:"description,omitempty"`
 	IsClosed     int       `json:"is_closed,omitempty"`
 	Addresses    Addresses `json:"addresses"`
+	CropPhoto    CropPhoto `json:"crop_photo"`
 	Type         string    `json:"type,omitempty"`
 	IsAdmin      int       `json:"is_admin,omitempty"`
 	IsMember     int       `json:"is_member,omitempty"`

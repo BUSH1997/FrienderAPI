@@ -520,3 +520,38 @@ func (r eventRepository) GetGroupEvents(ctx context.Context, params models.GetEv
 
 	return ret, nil
 }
+
+func (r eventRepository) CheckIfExists(ctx context.Context, event models.Event) (bool, error) {
+	ctx = r.logger.WithCaller(ctx)
+
+	eventExist := true
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var dbEvent db_models.Event
+		res := r.db.Take(&dbEvent, "title = ? and description = ?", event.Title, event.Description)
+		if err := res.Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			eventExist = false
+			return nil
+		}
+		if err := res.Error; err != nil {
+			return errors.Wrap(err, "failed to get user by id")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return false, errors.Wrap(err, "failed to make transaction")
+	}
+
+	return eventExist, nil
+}
+
+func (r eventRepository) GetCountEvents(ctx context.Context, typeEvents string) (int64, error) {
+	var dbEvent db_models.Event
+	var count int64
+	res := r.db.Model(&dbEvent).Where("source = ?", typeEvents).Count(&count)
+	if err := res.Error; err != nil {
+		return 0, errors.Wrap(err, "Failed to get count events by type")
+	}
+
+	return count, nil
+}

@@ -26,4 +26,6 @@ type Usecase interface {
 	Change(ctx context.Context, event models.Event) error
 	GetAllCategories(ctx context.Context) ([]string, error)
 	UpdateAlbum(ctx context.Context, updateInfo models.UpdateAlbumInfo) error
+	CheckIfExists(ctx context.Context, event models.Event) (bool, error)
+	GetCountEvents(ctx context.Context, typeEvents string) (int64, error)
 }

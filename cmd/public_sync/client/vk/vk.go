@@ -103,21 +103,58 @@ func (c HTTPVKClient) GetCountPublicEventsWithSyncData(ctx context.Context, data
 	return respEvents.VKEvents.VKEventsResponse.Count, nil
 }
 
+func (c HTTPVKClient) GetGroupsByIds(ctx context.Context, data client.SyncData, uuids []string) error {
+	getVKEventsDataURL := data.GetURLs()[1]
+	getVKEventsDataFormData := data.GetFormData()[1]
+
+	getVKEventsDataFormData["group_ids"] = strings.Join(uuids, ",")
+
+	respEventsData := GetEventsDataResponse{
+		downloadLimitBytes: c.config.DownloadLimitBytes,
+	}
+	err := c.client.PerformRequest(ctx, GetRequestWithBody{
+		GetRequest: GetRequest{
+			RequestURL: getVKEventsDataURL,
+		},
+		FormData: getVKEventsDataFormData,
+	}, &respEventsData)
+	if err != nil {
+		return errors.Wrap(err, "failed to perform request for events data to vk api")
+	}
+
+	return nil
+}
+
 func convertEventsToModel(vkEvents []VKEventData, eventsInfo EventInfo) []models.Event {
 	events := make([]models.Event, 0, len(vkEvents))
 	for _, vkEvent := range vkEvents {
+		var avatar models.Avatar
+		avatar.AvatarVkId = "0"
+		if vkEvent.CropPhoto.Photo.Sizes == nil {
+			avatar.AvatarUrl = vkEvent.Photo200
+		} else {
+			indexLargestPhoto := 0
+			maxHeightWidth := 0
+			for i, v := range vkEvent.CropPhoto.Photo.Sizes {
+				if v.Height+v.Width > maxHeightWidth {
+					maxHeightWidth = v.Height + v.Width
+					indexLargestPhoto = i
+				}
+			}
+
+			avatar.AvatarUrl = vkEvent.CropPhoto.Photo.Sizes[indexLargestPhoto].Url
+		}
+
 		event := models.Event{
 			Uid:         strconv.Itoa(int(vkEvent.ID)),
 			Title:       vkEvent.Name,
 			StartsAt:    vkEvent.StartDate,
 			IsPublic:    true,
 			Description: vkEvent.Description,
-			Images:      []string{vkEvent.Photo200},
+			Images:      []string{avatar.AvatarUrl},
 			Category:    models.Category(eventsInfo.Category),
 			Source:      eventsInfo.Source,
-			Avatar: models.Avatar{
-				AvatarUrl:  vkEvent.Photo200,
-				AvatarVkId: "0"},
+			Avatar:      avatar,
 			GeoData: models.Geo{
 				Latitude:  vkEvent.Place.Latitude,
 				Longitude: vkEvent.Place.Longitude,

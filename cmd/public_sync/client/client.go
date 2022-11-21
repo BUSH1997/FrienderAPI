@@ -8,6 +8,7 @@ import (
 type PublicEventsClient interface {
 	UploadPublicEvents(ctx context.Context, syncData SyncData) ([]models.Event, error)
 	GetCountPublicEventsWithSyncData(ctx context.Context, data SyncData) (int, error)
+	GetGroupsByIds(ctx context.Context, data SyncData, uuids []string) error
 }
 
 type SyncData interface {

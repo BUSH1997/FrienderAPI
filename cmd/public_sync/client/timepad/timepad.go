@@ -50,6 +50,10 @@ func (c HTTPTimePadClient) GetCountPublicEventsWithSyncData(ctx context.Context,
 	return 100, nil
 }
 
+func (c HTTPTimePadClient) GetGroupsByIds(ctx context.Context, data client.SyncData, uuids []string) error {
+	return nil
+}
+
 func convertEventsToModes(data PublicEventsData) []models.Event {
 	events := make([]models.Event, 0, len(data.Values))
 	for _, value := range data.Values {

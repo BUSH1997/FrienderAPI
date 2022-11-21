@@ -187,6 +187,18 @@ func (uc eventUsecase) GetSearch(ctx context.Context, params models.GetEventPara
 	return events, nil
 }
 
+func (uc eventUsecase) CheckIfExists(ctx context.Context, event models.Event) (bool, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
+	return uc.Events.CheckIfExists(ctx, event)
+}
+
+func (uc eventUsecase) GetCountEvents(ctx context.Context, typeEvents string) (int64, error) {
+	ctx = uc.logger.WithCaller(ctx)
+
+	return uc.Events.GetCountEvents(ctx, typeEvents)
+}
+
 func Filter(events []models.Event, sources []string) []models.Event {
 	if len(sources) == 0 {
 		return events

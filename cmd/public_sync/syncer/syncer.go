@@ -37,26 +37,29 @@ type Syncer interface {
 }
 
 type SyncManager struct {
-	Config     SyncerConfig
-	Logger     hardlogger.Logger
-	Syncers    []Syncer
-	Events     event.Usecase
-	Repository syncer.Repository
+	Config       SyncerConfig
+	Logger       hardlogger.Logger
+	Syncers      []Syncer
+	SyncerUpdate Syncer
+	Events       event.Usecase
+	Repository   syncer.Repository
 }
 
 func New(
 	config SyncerConfig,
 	logger hardlogger.Logger,
 	syncers []Syncer,
+	syncerUpdate Syncer,
 	usecase event.Usecase,
 	repository syncer.Repository,
 ) SyncManager {
 	return SyncManager{
-		Config:     config,
-		Logger:     logger,
-		Syncers:    syncers,
-		Events:     usecase,
-		Repository: repository,
+		Config:       config,
+		Logger:       logger,
+		Syncers:      syncers,
+		SyncerUpdate: syncerUpdate,
+		Events:       usecase,
+		Repository:   repository,
 	}
 }
 
@@ -79,6 +82,16 @@ func (s SyncManager) RunPublicSync() {
 		err = s.syncPublicEvents(ctx)
 		if err != nil {
 			s.Logger.Errorf("failed to process sync with error: %s", err.Error())
+
+			err = s.Repository.Update(ctx, time.Now().Add(-s.Config.ResyncDelayAfterFail))
+			if err != nil {
+				s.Logger.Errorf("failed to update sync after fail with error: %s", err.Error())
+			}
+		}
+
+		err = s.updatePublicEvents(ctx)
+		if err != nil {
+			s.Logger.Errorf("failed to process updateEvents sync with error: %s", err.Error())
 
 			err = s.Repository.Update(ctx, time.Now().Add(-s.Config.ResyncDelayAfterFail))
 			if err != nil {
@@ -114,12 +127,7 @@ func (s SyncManager) syncPublicEvents(ctx context.Context) error {
 				return errors.Wrap(err, "failed to upload public events")
 			}
 
-			existingEvents, err := s.Events.GetAllPublic(ctx)
-			if err != nil {
-				return errors.Wrap(err, "failed to get existing events")
-			}
-
-			newEvents, changedEvents := getEventsToImport(existingEvents, externalEvents)
+			newEvents, err := s.filterExistEvents(ctx, externalEvents)
 
 			for _, newEvent := range newEvents {
 				if err != nil {
@@ -137,13 +145,6 @@ func (s SyncManager) syncPublicEvents(ctx context.Context) error {
 				}
 			}
 
-			for _, changedEvent := range changedEvents {
-				err = s.Events.Update(ctx, changedEvent)
-				if err != nil {
-					return errors.Wrapf(err, "failed to update public event, uid: %d", changedEvent.Uid)
-				}
-			}
-
 			currentItem += 100
 		}
 
@@ -151,6 +152,50 @@ func (s SyncManager) syncPublicEvents(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (s SyncManager) updatePublicEvents(ctx context.Context) error {
+	countEvents, err := s.Events.GetCountEvents(ctx, models.SOURCE_EVENT_VK)
+	if err != nil {
+		return err
+	}
+
+	for i := int64(0); i < countEvents; i = i + 100 {
+		param := models.GetEventParams{
+			Source: models.SOURCE_EVENT_VK,
+			Page:   int(i / 100),
+			Limit:  100,
+		}
+
+		events, err := s.Events.Get(ctx, param)
+		if err != nil {
+			return err
+		}
+
+		var uuids []string
+		for _, value := range events {
+			uuids = append(uuids, value.Uid)
+		}
+
+		s.SyncerUpdate.Client().GetGroupsByIds(ctx, s.SyncerUpdate.SyncData(), uuids)
+	}
+
+	return nil
+}
+
+func (s SyncManager) filterExistEvents(ctx context.Context, externalEvents []models.Event) ([]models.Event, error) {
+	var newEvents []models.Event
+	for _, v := range externalEvents {
+		isExist, err := s.Events.CheckIfExists(ctx, v)
+		if err != nil {
+			return []models.Event{}, err
+		}
+		if !isExist {
+			newEvents = append(newEvents, v)
+		}
+	}
+
+	return newEvents, nil
 }
 
 func getEventsToImport(existingEvents []models.Event, externalEvents []models.Event) ([]models.Event, []models.Event) {

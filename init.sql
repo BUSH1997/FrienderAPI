@@ -1,22 +1,22 @@
-drop table subscribe_profile_sharing cascade;
-drop table revindex_words cascade;
-drop table revindex_events cascade;
-drop table unlocked_awards cascade;
-drop table complaints cascade;
-drop type item;
-drop table messages cascade;
-drop table awards cascade;
-drop table unlocked_statuses cascade;
-drop table subscribe_sharings cascade;
-drop table groups_events_sharing cascade;
-drop table groups cascade;
-drop table event_sharings cascade;
-drop table events cascade;
-drop table users cascade;
-drop table statuses cascade;
-drop table conditions cascade;
-drop table categories cascade;
-drop table syncer cascade;
+drop table if exists subscribe_profile_sharing cascade;
+drop table if exists revindex_words cascade;
+drop table if exists revindex_events cascade;
+drop table if exists unlocked_awards cascade;
+drop table if exists complaints cascade;
+drop type  if exists item;
+drop table if exists messages cascade;
+drop table if exists awards cascade;
+drop table if exists unlocked_statuses cascade;
+drop table if exists subscribe_sharings cascade;
+drop table if exists groups_events_sharing cascade;
+drop table if exists groups cascade;
+drop table if exists event_sharings cascade;
+drop table if exists events cascade;
+drop table if exists users cascade;
+drop table if exists statuses cascade;
+drop table if exists conditions cascade;
+drop table if exists categories cascade;
+drop table if exists syncer cascade;
 
 
 create table categories(
