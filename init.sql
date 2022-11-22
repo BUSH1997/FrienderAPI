@@ -67,7 +67,7 @@ create table events(
                        photos text,
                        members_limit int,
                        source varchar(256),
-                       ticket varchar(256),
+                       ticket text,
                        forks int[],
                        albums varchar(64)[],
                        last_message_created_at bigserial,
