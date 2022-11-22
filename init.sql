@@ -170,7 +170,8 @@ create table complaints(
                            item_uid varchar(256),
                            time_created bigint,
                            is_processed bool,
-                           reason text
+                           reason text,
+                           constraint initiator_item_uid unique (initiator, item, item_uid)
 );
 
 insert into categories(name) values ('Концерт'), ('Выставка'), ('Кино'), ('Экскурсия'), ('Спорт'), ('Театр'), ('Шоу'),
