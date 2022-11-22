@@ -8,6 +8,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -41,7 +42,7 @@ func (r profileRepository) GetOneProfile(ctx context.Context, userID int64) (mod
 	var dbComplaint db_models.Complaint
 	res = r.db.Model(&db_models.Complaint{}).
 		Where("item = ?", "user").
-		Where("item_uid = ?", userID).
+		Where("item_uid = ?", strconv.Itoa(int(userID))).
 		Where("initiator = ?", dbInitiator.ID).
 		Take(&dbComplaint)
 	if err := res.Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -204,7 +205,7 @@ func (r profileRepository) getUserCurrentStatus(ctx context.Context, id int64) (
 	}
 
 	var dbStatus db_models.Status
-	res = r.db.Take(&dbStatus, "user_id = ?", dbUser.ID)
+	res = r.db.Take(&dbStatus, "id = ?", dbUser.CurrentStatus)
 	if err := res.Error; err != nil {
 		return models.Status{}, errors.Wrapf(err, "failed to get status")
 	}
