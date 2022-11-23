@@ -218,11 +218,19 @@ func (r eventRepository) UnSubscribe(ctx context.Context, event string, user int
 			return errors.Wrapf(err, "failed to update event members count")
 		}
 
-		res = r.db.Model(&db_models.Event{}).
-			Where("id = ?", dbEvent.ID).
-			Update("blacklist", gorm.Expr("array_append(events.blacklist, ?)", user))
+		var dbOwner db_models.User
+		res = r.db.Take(&dbOwner, "id = ?", dbEvent.Owner)
 		if err := res.Error; err != nil {
-			return errors.Wrapf(err, "failed to update event blacklist")
+			return errors.Wrap(err, "failed to get owner")
+		}
+
+		if user != contextlib.GetUser(ctx) && user != int64(dbOwner.Uid) {
+			res = r.db.Model(&db_models.Event{}).
+				Where("id = ?", dbEvent.ID).
+				Update("blacklist", gorm.Expr("array_append(events.blacklist, ?)", user))
+			if err := res.Error; err != nil {
+				return errors.Wrapf(err, "failed to update event blacklist")
+			}
 		}
 
 		return nil
