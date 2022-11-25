@@ -36,6 +36,15 @@ func (r profileRepository) Create(ctx context.Context, user int64, isGroup bool)
 			return errors.Wrapf(err, "failed to create unlocked status for user")
 		}
 
+		dbUAuth := db_models.AuthUser{
+			UID: user,
+		}
+
+		res = r.db.Create(&dbUAuth)
+		if err := res.Error; err != nil {
+			return errors.Wrapf(err, "failed to create auth user")
+		}
+
 		return nil
 	})
 	if err != nil {
