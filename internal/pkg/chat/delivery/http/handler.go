@@ -113,22 +113,20 @@ func (ch *ChatHandler) ProcessMessage(echoCtx echo.Context) error {
 
 	user := context.GetUser(ctx)
 
-	ch.messenger.Chat.Mx.Lock()
+	if !ch.messenger.HasChat(eventID) {
+		ch.messenger.AppendChat(eventID)
+	}
 
-	ch.messenger.Chat.Clients = append(ch.messenger.Chat.Clients, &chat.Client{
-		Socket: ws,
-		UserID: user,
-	})
-
-	fmt.Printf("client %d connected\n", user)
-
-	ch.messenger.Chat.Mx.Unlock()
+	ch.messenger.AppendClientToChat(eventID, ws, user)
 
 	defer func() {
-		ws.Close()
-		ch.messenger.Chat.Mx.Lock()
-		ch.messenger.Chat.Clients = remove(ch.messenger.Chat.Clients, user)
-		ch.messenger.Chat.Mx.Unlock()
+		err := ws.Close()
+		if err != nil {
+			ch.logger.WithCtx(ctx).WithError(err).Error("failed to close message from socket")
+			return // TODO:
+		}
+
+		ch.messenger.RemoveClientFromChat(eventID, user)
 	}()
 
 	for {
@@ -156,13 +154,13 @@ func (ch *ChatHandler) ProcessMessage(echoCtx echo.Context) error {
 			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to unmarshal json message").Error())
 		}
 
-		for _, client := range ch.messenger.Chat.Clients {
+		for _, client := range ch.messenger.Chats[eventID].Clients {
 			fmt.Printf("write to client %d message: %s \n", client.UserID, msg)
 
 			err := client.Socket.WriteMessage(websocket.TextMessage, jsonMessage)
 			if err != nil {
 				ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to write message to %d", client.UserID)
-				ch.messenger.Chat.Clients = remove(ch.messenger.Chat.Clients, user)
+				ch.messenger.RemoveClientFromChat(eventID, user)
 				continue
 			}
 
@@ -173,16 +171,4 @@ func (ch *ChatHandler) ProcessMessage(echoCtx echo.Context) error {
 			}
 		}
 	}
-}
-
-func remove(clients []*chat.Client, uid int64) []*chat.Client {
-	for i, client := range clients {
-		if client.UserID != uid {
-			continue
-		}
-
-		return append(clients[:i], clients[i+1:]...)
-	}
-
-	return nil
 }

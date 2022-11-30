@@ -12,8 +12,8 @@ postgres:
   host: localhost
   port: 5432
   dbname: friender
-  user: s.kust
-  password: 12345
+  user: postgres
+  password: 1234
 transport:
   timepad:
     download_limit_bytes: 2000000000
