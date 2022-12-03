@@ -14,7 +14,7 @@ func (r searchRepository) GetEventUIDs(ctx context.Context, terms []string) ([]s
 	for _, term := range terms {
 		var dbRevindexWord db_models.RevindexWord
 		res := r.db.Model(&db_models.RevindexWord{}).
-			Where("word = ?", term).
+			Where("word LIKE ?", "%"+term+"%").
 			Take(&dbRevindexWord)
 		if err := res.Error; err == gorm.ErrRecordNotFound {
 			return nil, nil
