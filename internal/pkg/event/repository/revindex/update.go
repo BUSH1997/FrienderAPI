@@ -5,6 +5,7 @@ import (
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
+	"strconv"
 	"strings"
 )
 
@@ -54,8 +55,8 @@ func (r eventRepository) updateRevindex(newTitle string, oldTitle string, uid st
 		return errors.Wrap(err, "failed to get stammers from title")
 	}
 
-	for _, term := range newTerms {
-		err := r.createOrUpdateRevindex(term, int64(dbRevindexEvent.ID))
+	for i, term := range newTerms {
+		err := r.createOrUpdateRevindex(term, int64(dbRevindexEvent.ID), i)
 		if err != nil {
 			return errors.Wrapf(err, "failed to update revindex with event %s for term %s", uid, term)
 		}
@@ -64,9 +65,10 @@ func (r eventRepository) updateRevindex(newTitle string, oldTitle string, uid st
 	return nil
 }
 
-func getEventIDPosition(eventIDs []int64, ID int64) int {
-	for i, oldEventID := range eventIDs {
-		if oldEventID == ID {
+func getEventIDPosition(eventIDsWithPosition []string, ID int64) int {
+	for i, eventIDWithPosition := range eventIDsWithPosition {
+		eventID, _ := strconv.ParseInt(strings.Split(eventIDWithPosition, ":")[0], 10, 64)
+		if eventID == ID {
 			return i
 		}
 	}

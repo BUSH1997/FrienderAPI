@@ -147,7 +147,7 @@ create table messages(
 create table revindex_words(
                                id serial primary key,
                                word varchar(256) UNIQUE,
-                               events int[]
+                               events text[]
 );
 
 create table revindex_events(

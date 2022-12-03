@@ -2,12 +2,14 @@ package revindex
 
 import (
 	"context"
+	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/stammer"
 	"github.com/lib/pq"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -27,8 +29,8 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 		return errors.Wrap(err, "failed to create revindex event")
 	}
 
-	for _, term := range terms {
-		err := r.createOrUpdateRevindex(term, int64(dbRevindexEvent.ID))
+	for i, term := range terms {
+		err := r.createOrUpdateRevindex(term, int64(dbRevindexEvent.ID), i)
 		if err != nil {
 			return errors.Wrapf(err, "failed to create or update revindex for term %s", term)
 		}
@@ -42,7 +44,7 @@ func (r eventRepository) Create(ctx context.Context, event models.Event) error {
 	return nil
 }
 
-func (r eventRepository) createOrUpdateRevindex(term string, ID int64) error {
+func (r eventRepository) createOrUpdateRevindex(term string, ID int64, termPosition int) error {
 	var dbRevindexWords []db_models.RevindexWord
 
 	res := r.db.Model(db_models.RevindexWord{}).
@@ -56,7 +58,7 @@ func (r eventRepository) createOrUpdateRevindex(term string, ID int64) error {
 	if len(dbRevindexWords) == 0 {
 		dbRevindexWord := db_models.RevindexWord{
 			Word:   term,
-			Events: pq.Int64Array{ID},
+			Events: pq.StringArray{fmt.Sprintf("%d:%d", ID, termPosition)},
 		}
 
 		res := r.db.Create(&dbRevindexWord)
@@ -67,7 +69,7 @@ func (r eventRepository) createOrUpdateRevindex(term string, ID int64) error {
 		return nil
 	}
 
-	err := r.updateRevindexWord(term, dbRevindexWords[0].Events, ID)
+	err := r.updateRevindexWord(term, dbRevindexWords[0].Events, ID, termPosition)
 	if err != nil {
 		return errors.Wrap(err, "failed to update revindex word")
 	}
@@ -75,15 +77,23 @@ func (r eventRepository) createOrUpdateRevindex(term string, ID int64) error {
 	return nil
 }
 
-func (r eventRepository) updateRevindexWord(term string, eventIDs []int64, ID int64) error {
-	eventIDList := append(eventIDs, ID)
-	sort.Slice(eventIDList, func(i, j int) bool {
-		return eventIDList[i] < eventIDList[j]
+func (r eventRepository) updateRevindexWord(
+	term string,
+	eventIDsWithPositions []string,
+	ID int64,
+	termPosition int,
+) error {
+	eventIDWithPositionsList := append(eventIDsWithPositions, fmt.Sprintf("%d:%d", ID, termPosition))
+	sort.Slice(eventIDWithPositionsList, func(i, j int) bool {
+		first, _ := strconv.ParseInt(strings.Split(eventIDWithPositionsList[i], ":")[0], 10, 64)
+		second, _ := strconv.ParseInt(strings.Split(eventIDWithPositionsList[j], ":")[0], 10, 64)
+
+		return first < second
 	})
 
 	res := r.db.Model(&db_models.RevindexWord{}).
 		Where("word = ?", term).
-		Update("events", pq.Int64Array(eventIDList))
+		Update("events", pq.StringArray(eventIDWithPositionsList))
 
 	if err := res.Error; err != nil {
 		return errors.Wrap(err, "failed to update revindex word in db")
