@@ -8,10 +8,19 @@ type Chat struct {
 }
 
 type Message struct {
+	MessageID   string `json:"message_id,omitempty"`
 	UserID      int64  `json:"user_id,omitempty"`
 	EventID     string `json:"event_id,omitempty"`
 	Text        string `json:"text,omitempty"`
+	Type        string `json:"type,omitempty"`
 	TimeCreated int64  `json:"time_created,omitempty"`
+	Error       string `json:"error,omitempty"`
+}
+
+type MessageInput struct {
+	Type      string `json:"type,omitempty"`
+	Value     string `json:"value,omitempty"`
+	MessageID string `json:"message_id,omitempty"`
 }
 
 type GetMessageOpts struct {

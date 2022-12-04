@@ -10,4 +10,5 @@ type Usecase interface {
 	GetChats(ctx context.Context) ([]models.Chat, error)
 	GetMessages(ctx context.Context, opts models.GetMessageOpts) ([]models.Message, error)
 	UpdateLastCheckTime(ctx context.Context, event string, user int64, time int64) error
+	DeleteMessage(ctx context.Context, messageID string) error
 }

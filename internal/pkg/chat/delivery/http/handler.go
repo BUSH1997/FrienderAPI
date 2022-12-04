@@ -1,14 +1,15 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/BUSH1997/FrienderAPI/internal/api/errors/convert"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/chat"
-	"github.com/BUSH1997/FrienderAPI/internal/pkg/context"
+	contextlib "github.com/BUSH1997/FrienderAPI/internal/pkg/context"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/logger/hardlogger"
+	"github.com/gofrs/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -85,7 +86,7 @@ func (ch *ChatHandler) GetMessages(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
-	user := context.GetUser(ctx)
+	user := contextlib.GetUser(ctx)
 	err = ch.useCase.UpdateLastCheckTime(ctx, opts.EventID, user, time.Now().Unix())
 	if err != nil {
 		ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to update last check time for %d", user)
@@ -111,7 +112,7 @@ func (ch *ChatHandler) ProcessMessage(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
 	}
 
-	user := context.GetUser(ctx)
+	user := contextlib.GetUser(ctx)
 
 	if !ch.messenger.HasChat(eventID) {
 		ch.messenger.AppendChat(eventID)
@@ -130,45 +131,108 @@ func (ch *ChatHandler) ProcessMessage(echoCtx echo.Context) error {
 	}()
 
 	for {
-		mt, msg, err := ws.ReadMessage()
-		if err != nil || mt == websocket.CloseMessage {
-			ch.logger.WithCtx(ctx).WithError(err).Error("failed to read message from socket")
-			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to read message").Error())
-		}
-
-		message := models.Message{
-			UserID:      user,
-			EventID:     eventID,
-			Text:        string(msg),
-			TimeCreated: time.Now().Unix(),
-		}
-
-		err = ch.useCase.CreateMessage(ctx, message)
+		msg := models.MessageInput{}
+		err = ws.ReadJSON(&msg)
 		if err != nil {
-			ch.logger.WithCtx(ctx).WithError(err).Error("failed to create message")
-			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to create message").Error())
+			ch.logger.WithCtx(ctx).WithError(err).Error("failed to read json message from websocket")
+			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to read json message from websocket").Error())
 		}
 
-		jsonMessage, err := json.Marshal(&message)
+		err = ch.routeProcessMessage(ctx, msg, user, eventID)
 		if err != nil {
-			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrap(err, "failed to unmarshal json message").Error())
-		}
-
-		for _, client := range ch.messenger.Chats[eventID].Clients {
-			fmt.Printf("write to client %d message: %s \n", client.UserID, msg)
-
-			err := client.Socket.WriteMessage(websocket.TextMessage, jsonMessage)
-			if err != nil {
-				ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to write message to %d", client.UserID)
-				ch.messenger.RemoveClientFromChat(eventID, user)
-				continue
-			}
-
-			err = ch.useCase.UpdateLastCheckTime(ctx, eventID, client.UserID, time.Now().Unix())
-			if err != nil {
-				ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to update last check time for %d", client.UserID)
-				return echoCtx.JSON(http.StatusInternalServerError, convert.DeliveryError(err).Error())
-			}
+			ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to process message, type %s", msg.Type)
+			return echoCtx.JSON(http.StatusInternalServerError, errors.Wrapf(err, "failed to process message, , type %s", msg.Type).Error())
 		}
 	}
+}
+
+func (ch *ChatHandler) routeProcessMessage(ctx context.Context, msg models.MessageInput, user int64, event string) error {
+	if msg.Type == chat.CreateTextMessage {
+		return ch.sendTextMessage(ctx, msg, user, event)
+	}
+	if msg.Type == chat.DeleteMessage {
+		return ch.deleteMessage(ctx, msg, user, event)
+	}
+
+	return chat.UnexpectedMessageType
+}
+
+func (ch *ChatHandler) deleteMessage(ctx context.Context, msg models.MessageInput, user int64, event string) error {
+	message := models.Message{
+		MessageID: msg.MessageID,
+		EventID:   event,
+		Type:      chat.DeleteMessage,
+	}
+
+	err := ch.useCase.DeleteMessage(ctx, msg.MessageID)
+	if err != nil && !errors.Is(err, chat.ErrNotAllowedToDelete) {
+		ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to delete message")
+		return errors.Wrap(err, "failed to delete message")
+	}
+	if errors.Is(err, chat.ErrNotAllowedToDelete) {
+		message.Error = chat.ErrNotAllowedToDelete.Error()
+	}
+
+	jsonMessage, err := json.Marshal(&message)
+	if err != nil {
+		return errors.Wrap(err, "failed to unmarshal json message")
+	}
+
+	err = ch.writeMessageToClients(ctx, jsonMessage, user, event)
+	if err != nil {
+		return errors.Wrap(err, "failed to write message to clients")
+	}
+
+	return nil
+}
+
+func (ch *ChatHandler) sendTextMessage(ctx context.Context, msg models.MessageInput, user int64, event string) error {
+	messageID, err := uuid.NewV4()
+	if err != nil {
+		return errors.Wrap(err, "failed to generate message id")
+	}
+
+	message := models.Message{
+		MessageID:   messageID.String(),
+		UserID:      user,
+		EventID:     event,
+		Text:        msg.Value,
+		TimeCreated: time.Now().Unix(),
+	}
+
+	err = ch.useCase.CreateMessage(ctx, message)
+	if err != nil {
+		ch.logger.WithCtx(ctx).WithError(err).Error("failed to create message")
+		return errors.Wrap(err, "failed to create message")
+	}
+
+	jsonMessage, err := json.Marshal(&message)
+	if err != nil {
+		return errors.Wrap(err, "failed to unmarshal json message")
+	}
+
+	err = ch.writeMessageToClients(ctx, jsonMessage, user, event)
+	if err != nil {
+		return errors.Wrap(err, "failed to write message to clients")
+	}
+
+	return nil
+}
+
+func (ch *ChatHandler) writeMessageToClients(ctx context.Context, jsonMessage []byte, user int64, event string) error {
+	for _, client := range ch.messenger.Chats[event].Clients {
+		err := client.Socket.WriteMessage(websocket.TextMessage, jsonMessage)
+		if err != nil {
+			ch.logger.WithCtx(ctx).WithError(err).Errorf("failed to write message to %d", client.UserID)
+			ch.messenger.RemoveClientFromChat(event, user)
+			continue
+		}
+
+		err = ch.useCase.UpdateLastCheckTime(ctx, event, client.UserID, time.Now().Unix())
+		if err != nil {
+			return errors.Wrap(err, "failed to update last check time")
+		}
+	}
+
+	return nil
 }

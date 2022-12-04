@@ -6,6 +6,11 @@ import (
 	"sync"
 )
 
+const (
+	CreateTextMessage = "CreateText"
+	DeleteMessage     = "Delete"
+)
+
 type Messenger struct {
 	Mx    sync.Mutex
 	Chats map[string]*Chat
