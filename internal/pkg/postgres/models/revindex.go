@@ -3,9 +3,9 @@ package models
 import "github.com/lib/pq"
 
 type RevindexWord struct {
-	ID     uint          `gorm:"column:id"`
-	Word   string        `gorm:"column:word"`
-	Events pq.Int64Array `gorm:"column:events;type:integer[]"`
+	ID     uint           `gorm:"column:id"`
+	Word   string         `gorm:"column:word"`
+	Events pq.StringArray `gorm:"column:events;type:text[]"`
 }
 
 func (RevindexWord) TableName() string {

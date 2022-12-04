@@ -136,18 +136,20 @@ create table syncer(
 
 create table messages(
                          id serial primary key,
+                         message_uid varchar(256),
                          user_id int references users(id),
                          user_uid int,
                          event_id int references events(id),
                          event_uid varchar(256),
                          text text,
-                         time_created bigint
+                         time_created bigint,
+                         is_deleted bool
 );
 
 create table revindex_words(
                                id serial primary key,
                                word varchar(256) UNIQUE,
-                               events int[]
+                               events text[]
 );
 
 create table revindex_events(

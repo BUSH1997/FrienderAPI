@@ -2,6 +2,7 @@ package revindex
 
 import (
 	"context"
+	eventpkg "github.com/BUSH1997/FrienderAPI/internal/pkg/event"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/models"
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
@@ -30,6 +31,9 @@ func (r eventRepository) Delete(ctx context.Context, event string, groupInfo mod
 
 	for _, term := range oldTerms {
 		err := r.excludeEventIDFromRevindex(term, int64(dbRevindexEvent.ID))
+		if err == eventpkg.ErrNotFoundInIndex {
+			continue
+		}
 		if err != nil {
 			return errors.Wrapf(err, "failed to exclude event id from revindex of %s", term)
 		}
@@ -55,19 +59,19 @@ func (r eventRepository) excludeEventIDFromRevindex(term string, ID int64) error
 	}
 
 	if len(dbRevindexWord.Events) == 0 {
-		return errors.New("expected at least one event id in term revindex")
+		return eventpkg.ErrNotFoundInIndex
 	}
 
-	eventIDPosition := getEventIDPosition(dbRevindexWord.Events, ID)
-	if eventIDPosition == -1 {
+	eventPosition := getEventIDPosition(dbRevindexWord.Events, ID)
+	if eventPosition == -1 {
 		return errors.New("expected event id in term revindex")
 	}
 
-	var eventIDList pq.Int64Array
+	var eventIDList pq.StringArray
 	if len(dbRevindexWord.Events) > 1 {
 		eventIDList = append(
-			dbRevindexWord.Events[0:eventIDPosition],
-			dbRevindexWord.Events[eventIDPosition+1:len(dbRevindexWord.Events)]...,
+			dbRevindexWord.Events[0:eventPosition],
+			dbRevindexWord.Events[eventPosition+1:len(dbRevindexWord.Events)]...,
 		)
 	}
 

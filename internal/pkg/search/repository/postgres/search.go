@@ -5,12 +5,15 @@ import (
 	db_models "github.com/BUSH1997/FrienderAPI/internal/pkg/postgres/models"
 	"github.com/BUSH1997/FrienderAPI/internal/pkg/tools/errors"
 	"gorm.io/gorm"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 func (r searchRepository) GetEventUIDs(ctx context.Context, terms []string) ([]string, error) {
 	ctx = r.logger.WithCaller(ctx)
 
-	var eventIDsArray [][]int64
+	var eventIDsArray []string
 	for _, term := range terms {
 		var dbRevindexWord db_models.RevindexWord
 		res := r.db.Model(&db_models.RevindexWord{}).
@@ -23,14 +26,25 @@ func (r searchRepository) GetEventUIDs(ctx context.Context, terms []string) ([]s
 			return nil, errors.Wrapf(err, "failed to get revindex for word %s", term)
 		}
 
-		eventIDsArray = append(eventIDsArray, dbRevindexWord.Events)
+		eventIDsArray = append(eventIDsArray, dbRevindexWord.Events...)
 	}
 
 	eventIDsMap := make(map[int64]int, 0)
-	for _, eventIDs := range eventIDsArray {
-		for _, eventID := range eventIDs {
-			eventIDsMap[eventID] += 1
+	eventWordPositionMap := make(map[int64]int64, 0)
+	for _, searchEvent := range eventIDsArray {
+		eventIDString := strings.Split(searchEvent, ":")[0]
+		eventID, err := strconv.ParseInt(eventIDString, 10, 64)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to parse event id %s", eventIDString)
 		}
+		wordPositionString := strings.Split(searchEvent, ":")[1]
+		wordPosition, err := strconv.ParseInt(wordPositionString, 10, 64)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to parse word position %s", wordPositionString)
+		}
+
+		eventIDsMap[eventID] += 1
+		eventWordPositionMap[eventID] += wordPosition
 	}
 
 	var eventIDs []int64
@@ -50,6 +64,10 @@ func (r searchRepository) GetEventUIDs(ctx context.Context, terms []string) ([]s
 	if err := res.Error; err != nil {
 		return nil, errors.Wrap(err, "failed to get revindex events")
 	}
+
+	sort.Slice(dbRevindexEvents, func(i, j int) bool {
+		return eventWordPositionMap[int64(dbRevindexEvents[i].ID)] < eventWordPositionMap[int64(dbRevindexEvents[j].ID)]
+	})
 
 	eventUIDs := make([]string, 0, len(dbRevindexEvents))
 	for _, dbRevindexEvent := range dbRevindexEvents {

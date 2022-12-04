@@ -96,7 +96,7 @@ func main() {
 	messenger := chat.NewMessenger()
 
 	chatRepo := chatPostgres.New(db, logger)
-	chatUseCase := chatUsecase.New(chatRepo, logger)
+	chatUseCase := chatUsecase.New(chatRepo, eventRepo, logger)
 	chatHandler := chatHandler.NewChatHandler(chatUseCase, messenger, logger)
 
 	complaintRepo := complaintPostgres.New(db, logger)

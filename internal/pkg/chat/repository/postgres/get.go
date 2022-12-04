@@ -35,6 +35,7 @@ func (r chatRepository) GetMessages(ctx context.Context, opts models.GetMessageO
 		messages = make([]models.Message, 0, len(dbMessages))
 		for _, dbMessage := range dbMessages {
 			message := models.Message{
+				MessageID:   dbMessage.MessageID,
 				UserID:      dbMessage.UserUID,
 				Text:        dbMessage.Text,
 				EventID:     dbMessage.EventUID,

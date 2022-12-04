@@ -25,6 +25,7 @@ func (r chatRepository) CreateMessage(ctx context.Context, message models.Messag
 		}
 
 		dbMessage := db_models.Message{
+			MessageID:   message.MessageID,
 			UserID:      int(dbUser.ID),
 			UserUID:     int64(dbUser.Uid),
 			TimeCreated: message.TimeCreated,
